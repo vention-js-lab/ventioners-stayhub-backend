@@ -1,11 +1,21 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { config } from 'dotenv';
-
-config();
+import { ConfigService } from '@nestjs/config';
+import { EnvConfig, ValidationConfig } from './shared/configs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.APP_PORT);
+
+  app.setGlobalPrefix('api');
+
+  const configService = app.get(ConfigService<EnvConfig>);
+
+  app.useGlobalPipes(ValidationConfig);
+
+  const port = configService.getOrThrow('APP_PORT', {
+    infer: true,
+  });
+
+  await app.listen(port);
 }
 bootstrap();
