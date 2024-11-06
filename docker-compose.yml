@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+  app:
+    build: .
+    container_name: stayHub
+    ports:
+      - '${APP_PORT}:${APP_PORT}'
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:13
+    container_name: postgres_database
+    ports:
+      - '5555:5555'
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:
