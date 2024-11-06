@@ -32,6 +32,14 @@
 $ npm install
 ```
 
+## Create your own .env according to .env.example
+
+## Install docker and run command
+
+```bash
+$ docker compose up --build -d
+```
+
 ## Running the app
 
 ```bash
