@@ -4,6 +4,7 @@ import {
   UsersSortBy,
   UsersSortOrder,
 } from '../../constants/users-sort-params.constant';
+import { Transform } from 'class-transformer';
 
 export class UserSearchParamsReqDto {
   @TransformToInt()
@@ -23,6 +24,12 @@ export class UserSearchParamsReqDto {
   @IsEnum(UsersSortBy)
   sort_by?: UsersSortBy;
 
+  @Transform(
+    ({ value }) => {
+      return value.toUpperCase();
+    },
+    { toClassOnly: true },
+  )
   @IsOptional()
   @IsEnum(UsersSortOrder)
   sort_order?: UsersSortOrder;

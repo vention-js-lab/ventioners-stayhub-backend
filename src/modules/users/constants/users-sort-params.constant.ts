@@ -1,9 +1,9 @@
 export enum UsersSortBy {
   Email = 'email',
-  FirstName = 'firstName',
-  LastName = 'lastName',
-  CreatedAt = 'createdAt',
-  UpdatedAt = 'updatedAt',
+  FirstName = 'first_name',
+  LastName = 'last_name',
+  CreatedAt = 'created_at',
+  UpdatedAt = 'updated_at',
 }
 
 export enum UsersSortOrder {
