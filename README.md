@@ -40,6 +40,12 @@ $ npm install
 $ docker compose up --build -d
 ```
 
+## Run migrations
+
+```bash
+$ npm run migration:run
+```
+
 ## Running the app
 
 ```bash
