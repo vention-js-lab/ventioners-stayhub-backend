@@ -62,7 +62,6 @@ describe('UsersController', () => {
         data: mockUsers,
         totalCount: mockUsers.length,
         totalPages: 1,
-        message: 'Users retrieved successfully',
       });
     });
   });
@@ -71,7 +70,6 @@ describe('UsersController', () => {
     it("returns a user's information", () => {
       expect(controller.getUser('1')).resolves.toEqual({
         data: mockUsers[0],
-        message: 'User retrieved successfully',
       });
     });
   });
@@ -87,7 +85,6 @@ describe('UsersController', () => {
 
       expect(controller.createUser(createUserDto)).resolves.toEqual({
         data: mockUsers[0],
-        message: 'User created successfully',
       });
     });
   });
@@ -102,7 +99,6 @@ describe('UsersController', () => {
 
       expect(controller.updateUser(updateUserDto, '1')).resolves.toEqual({
         data: mockUsers[0],
-        message: 'User updated successfully',
       });
     });
   });

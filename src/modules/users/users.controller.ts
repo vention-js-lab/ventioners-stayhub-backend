@@ -30,7 +30,6 @@ export class UsersController {
       data: users,
       totalCount: totalCount,
       totalPages: totalPages,
-      message: 'Users retrieved successfully',
     };
   }
 
@@ -40,7 +39,6 @@ export class UsersController {
 
     return {
       data: user,
-      message: 'User retrieved successfully',
     };
   }
 
@@ -53,7 +51,6 @@ export class UsersController {
 
     return {
       data: newUser,
-      message: 'User created successfully',
     };
   }
 
@@ -72,7 +69,6 @@ export class UsersController {
 
     return {
       data: updatedUser,
-      message: 'User updated successfully',
     };
   }
 }
