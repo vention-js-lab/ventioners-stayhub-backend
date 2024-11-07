@@ -10,7 +10,7 @@ import { Hasher } from 'src/shared/libs/hasher.lib';
 export class AuthService {
   constructor(
     @InjectRepository(Auth)
-    private readonly userRepository: Repository<Auth>,
+    private readonly authRepository: Repository<Auth>,
     private jwtService: JwtService,
   ) {}
 
@@ -18,28 +18,28 @@ export class AuthService {
     const { email, password, first_name, last_name } = registerDto;
     const hashedPassword = await Hasher.hashValue(password);
 
-    const existingUser = await this.userRepository.findOne({
+    const existingUser = await this.authRepository.findOne({
       where: { email },
     });
     if (existingUser) {
       throw new BadRequestException('Email already exists in the system');
     }
 
-    const user = this.userRepository.create({
+    const user = this.authRepository.create({
       email,
       password: hashedPassword,
       first_name,
       last_name,
     });
-    await this.userRepository.save(user);
+    await this.authRepository.save(user);
 
     const payload = { sub: user.id, userEmail: user.email };
-    const accessToken = await this.generateAccesssToken(payload);
+    const accessToken = await this.generateAccessToken(payload);
 
     return { accessToken };
   }
 
-  async generateAccesssToken(payload: { sub: string; userEmail: string }) {
+  async generateAccessToken(payload: { sub: string; userEmail: string }) {
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: process.env.AUTH_TOKEN_SECRET,
       expiresIn: process.env.AUTH_TOKEN_EXPIRES_IN,
