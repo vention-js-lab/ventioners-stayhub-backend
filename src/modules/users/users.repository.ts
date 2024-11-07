@@ -1,6 +1,11 @@
 import { User } from './entities/user.entity';
 import { UserSearchParamsReqDto, CreateUserReqDto } from './dto/request';
-import { DataSource, DeleteResult, Repository } from 'typeorm';
+import {
+  DataSource,
+  DeleteResult,
+  FindOptionsWhere,
+  Repository,
+} from 'typeorm';
 
 export class UsersRepository extends Repository<User> {
   constructor(private readonly dataSource: DataSource) {
@@ -37,12 +42,8 @@ export class UsersRepository extends Repository<User> {
     };
   }
 
-  async getUserById(userId: string): Promise<User | null> {
-    return await this.findOneBy({ id: userId });
-  }
-
-  async getUserByEmail(email: string): Promise<User | null> {
-    return await this.findOneBy({ email });
+  async getUserBy(options: FindOptionsWhere<User>): Promise<User | null> {
+    return await this.findOneBy(options);
   }
 
   async createUser(dto: CreateUserReqDto): Promise<User> {

@@ -26,7 +26,7 @@ export class UsersService {
   }
 
   async getUser(userId: string): Promise<User> {
-    const user = await this.usersRepository.getUserById(userId);
+    const user = await this.usersRepository.getUserBy({ id: userId });
 
     if (!user) {
       throw new NotFoundException(`User with id ${userId} not found`);
@@ -36,7 +36,7 @@ export class UsersService {
   }
 
   async createUser(dto: CreateUserReqDto): Promise<User> {
-    const user = await this.usersRepository.getUserByEmail(dto.email);
+    const user = await this.usersRepository.getUserBy({ email: dto.email });
 
     if (user) {
       throw new BadRequestException(

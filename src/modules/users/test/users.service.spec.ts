@@ -4,6 +4,8 @@ import { mockUsers } from './users.mock';
 import { UsersRepository } from '../users.repository';
 import { CreateUserReqDto, UpdateUserReqDto } from '../dto/request';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { FindOptionsWhere } from 'typeorm';
+import { User } from '../entities/user.entity';
 
 const mockUser = mockUsers[0];
 
@@ -13,11 +15,12 @@ const mockUsersRepository = {
     totalCount: mockUsers.length,
     totalPages: 1,
   }),
-  getUserById: jest.fn().mockImplementation((userId: string) => {
-    return userId === 'existing-user-id' ? mockUser : null;
-  }),
-  getUserByEmail: jest.fn().mockImplementation((email: string) => {
-    return email === 'existingemail@gmail.com' ? mockUser : null;
+  getUserBy: jest.fn().mockImplementation((options: FindOptionsWhere<User>) => {
+    if (options.id) {
+      return options.id === 'existing-user-id' ? mockUser : null;
+    } else if (options.email) {
+      return options.email === 'existingemail@gmail.com' ? mockUser : null;
+    }
   }),
   createUser: jest.fn().mockResolvedValue(mockUser),
   updateUser: jest.fn().mockImplementation((_dto, userId) => {
