@@ -9,6 +9,9 @@ const envConfigSchema = z.object({
   DB_USER: z.string(),
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
+
+  AUTH_ACCESS_TOKEN_SECRET: z.string(),
+  AUTH_ACCESS_TOKEN_EXPIRES_IN: z.string(),
 });
 
 export type EnvConfig = z.infer<typeof envConfigSchema>;
