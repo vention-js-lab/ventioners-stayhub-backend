@@ -16,12 +16,22 @@ import {
   CreateUserReqDto,
   UpdateUserReqDto,
 } from './dto/request';
+import { ApiTags } from '@nestjs/swagger';
+import {
+  CreateUserSwaggerDecorator,
+  DeleteUserSwaggerDecorator,
+  GetUserSwaggerDecorator,
+  GetUsersSwaggerDecorator,
+  UpdateUserSwaggerDecorator,
+} from './decorators/swagger.decorator';
 
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('')
+  @GetUsersSwaggerDecorator()
   async getUsers(@Query() searchParams: UserSearchParamsReqDto) {
     const { users, totalCount, totalPages } =
       await this.usersService.getUsers(searchParams);
@@ -34,6 +44,7 @@ export class UsersController {
   }
 
   @Get(':userId')
+  @GetUserSwaggerDecorator()
   async getUser(@Param('userId', new ParseUUIDV4Pipe()) userId: string) {
     const user = await this.usersService.getUser(userId);
 
@@ -43,6 +54,7 @@ export class UsersController {
   }
 
   @Post('')
+  @CreateUserSwaggerDecorator()
   async createUser(
     @Body()
     dto: CreateUserReqDto,
@@ -55,12 +67,14 @@ export class UsersController {
   }
 
   @Delete(':userId')
+  @DeleteUserSwaggerDecorator()
   @HttpCode(204)
   async deleteUser(@Param('userId', new ParseUUIDV4Pipe()) userId: string) {
     await this.usersService.deleteUser(userId);
   }
 
   @Put(':userId')
+  @UpdateUserSwaggerDecorator()
   async updateUser(
     @Body() dto: UpdateUserReqDto,
     @Param('userId', new ParseUUIDV4Pipe()) userId: string,
