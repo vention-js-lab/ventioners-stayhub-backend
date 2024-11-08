@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
@@ -5,31 +6,24 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { MatchField } from 'src/shared/validators/match-field.validator';
-
 export class RegisterDto {
   @IsEmail()
-  @IsNotEmpty({ message: 'Email must not be empty' })
+  @MaxLength(255)
+  @Transform(({ value }) => value.toLowerCase())
   email: string;
 
   @IsString()
-  @MinLength(6, {
-    message: 'Password is too short. Minimum length is 6 characters.',
-  })
-  @MaxLength(22, {
-    message: 'Password is too long. Maximum length is 22 characters.',
-  })
-  @IsNotEmpty({ message: 'Password must not be empty' })
+  @MinLength(8)
+  @MaxLength(255)
   password: string;
 
   @IsString()
-  @MatchField('password', { message: 'Password confirmation should match.' })
-  passwordConfirmation: string;
+  @IsNotEmpty()
+  @MaxLength(255)
+  firstName: string;
 
   @IsString()
-  @IsNotEmpty({ message: 'First name must not be empty' })
-  first_name: string;
-
-  @IsString()
-  last_name: string;
+  @IsNotEmpty()
+  @MaxLength(255)
+  lastName: string;
 }

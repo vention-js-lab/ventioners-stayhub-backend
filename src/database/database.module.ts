@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { User } from 'src/modules/users/entities/user.entity';
-import { Auth } from '../modules/auth/entities/auth.entity';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
@@ -14,13 +13,13 @@ import { Auth } from '../modules/auth/entities/auth.entity';
         username: configService.get('DB_USER'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [User, Auth],
+        entities: [User],
         migrations: [`./migrations/**/*{.ts,.js}`],
         ssl: configService.get('NODE_ENV') === 'production',
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([User, Auth]), // Add your ennities here to be able to use them in your services
+    TypeOrmModule.forFeature([User]), // Add your ennities here to be able to use them in your services
   ],
   exports: [TypeOrmModule],
 })
