@@ -5,6 +5,9 @@ import { validateEnv } from './shared/configs';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { OAuthModule } from './modules';
+import { config } from 'dotenv';
+
+config();
 
 @Module({
   imports: [

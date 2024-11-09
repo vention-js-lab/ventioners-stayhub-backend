@@ -6,13 +6,13 @@ import { generateToken } from 'src/shared';
 export class OAuthService {
   constructor(readonly userRepository: UsersRepository) {}
   async googleLogin(req) {
-    const isUserExist = await this.userRepository.getUserBy({
+    const user = await this.userRepository.getUserBy({
       email: req.user.email,
     });
 
-    if (isUserExist) {
-      const accessToken = generateToken(isUserExist.id, '72h');
-      const refreshToken = generateToken(isUserExist.id, '30d');
+    if (user) {
+      const accessToken = generateToken(user.id, '72h');
+      const refreshToken = generateToken(user.id, '30d');
 
       return {
         message: 'User information from google',

@@ -3,7 +3,7 @@ import { Controller, Get, Request, Response, UseGuards } from '@nestjs/common';
 import { OAuthService } from './oAuth.service';
 
 @Controller('auth')
-export class AppController {
+export class OAppController {
   constructor(private readonly appService: OAuthService) {}
 
   @Get('google/login')
