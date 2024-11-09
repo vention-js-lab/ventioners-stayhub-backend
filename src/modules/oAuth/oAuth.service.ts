@@ -1,18 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../users/users.repository';
-import { generateToken } from 'src/shared';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class OAuthService {
-  constructor(readonly userRepository: UsersRepository) {}
+  constructor(
+    readonly userRepository: UsersRepository,
+    private readonly jwtService: JwtService,
+  ) {}
   async googleLogin(req) {
     const user = await this.userRepository.getUserBy({
       email: req.user.email,
     });
 
     if (user) {
-      const accessToken = generateToken(user.id, '72h');
-      const refreshToken = generateToken(user.id, '30d');
+      const accessToken = this.jwtService.sign(
+        { id: user.id },
+        { expiresIn: '72h' },
+      );
+      const refreshToken = this.jwtService.sign(
+        { id: user.id },
+        { expiresIn: '30d' },
+      );
 
       return {
         message: 'User information from google',
@@ -27,8 +36,14 @@ export class OAuthService {
         lastName: req.user.lastName,
         password: '',
       });
-      const accessToken = generateToken(user.id, '72h');
-      const refreshToken = generateToken(user.id, '30d');
+      const accessToken = this.jwtService.sign(
+        { id: user.id },
+        { expiresIn: '72h' },
+      );
+      const refreshToken = this.jwtService.sign(
+        { id: user.id },
+        { expiresIn: '30d' },
+      );
 
       return {
         message: 'User information from google',
