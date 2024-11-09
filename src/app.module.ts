@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { validateEnv } from './shared/configs';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { OAuthModule } from './modules';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthModule } from './modules/auth/auth.module';
     DatabaseModule,
     UsersModule,
     AuthModule,
+    OAuthModule,
   ],
 })
 export class AppModule {}
