@@ -3,8 +3,6 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
-import { UsersRepository } from '../users/users.repository';
-import { DataSource } from 'typeorm';
 
 @Module({
   imports: [
@@ -14,14 +12,7 @@ import { DataSource } from 'typeorm';
     }),
     UsersModule,
   ],
-  providers: [
-    AuthService,
-    {
-      provide: UsersRepository,
-      useFactory: (dataSource: DataSource) => new UsersRepository(dataSource),
-      inject: [DataSource],
-    },
-  ],
+  providers: [AuthService],
   controllers: [AuthController],
 })
 export class AuthModule {}
