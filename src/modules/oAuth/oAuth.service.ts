@@ -1,56 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../users/users.repository';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OAuthService {
   constructor(
-    readonly userRepository: UsersRepository,
+    private userRepository: UsersRepository,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
-  async googleLogin(req) {
-    const user = await this.userRepository.getUserBy({
-      email: req.user.email,
+  async googleLogin(payload: any) {
+    let user = await this.userRepository.getUserBy({
+      email: payload?.email,
     });
 
-    if (user) {
-      const accessToken = this.jwtService.sign(
-        { id: user.id },
-        { expiresIn: '72h' },
-      );
-      const refreshToken = this.jwtService.sign(
-        { id: user.id },
-        { expiresIn: '30d' },
-      );
-
-      return {
-        message: 'User information from google',
-        user: req.user,
-        accessToken,
-        refreshToken,
-      };
-    } else {
-      const user = await this.userRepository.createUser({
-        email: req.user.email,
-        firstName: req.user.firstName,
-        lastName: req.user.lastName,
+    if (!user) {
+      user = await this.userRepository.createUser({
+        email: payload?.email,
+        firstName: payload?.firstName,
+        lastName: payload?.lastName,
         password: '',
       });
-      const accessToken = this.jwtService.sign(
-        { id: user.id },
-        { expiresIn: '72h' },
-      );
-      const refreshToken = this.jwtService.sign(
-        { id: user.id },
-        { expiresIn: '30d' },
-      );
-
-      return {
-        message: 'User information from google',
-        user: req.user,
-        accessToken,
-        refreshToken,
-      };
     }
+    const accessToken = this.jwtService.sign(
+      { sub: user.id },
+      { expiresIn: this.configService.get('AUTH_ACCESS_TOKEN_EXPIRES_IN') },
+    );
+    const refreshToken = this.jwtService.sign(
+      { sub: user.id },
+      { expiresIn: this.configService.get('AUTH_REFRESH_TOKEN_EXPIRES_IN') },
+    );
+
+    return {
+      message: 'User information from google',
+      user: user,
+      accessToken,
+      refreshToken,
+    };
   }
 }
