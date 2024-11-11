@@ -3,25 +3,23 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
-import { UsersRepository } from '../users/users.repository';
-import { DataSource } from 'typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    JwtModule.register({
-      secret: process.env.AUTH_TOKEN_SECRET,
-      signOptions: { expiresIn: process.env.AUTH_TOKEN_EXPIRES_IN },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('AUTH_ACCESS_TOKEN_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('AUTH_ACCESS_TOKEN_EXPIRES_IN'),
+        },
+      }),
     }),
     UsersModule,
   ],
-  providers: [
-    AuthService,
-    {
-      provide: UsersRepository,
-      useFactory: (dataSource: DataSource) => new UsersRepository(dataSource),
-      inject: [DataSource],
-    },
-  ],
+  providers: [AuthService],
   controllers: [AuthController],
 })
 export class AuthModule {}

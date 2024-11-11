@@ -4,6 +4,7 @@ import { RegisterDto } from './dto/request/register.dto';
 import { Hasher } from '../../shared/libs/hasher.lib';
 import { UsersRepository } from '../users/users.repository';
 import { ConfigService } from '@nestjs/config';
+import { LoginDto } from './dto/request/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -30,11 +31,32 @@ export class AuthService {
     });
 
     const payload = { sub: createdUser.id, userEmail: createdUser.email };
-    const accessToken = await this.generateAccessToken(payload);
+    const accessToken = await this.jwtService.signAsync(payload);
 
     return { accessToken };
   }
 
+  async login(loginDto: LoginDto) {
+    const user = await this.usersRepository.findOne({
+      where: { email: loginDto.email },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Invalid email or password');
+    }
+
+    const isPasswordValid = await Hasher.verifyHash(
+      user.passwordHash,
+      loginDto.password,
+    );
+    if (!isPasswordValid) {
+      throw new BadRequestException('Invalid email or password');
+    }
+    const payload = { sub: user.id, userEmail: user.email };
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    return { accessToken };
+  }
   async generateAccessToken(payload: { sub: string; userEmail: string }) {
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: this.configService.get('AUTH_ACCESS_TOKEN_SECRET'),
