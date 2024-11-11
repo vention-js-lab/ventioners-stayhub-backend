@@ -16,5 +16,6 @@ import { DataSource } from 'typeorm';
     },
     UsersService,
   ],
+  exports: [UsersRepository],
 })
 export class UsersModule {}
