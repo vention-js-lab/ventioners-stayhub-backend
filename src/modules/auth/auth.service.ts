@@ -31,7 +31,7 @@ export class AuthService {
     });
 
     const payload = { sub: createdUser.id, userEmail: createdUser.email };
-    const accessToken = await this.generateAccessToken(payload);
+    const accessToken = await this.jwtService.signAsync(payload);
 
     return { accessToken };
   }
@@ -53,7 +53,7 @@ export class AuthService {
       throw new BadRequestException('Invalid email or password');
     }
     const payload = { sub: user.id, userEmail: user.email };
-    const accessToken = await this.generateAccessToken(payload);
+    const accessToken = await this.jwtService.signAsync(payload);
 
     return { accessToken };
   }
