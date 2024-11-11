@@ -34,8 +34,6 @@ export class OAuthService {
     );
 
     return {
-      message: 'User information from google',
-      user: user,
       accessToken,
       refreshToken,
     };
