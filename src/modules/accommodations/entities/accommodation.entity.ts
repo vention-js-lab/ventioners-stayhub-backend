@@ -3,9 +3,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Amenity } from './amenity.entity';
 
 @Entity()
 export class Accommodation {
@@ -45,6 +48,20 @@ export class Accommodation {
     default: AccommodationStatus.PENDING_APPROVAL,
   })
   status: AccommodationStatus;
+
+  @ManyToMany(() => Amenity, (amenity) => amenity.accommodations)
+  @JoinTable({
+    name: 'accommodation_amenities',
+    joinColumn: {
+      name: 'accommodationId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'amenityId',
+      referencedColumnName: 'id',
+    },
+  })
+  amenities: Amenity[];
 
   @CreateDateColumn({
     name: 'created_at',
