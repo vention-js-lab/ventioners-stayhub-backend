@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { OAuthService } from './oAuth.service';
 import { ConfigService } from '@nestjs/config';
-import { User } from 'src/shared/decorators/user.decorator';
+import { GetUser } from 'src/shared/decorators/user.decorator';
 
 @Controller('auth')
 export class OAppController {
@@ -23,7 +23,7 @@ export class OAppController {
 
   @Get('google/callback')
   @UseGuards(GoogleOAuthGuard)
-  async googleAuthRedirect(@User() user, @Response() res) {
+  async googleAuthRedirect(@GetUser() user, @Response() res) {
     if (!user) {
       throw new UnauthorizedException('User is not authenticated');
     }

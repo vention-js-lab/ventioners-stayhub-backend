@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../users/users.repository';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { GoogleUserCreateDto } from './dtos';
 
 @Injectable()
 export class OAuthService {
@@ -10,7 +11,7 @@ export class OAuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
-  async googleLogin(payload: any) {
+  async googleLogin(payload: GoogleUserCreateDto) {
     let user = await this.userRepository.getUserBy({
       email: payload?.email,
     });
