@@ -12,6 +12,12 @@ const envConfigSchema = z.object({
 
   AUTH_ACCESS_TOKEN_SECRET: z.string(),
   AUTH_ACCESS_TOKEN_EXPIRES_IN: z.string(),
+  AUTH_REFRESH_TOKEN_EXPIRES_IN: z.string(),
+
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
+  GOOGLE_CLIENT_CALLBACK_URL: z.string(),
+  GOOGLE_CLIENT_REDIRECT_URL: z.string(),
 });
 
 export type EnvConfig = z.infer<typeof envConfigSchema>;
