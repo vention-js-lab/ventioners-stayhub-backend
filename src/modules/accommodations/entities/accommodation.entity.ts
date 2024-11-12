@@ -1,10 +1,12 @@
-import { AccommodationStatus } from 'src/shared/constants';
+import {
+  AccommodationCategory,
+  AccommodationStatus,
+} from 'src/shared/constants';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -39,8 +41,13 @@ export class Accommodation {
   })
   price_per_night: number;
 
-  @Column('text', { array: true })
-  type: string[];
+  @Column({
+    type: 'enum',
+    enum: AccommodationCategory,
+    array: true,
+    default: [AccommodationCategory.HOTEL],
+  })
+  categories: AccommodationCategory[];
 
   @Column({
     type: 'enum',
@@ -49,18 +56,7 @@ export class Accommodation {
   })
   status: AccommodationStatus;
 
-  @ManyToMany(() => Amenity, (amenity) => amenity.accommodations)
-  @JoinTable({
-    name: 'accommodation_amenities',
-    joinColumn: {
-      name: 'accommodationId',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'amenityId',
-      referencedColumnName: 'id',
-    },
-  })
+  @OneToMany(() => Amenity, (amenity) => amenity.accommodation)
   amenities: Amenity[];
 
   @CreateDateColumn({
