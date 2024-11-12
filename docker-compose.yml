@@ -10,6 +10,16 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  cache:
+    image: redis
+    ports:
+      - '${REDIS_PORT}:6379'
+    command: redis-server --loglevel warning --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - cache:/data
+    restart: always
 
 volumes:
   postgres_data:
+  cache:
+    driver: local
