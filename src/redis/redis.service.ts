@@ -2,6 +2,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { RedisCache } from 'cache-manager-redis-yet';
 import { RedisClientType } from 'redis';
+import { parseJSON } from 'src/shared/helpers';
 
 @Injectable()
 export class RedisService {
@@ -33,25 +34,23 @@ export class RedisService {
     return await this.redis.del(key);
   }
 
-  async hGet<T>(key: string, field: string): Promise<T | undefined> {
+  async hGet<T>(key: string, field: string): Promise<T | string | undefined> {
     const result = await this.redis.hGet(key, field);
 
-    return this.isJSONString(result) ? JSON.parse(result) : result;
+    return parseJSON<T>(result);
   }
 
-  async hGetAll<T>(key: string): Promise<{ [key: string]: T } | null> {
+  async hGetAll<T>(key: string): Promise<{ [key: string]: T | string } | null> {
     const result = await this.redis.hGetAll(key);
 
     if (Object.keys(result).length === 0) {
       return null;
     }
 
-    const parsedResult: { [key: string]: T } = {};
+    const parsedResult: { [key: string]: T | string } = {};
 
     for (const field in result) {
-      parsedResult[field] = this.isJSONString(result[field])
-        ? JSON.parse(result[field])
-        : result[field];
+      parsedResult[field] = parseJSON<T>(result[field]);
     }
 
     return parsedResult;
@@ -75,15 +74,5 @@ export class RedisService {
     mode?: 'NX' | 'XX' | 'GT' | 'LT',
   ): Promise<boolean> {
     return await this.redis.expire(key, time, mode);
-  }
-
-  private isJSONString(str: string): boolean {
-    try {
-      JSON.parse(str);
-
-      return true;
-    } catch {
-      return false;
-    }
   }
 }
