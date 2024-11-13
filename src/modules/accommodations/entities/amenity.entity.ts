@@ -1,4 +1,3 @@
-import { AmenityCategory } from 'src/shared/constants';
 import {
   Column,
   CreateDateColumn,
@@ -22,13 +21,6 @@ export class Amenity {
 
   @Column({ type: 'text', nullable: true })
   description: string;
-
-  @Column({
-    type: 'enum',
-    enum: AmenityCategory,
-    default: AmenityCategory.FEATURES,
-  })
-  category: AmenityCategory;
 
   @Column({ type: 'varchar' })
   icon: string;
