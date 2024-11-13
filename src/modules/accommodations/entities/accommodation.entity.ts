@@ -1,16 +1,14 @@
-import { AccommodationType, AccommodationStatus } from 'src/shared/constants';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Amenity } from './amenity.entity';
-import { AccommodationCategory } from './accommodation-category.entity';
+import { AccommodationCategory } from './category.entity';
 
 @Entity()
 export class Accommodation {
@@ -40,20 +38,6 @@ export class Accommodation {
     type: 'decimal',
   })
   pricePerNight: number;
-
-  @Column({
-    type: 'enum',
-    enum: AccommodationType,
-  })
-  @Index()
-  type: AccommodationType;
-
-  @Column({
-    type: 'enum',
-    enum: AccommodationStatus,
-    default: AccommodationStatus.PENDING_APPROVAL,
-  })
-  status: AccommodationStatus;
 
   @OneToMany(() => Amenity, (amenity) => amenity.accommodation)
   amenities: Amenity[];
