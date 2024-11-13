@@ -27,6 +27,9 @@ export class Accommodation {
   })
   description: string;
 
+  @Column('text', { array: true })
+  images: string[];
+
   @Column({
     type: 'varchar',
     length: 200,
