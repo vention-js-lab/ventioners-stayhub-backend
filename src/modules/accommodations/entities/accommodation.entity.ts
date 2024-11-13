@@ -2,8 +2,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -42,7 +43,18 @@ export class Accommodation {
   })
   pricePerNight: number;
 
-  @OneToMany(() => Amenity, (amenity) => amenity.accommodation)
+  @ManyToMany(() => Amenity)
+  @JoinTable({
+    name: 'accommodation_amenities', // name of the junction table
+    joinColumn: {
+      name: 'accommodation_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'amenity_id',
+      referencedColumnName: 'id',
+    },
+  })
   amenities: Amenity[];
 
   @ManyToOne(() => AccommodationCategory, (category) => category.accommodations)

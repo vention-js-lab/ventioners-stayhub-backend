@@ -2,7 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -25,8 +25,8 @@ export class Amenity {
   @Column({ type: 'varchar' })
   icon: string;
 
-  @ManyToOne(() => Accommodation)
-  accommodation: Accommodation;
+  @ManyToMany(() => Accommodation)
+  accommodations: Accommodation[];
 
   @CreateDateColumn({
     name: 'created_at',
