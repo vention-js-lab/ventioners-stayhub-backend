@@ -4,7 +4,7 @@ import { RedisCache } from 'cache-manager-redis-yet';
 import { RedisClientType } from 'redis';
 
 @Injectable()
-export class RedisCacheService {
+export class RedisService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: RedisCache) {}
 
   get redis(): RedisClientType {
