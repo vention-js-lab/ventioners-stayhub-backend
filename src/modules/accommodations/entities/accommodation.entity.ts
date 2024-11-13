@@ -6,6 +6,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -45,7 +46,8 @@ export class Accommodation {
     type: 'enum',
     enum: AccommodationCategory,
   })
-  categories: AccommodationCategory;
+  @Index()
+  category: AccommodationCategory;
 
   @Column({
     type: 'enum',
