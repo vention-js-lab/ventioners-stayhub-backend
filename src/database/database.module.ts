@@ -1,7 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { Accommodation, Amenity } from 'src/modules/accommodations/entities';
+import {
+  Accommodation,
+  AccommodationCategory,
+  Amenity,
+} from 'src/modules/accommodations/entities';
 import { User } from 'src/modules/users/entities/user.entity';
 @Module({
   imports: [
@@ -20,7 +24,12 @@ import { User } from 'src/modules/users/entities/user.entity';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([User, Accommodation, Amenity]), // Add your ennities here to be able to use them in your services
+    TypeOrmModule.forFeature([
+      User,
+      Accommodation,
+      Amenity,
+      AccommodationCategory,
+    ]), // Add your ennities here to be able to use them in your services
   ],
   exports: [TypeOrmModule],
 })
