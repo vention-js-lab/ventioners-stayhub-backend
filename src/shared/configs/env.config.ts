@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 const envConfigSchema = z.object({
   APP_PORT: z.coerce.number().int().positive(),
+  CLIENT_URL: z.string(),
+
   NODE_ENV: z.enum(['development', 'production', 'test']),
 
   DB_HOST: z.string(),

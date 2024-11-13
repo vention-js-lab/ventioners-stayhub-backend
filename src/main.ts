@@ -15,6 +15,11 @@ async function bootstrap() {
 
   app.useGlobalPipes(ValidationConfig);
 
+  app.enableCors({
+    origin: [configService.get('CLIENT_URL')],
+    credentials: true,
+  });
+
   const port = configService.getOrThrow('APP_PORT', {
     infer: true,
   });
