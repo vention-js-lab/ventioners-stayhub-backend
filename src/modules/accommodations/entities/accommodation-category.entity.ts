@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Accommodation } from './accommodation.entity';
 
 @Entity()
 export class AccommodationCategory {
@@ -21,7 +23,10 @@ export class AccommodationCategory {
     type: 'varchar',
     length: 255,
   })
-  description: string;
+  icon: string;
+
+  @OneToMany(() => Accommodation, (accommodation) => accommodation.category)
+  accommodations: Accommodation[];
 
   @CreateDateColumn({
     name: 'created_at',

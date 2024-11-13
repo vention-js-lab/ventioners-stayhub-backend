@@ -4,11 +4,13 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Amenity } from './amenity.entity';
+import { AccommodationCategory } from './accommodation-category.entity';
 
 @Entity()
 export class Accommodation {
@@ -55,6 +57,9 @@ export class Accommodation {
 
   @OneToMany(() => Amenity, (amenity) => amenity.accommodation)
   amenities: Amenity[];
+
+  @ManyToOne(() => AccommodationCategory, (category) => category.accommodations)
+  category: AccommodationCategory;
 
   @CreateDateColumn({
     name: 'created_at',
