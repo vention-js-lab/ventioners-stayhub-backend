@@ -44,10 +44,8 @@ export class Accommodation {
   @Column({
     type: 'enum',
     enum: AccommodationCategory,
-    array: true,
-    default: [AccommodationCategory.HOTEL],
   })
-  categories: AccommodationCategory[];
+  categories: AccommodationCategory;
 
   @Column({
     type: 'enum',
