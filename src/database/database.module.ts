@@ -18,7 +18,7 @@ import { User } from 'src/modules/users/entities/user.entity';
         username: configService.get('DB_USER'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [User, Accommodation, Amenity],
+        entities: [User, Accommodation, Amenity, AccommodationCategory],
         migrations: [`./migrations/**/*{.ts,.js}`],
         ssl: configService.get('NODE_ENV') === 'production',
       }),
