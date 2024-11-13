@@ -24,12 +24,6 @@ import { User } from 'src/modules/users/entities/user.entity';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([
-      User,
-      Accommodation,
-      Amenity,
-      AccommodationCategory,
-    ]), // Add your ennities here to be able to use them in your services
   ],
   exports: [TypeOrmModule],
 })
