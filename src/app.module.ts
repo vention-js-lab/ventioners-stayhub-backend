@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '@database';
+import { RedisModule } from './redis/redis.module';
 import { ConfigModule } from '@nestjs/config';
 import { validateEnv } from './shared/configs';
 import { UsersModule } from './modules/users/users.module';
@@ -14,6 +15,7 @@ import { OAuthModule } from './modules';
       validate: validateEnv,
     }),
     DatabaseModule,
+    RedisModule,
     UsersModule,
     AuthModule,
     OAuthModule,

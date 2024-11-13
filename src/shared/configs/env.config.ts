@@ -10,8 +10,14 @@ const envConfigSchema = z.object({
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
 
+  REDIS_HOST: z.string(),
+  REDIS_PORT: z.coerce.number().int().positive(),
+  REDIS_PASSWORD: z.string(),
+
   AUTH_ACCESS_TOKEN_SECRET: z.string(),
   AUTH_ACCESS_TOKEN_EXPIRES_IN: z.string(),
+
+  AUTH_REFRESH_TOKEN_SECRET: z.string(),
   AUTH_REFRESH_TOKEN_EXPIRES_IN: z.string(),
 
   GOOGLE_CLIENT_ID: z.string(),
