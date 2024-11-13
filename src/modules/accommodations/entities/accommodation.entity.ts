@@ -40,7 +40,7 @@ export class Accommodation {
     name: 'price_per_night',
     type: 'decimal',
   })
-  price_per_night: number;
+  pricePerNight: number;
 
   @Column({
     type: 'enum',
