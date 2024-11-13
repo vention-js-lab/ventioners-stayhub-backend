@@ -1,7 +1,4 @@
-import {
-  AccommodationCategory,
-  AccommodationStatus,
-} from 'src/shared/constants';
+import { AccommodationType, AccommodationStatus } from 'src/shared/constants';
 import {
   Column,
   CreateDateColumn,
@@ -44,10 +41,10 @@ export class Accommodation {
 
   @Column({
     type: 'enum',
-    enum: AccommodationCategory,
+    enum: AccommodationType,
   })
   @Index()
-  category: AccommodationCategory;
+  type: AccommodationType;
 
   @Column({
     type: 'enum',

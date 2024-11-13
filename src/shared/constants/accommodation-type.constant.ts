@@ -1,4 +1,4 @@
-export enum AccommodationCategory {
+export enum AccommodationType {
   HOTEL = 'hotel',
   APARTMENT = 'apartment',
   VILLA = 'villa',
