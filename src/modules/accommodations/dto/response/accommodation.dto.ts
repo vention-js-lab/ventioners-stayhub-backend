@@ -17,9 +17,6 @@ export class AccommodationDto {
   pricePerNight: number;
 
   @ApiProperty()
-  categoryId: string;
-
-  @ApiProperty()
   images: string[];
 
   @ApiProperty()
