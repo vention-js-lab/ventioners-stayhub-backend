@@ -9,10 +9,6 @@ export class SearchAccommodationParamsDto {
   @IsOptional()
   category: string;
 
-  @IsString()
-  @IsOptional()
-  location: string;
-
   @IsDate()
   @IsOptional()
   fromDate: Date;
