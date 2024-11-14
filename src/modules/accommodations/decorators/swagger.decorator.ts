@@ -5,7 +5,6 @@ import { GetManyAccommodationResponseDto } from '../dto/response';
 export function GetAccommodationsSwaggerDecorator() {
   return applyDecorators(
     ApiOkResponse({
-      description: 'Accommodations retrieved successfully',
       type: GetManyAccommodationResponseDto,
     }),
     ApiQuery({

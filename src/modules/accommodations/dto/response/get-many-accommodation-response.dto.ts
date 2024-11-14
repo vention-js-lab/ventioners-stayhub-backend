@@ -3,11 +3,17 @@ import { AccommodationDto } from './accommodation.dto';
 
 export class GetManyAccommodationResponseDto {
   @ApiProperty({ type: AccommodationDto, isArray: true })
-  items: AccommodationDto[];
+  data: AccommodationDto[];
 
   @ApiProperty()
-  total: number;
+  totalCount: number;
 
   @ApiProperty()
   totalPages: number;
+
+  @ApiProperty()
+  page: number;
+
+  @ApiProperty()
+  limit: number;
 }
