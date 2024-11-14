@@ -38,22 +38,6 @@ export class AccommodationsService {
       );
     }
 
-    if (searchParams.location) {
-      query.andWhere('(accommodation.location ILIKE :location)', {
-        location: `%${searchParams.location}%`,
-      });
-    }
-
-    if (searchParams.fromDate && searchParams.toDate) {
-      query.andWhere(
-        '(accommodation.createdAt >= :fromDate AND accommodation.createdAt <= :toDate)',
-        {
-          fromDate: searchParams.fromDate,
-          toDate: searchParams.toDate,
-        },
-      );
-    }
-
     const total = await query.getCount();
 
     query.skip(skip).take(limit);
