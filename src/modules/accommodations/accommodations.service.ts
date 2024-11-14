@@ -46,7 +46,7 @@ export class AccommodationsService {
 
     return {
       items,
-      total: totalCount,
+      totalCount,
       page,
       limit,
       totalPages: Math.ceil(totalCount / limit),

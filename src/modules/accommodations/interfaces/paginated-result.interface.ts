@@ -1,6 +1,6 @@
 export interface PaginatedResult<T> {
   items: T[];
-  total: number;
+  totalCount: number;
   page: number;
   limit: number;
   totalPages: number;
