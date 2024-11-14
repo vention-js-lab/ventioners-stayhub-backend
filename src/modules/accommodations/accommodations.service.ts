@@ -29,12 +29,12 @@ export class AccommodationsService {
       );
     }
 
-    if (searchParams.category) {
+    if (searchParams.categoryId) {
       query.innerJoinAndSelect(
         'accommodation.category',
         'category',
         'category.id = :categoryId',
-        { categoryId: searchParams.category },
+        { categoryId: searchParams.categoryId },
       );
     }
 
