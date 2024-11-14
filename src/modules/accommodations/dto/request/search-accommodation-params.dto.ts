@@ -1,5 +1,5 @@
 import { IsDate, IsOptional, IsString, Min, IsInt, Max } from 'class-validator';
-import { TransformToInt } from 'src/shared/decorators';
+import { TransformToDate, TransformToInt } from 'src/shared/decorators';
 
 export class SearchAccommodationQueryParamsDto {
   @IsString()
@@ -10,10 +10,12 @@ export class SearchAccommodationQueryParamsDto {
   @IsOptional()
   category: string;
 
+  @TransformToDate()
   @IsDate()
   @IsOptional()
   fromDate: Date;
 
+  @TransformToDate()
   @IsDate()
   @IsOptional()
   toDate: Date;
