@@ -11,9 +11,6 @@ export class AccommodationDto {
   location: string;
 
   @ApiProperty()
-  amenityIds: string[];
-
-  @ApiProperty()
   categoryId: string;
 
   @ApiProperty()
