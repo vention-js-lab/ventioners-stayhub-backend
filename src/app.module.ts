@@ -6,6 +6,7 @@ import { validateEnv } from './shared/configs';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { OAuthModule } from './modules';
+import { AccommodationsModule } from './modules/accommodations/accommodations.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { OAuthModule } from './modules';
     UsersModule,
     AuthModule,
     OAuthModule,
+    AccommodationsModule,
   ],
 })
 export class AppModule {}
