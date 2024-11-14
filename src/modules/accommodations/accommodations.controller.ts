@@ -17,7 +17,6 @@ export class AccommodationsController {
 
     return {
       data: responseData,
-      message: 'Accommodations retrieved successfully',
     };
   }
 }
