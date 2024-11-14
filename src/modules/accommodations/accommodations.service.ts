@@ -38,7 +38,7 @@ export class AccommodationsService {
       );
     }
 
-    const total = await query.getCount();
+    const totalCount = await query.getCount();
 
     query.skip(skip).take(limit);
 
@@ -46,10 +46,10 @@ export class AccommodationsService {
 
     return {
       items,
-      total,
+      total: totalCount,
       page,
       limit,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(totalCount / limit),
     };
   }
 }
