@@ -2,6 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class AccommodationDto {
   @ApiProperty()
+  id: string;
+
+  @ApiProperty()
   name: string;
 
   @ApiProperty()
@@ -9,6 +12,9 @@ export class AccommodationDto {
 
   @ApiProperty()
   location: string;
+
+  @ApiProperty()
+  pricePerNight: number;
 
   @ApiProperty()
   categoryId: string;
