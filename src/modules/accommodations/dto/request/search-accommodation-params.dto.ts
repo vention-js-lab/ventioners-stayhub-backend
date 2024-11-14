@@ -1,6 +1,6 @@
 import { IsDate, IsOptional, IsString, Min, IsInt, Max } from 'class-validator';
 
-export class SearchAccommodationParamsDto {
+export class SearchAccommodationQueryParamsDto {
   @IsString()
   @IsOptional()
   search: string;
