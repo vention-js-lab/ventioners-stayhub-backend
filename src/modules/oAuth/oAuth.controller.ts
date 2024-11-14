@@ -2,13 +2,15 @@ import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 import {
   Controller,
   Get,
-  Response,
+  Res,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { OAuthService } from './oAuth.service';
 import { ConfigService } from '@nestjs/config';
 import { GetUser } from 'src/shared/decorators/user.decorator';
+import { Response } from 'express';
+import { REFRESH_TOKEN_COOKIE_AGE } from 'src/shared/constants';
 
 @Controller('auth')
 export class OAppController {
@@ -23,14 +25,19 @@ export class OAppController {
 
   @Get('google/callback')
   @UseGuards(GoogleOAuthGuard)
-  async googleAuthRedirect(@GetUser() user, @Response() res) {
+  async googleAuthRedirect(@GetUser() user, @Res() res: Response) {
     if (!user) {
       throw new UnauthorizedException('User is not authenticated');
     }
+
     const tokens = await this.appService.googleLogin(user);
-    res.cookie('accessToken', tokens.accessToken, { httpOnly: true });
-    res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true });
-    // we can redirect to the frontend app when the user is authenticated
-    res.redirect(this.configService.get<string>('GOOGLE_CLIENT_REDIRECT_URL'));
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: this.configService.get('NODE_ENV') === 'production',
+      maxAge: REFRESH_TOKEN_COOKIE_AGE,
+    });
+
+    const redirectUrl = `${this.configService.get('GOOGLE_CLIENT_REDIRECT_URL')}?accessToken=${tokens.accessToken}`;
+    res.redirect(redirectUrl);
   }
 }
