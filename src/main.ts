@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { EnvConfig, ValidationConfig } from './shared/configs';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,6 +15,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService<EnvConfig>);
 
   app.useGlobalPipes(ValidationConfig);
+  app.use(cookieParser());
 
   app.enableCors({
     origin: [configService.get('CLIENT_URL')],
