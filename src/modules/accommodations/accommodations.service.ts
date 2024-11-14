@@ -24,7 +24,7 @@ export class AccommodationsService {
 
     if (searchParams.search) {
       query.andWhere(
-        '(accommodation.name ILIKE :search OR accommodation.description ILIKE :search)',
+        '(accommodation.name ILIKE :search OR accommodation.description ILIKE :search OR accommodation.location ILIKE :search)',
         { search: `%${searchParams.search}%` },
       );
     }
