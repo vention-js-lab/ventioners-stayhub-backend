@@ -5,6 +5,7 @@ import { Hasher } from '../../shared/libs/hasher.lib';
 import { UsersRepository } from '../users/users.repository';
 import { ConfigService } from '@nestjs/config';
 import { LoginDto } from './dto/request/login.dto';
+import { JwtPayload } from './auth.types';
 
 @Injectable()
 export class AuthService {
@@ -31,9 +32,10 @@ export class AuthService {
     });
 
     const payload = { sub: createdUser.id, userEmail: createdUser.email };
-    const accessToken = await this.jwtService.signAsync(payload);
+    const accessToken = await this.generateToken('ACCESS', payload);
+    const refreshToken = await this.generateToken('REFRESH', payload);
 
-    return { accessToken };
+    return { accessToken, refreshToken };
   }
 
   async login(loginDto: LoginDto) {
@@ -53,16 +55,21 @@ export class AuthService {
       throw new BadRequestException('Invalid email or password');
     }
     const payload = { sub: user.id, userEmail: user.email };
-    const accessToken = await this.jwtService.signAsync(payload);
+    const accessToken = await this.generateToken('ACCESS', payload);
+    const refreshToken = await this.generateToken('REFRESH', payload);
 
-    return { accessToken };
+    return { accessToken, refreshToken };
   }
-  async generateAccessToken(payload: { sub: string; userEmail: string }) {
-    const accessToken = await this.jwtService.signAsync(payload, {
-      secret: this.configService.get('AUTH_ACCESS_TOKEN_SECRET'),
-      expiresIn: this.configService.get('AUTH_ACCESS_TOKEN_EXPIRES_IN'),
-    });
 
-    return accessToken;
+  async generateToken(tokenType: 'REFRESH' | 'ACCESS', payload: JwtPayload) {
+    const refreshToken = await this.jwtService.signAsync(
+      { sub: payload.sub, userEmail: payload.userEmail },
+      {
+        secret: this.configService.get(`AUTH_${tokenType}_TOKEN_SECRET`),
+        expiresIn: this.configService.get(`AUTH_${tokenType}_TOKEN_EXPIRES_IN`),
+      },
+    );
+
+    return refreshToken;
   }
 }
