@@ -9,11 +9,5 @@ export class GetManyAccommodationResponseDto {
   total: number;
 
   @ApiProperty()
-  page: number;
-
-  @ApiProperty()
-  limit: number;
-
-  @ApiProperty()
   totalPages: number;
 }
