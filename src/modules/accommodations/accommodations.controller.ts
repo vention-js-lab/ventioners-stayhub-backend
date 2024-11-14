@@ -16,7 +16,11 @@ export class AccommodationsController {
       await this.accommodationsService.getAccommodations(searchQueryParams);
 
     return {
-      data: responseData,
+      data: responseData.items,
+      totalCount: responseData.totalCount,
+      totalPages: responseData.totalPages,
+      page: searchQueryParams.page,
+      limit: searchQueryParams.limit,
     };
   }
 }
