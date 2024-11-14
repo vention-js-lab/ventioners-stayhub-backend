@@ -12,8 +12,12 @@ export class AccommodationsController {
   async getManyAccommodations(
     @Query() searchQueryParams: SearchAccommodationQueryParamsDto,
   ) {
-    return await this.accommodationsService.getAccommodations(
-      searchQueryParams,
-    );
+    const responseData =
+      await this.accommodationsService.getAccommodations(searchQueryParams);
+
+    return {
+      data: responseData,
+      message: 'Accommodations retrieved successfully',
+    };
   }
 }
