@@ -12,7 +12,7 @@ export class AccommodationsService {
     private readonly accommodationRepository: Repository<Accommodation>,
   ) {}
 
-  async getManyAccommodations(
+  async getAccommodations(
     searchParams: SearchAccommodationParamsDto,
   ): Promise<PaginatedResult<Accommodation>> {
     const query =

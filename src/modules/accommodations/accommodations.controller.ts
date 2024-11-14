@@ -12,6 +12,6 @@ export class AccommodationsController {
   async getManyAccommodations(
     @Query() searchParams: SearchAccommodationParamsDto,
   ) {
-    return await this.accommodationsService.getManyAccommodations(searchParams);
+    return await this.accommodationsService.getAccommodations(searchParams);
   }
 }
