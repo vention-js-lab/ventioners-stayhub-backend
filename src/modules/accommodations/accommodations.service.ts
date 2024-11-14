@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Accommodation } from './entities';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SearchAccommodationParamsDto } from './dto/request';
+import { SearchAccommodationQueryParamsDto } from './dto/request';
 import { PaginatedResult } from './interfaces';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class AccommodationsService {
   ) {}
 
   async getAccommodations(
-    searchParams: SearchAccommodationParamsDto,
+    searchParams: SearchAccommodationQueryParamsDto,
   ): Promise<PaginatedResult<Accommodation>> {
     const query =
       this.accommodationRepository.createQueryBuilder('accommodation');
