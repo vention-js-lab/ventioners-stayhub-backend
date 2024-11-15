@@ -1,16 +1,11 @@
 import { GoogleOAuthGuard } from './guards/google-oauth.guard';
-import {
-  Controller,
-  Get,
-  Res,
-  UnauthorizedException,
-  UseGuards,
-} from '@nestjs/common';
-import { OAuthService } from './oAuth.service';
+import { Controller, Get, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { GetUser } from 'src/shared/decorators/user.decorator';
 import { Response } from 'express';
+import { OAuthService } from './oAuth.service';
+import { GetUser } from 'src/shared/decorators';
 import { REFRESH_TOKEN_COOKIE_AGE } from 'src/shared/constants';
+import { OAuthResponse } from './oAuth.types';
 
 @Controller('auth')
 export class OAppController {
@@ -25,12 +20,12 @@ export class OAppController {
 
   @Get('google/callback')
   @UseGuards(GoogleOAuthGuard)
-  async googleAuthRedirect(@GetUser() user, @Res() res: Response) {
-    if (!user) {
-      throw new UnauthorizedException('User is not authenticated');
-    }
-
+  async googleAuthRedirect(
+    @GetUser() user: OAuthResponse,
+    @Res() res: Response,
+  ) {
     const tokens = await this.appService.googleLogin(user);
+
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
