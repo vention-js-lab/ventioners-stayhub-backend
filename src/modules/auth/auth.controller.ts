@@ -12,7 +12,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/request/login.dto';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
-import { REFRESH_TOKEN_COOKIE_AGE } from 'src/shared/constants';
+import ms from 'ms';
 
 @Controller('auth')
 export class AuthController {
@@ -31,7 +31,9 @@ export class AuthController {
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
-      maxAge: REFRESH_TOKEN_COOKIE_AGE,
+      maxAge: ms(
+        this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
+      ),
     });
 
     return {
@@ -49,7 +51,9 @@ export class AuthController {
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
-      maxAge: REFRESH_TOKEN_COOKIE_AGE,
+      maxAge: ms(
+        this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
+      ),
     });
 
     return {
@@ -79,7 +83,9 @@ export class AuthController {
     res.cookie('refreshToken', newRefreshToken, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
-      maxAge: REFRESH_TOKEN_COOKIE_AGE,
+      maxAge: ms(
+        this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
+      ),
     });
 
     return { accessToken };

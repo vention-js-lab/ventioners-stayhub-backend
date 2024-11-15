@@ -4,8 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { OAuthService } from './oAuth.service';
 import { GetUser } from 'src/shared/decorators';
-import { REFRESH_TOKEN_COOKIE_AGE } from 'src/shared/constants';
 import { OAuthResponse } from './oAuth.types';
+import ms from 'ms';
 
 @Controller('auth')
 export class OAppController {
@@ -29,7 +29,9 @@ export class OAppController {
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
-      maxAge: REFRESH_TOKEN_COOKIE_AGE,
+      maxAge: ms(
+        this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
+      ),
     });
 
     const redirectUrl = `${this.configService.get('GOOGLE_CLIENT_REDIRECT_URL')}?accessToken=${tokens.accessToken}`;
