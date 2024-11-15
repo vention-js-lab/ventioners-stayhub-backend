@@ -66,7 +66,7 @@ export class AuthService {
   }
 
   async generateToken(tokenType: 'REFRESH' | 'ACCESS', payload: JwtPayload) {
-    const refreshToken = await this.jwtService.signAsync(
+    const token = await this.jwtService.signAsync(
       { sub: payload.sub, userEmail: payload.userEmail },
       {
         secret: this.configService.get(`AUTH_${tokenType}_TOKEN_SECRET`),
@@ -74,7 +74,7 @@ export class AuthService {
       },
     );
 
-    return refreshToken;
+    return token;
   }
 
   async verifyRefreshToken(refreshToken: string) {
