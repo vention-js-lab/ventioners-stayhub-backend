@@ -12,6 +12,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/request/login.dto';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { isProd } from 'src/shared/helpers';
 import ms from 'ms';
 
 @Controller('auth')
@@ -28,17 +29,20 @@ export class AuthController {
   ) {
     const tokens = await this.authService.register(registerDto);
 
+    res.cookie('accessToken', tokens.accessToken, {
+      httpOnly: true,
+      secure: isProd(this.configService.get('NODE_ENV')),
+      maxAge: ms(
+        this.configService.get<string>('AUTH_ACCESS_TOKEN_EXPIRES_IN'),
+      ),
+    });
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
+      secure: isProd(this.configService.get('NODE_ENV')),
       maxAge: ms(
         this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
       ),
     });
-
-    return {
-      accessToken: tokens.accessToken,
-    };
   }
 
   @Post('login')
@@ -48,17 +52,20 @@ export class AuthController {
   ) {
     const tokens = await this.authService.login(loginDto);
 
+    res.cookie('accessToken', tokens.accessToken, {
+      httpOnly: true,
+      secure: isProd(this.configService.get('NODE_ENV')),
+      maxAge: ms(
+        this.configService.get<string>('AUTH_ACCESS_TOKEN_EXPIRES_IN'),
+      ),
+    });
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
+      secure: isProd(this.configService.get('NODE_ENV')),
       maxAge: ms(
         this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
       ),
     });
-
-    return {
-      accessToken: tokens.accessToken,
-    };
   }
 
   @Get('refresh')
@@ -74,20 +81,30 @@ export class AuthController {
 
     const payload = await this.authService.verifyRefreshToken(refreshToken);
 
+    if (!payload) {
+      res.clearCookie('refreshToken');
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
     const accessToken = await this.authService.generateToken('ACCESS', payload);
     const newRefreshToken = await this.authService.generateToken(
       'REFRESH',
       payload,
     );
 
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: isProd(this.configService.get('NODE_ENV')),
+      maxAge: ms(
+        this.configService.get<string>('AUTH_ACCESS_TOKEN_EXPIRES_IN'),
+      ),
+    });
     res.cookie('refreshToken', newRefreshToken, {
       httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
+      secure: isProd(this.configService.get('NODE_ENV')),
       maxAge: ms(
         this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
       ),
     });
-
-    return { accessToken };
   }
 }

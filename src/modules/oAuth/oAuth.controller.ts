@@ -26,6 +26,13 @@ export class OAppController {
   ) {
     const tokens = await this.appService.googleLogin(user);
 
+    res.cookie('accessToken', tokens.accessToken, {
+      httpOnly: true,
+      secure: this.configService.get('NODE_ENV') === 'production',
+      maxAge: ms(
+        this.configService.get<string>('AUTH_ACCESS_TOKEN_EXPIRES_IN'),
+      ),
+    });
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
@@ -34,7 +41,6 @@ export class OAppController {
       ),
     });
 
-    const redirectUrl = `${this.configService.get('GOOGLE_CLIENT_REDIRECT_URL')}?accessToken=${tokens.accessToken}`;
-    res.redirect(redirectUrl);
+    res.redirect(this.configService.get('GOOGLE_CLIENT_REDIRECT_URL'));
   }
 }
