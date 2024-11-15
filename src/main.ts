@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { EnvConfig, ValidationConfig } from './shared/configs';
+import { parseCorsOrigins } from './shared/helpers';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
@@ -18,7 +19,7 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.enableCors({
-    origin: [configService.get('CLIENT_URL')],
+    origin: parseCorsOrigins(configService.get('CLIENT_URL')),
     credentials: true,
   });
 
