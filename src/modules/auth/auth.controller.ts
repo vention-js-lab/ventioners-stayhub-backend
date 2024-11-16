@@ -5,7 +5,7 @@ import {
   Post,
   Req,
   Res,
-  UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { RegisterDto } from './dto/request/register.dto';
 import { AuthService } from './auth.service';
@@ -14,6 +14,8 @@ import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { isProd } from 'src/shared/helpers';
 import ms from 'ms';
+import { RefreshTokenGuard } from './guards/refresh-token.guard';
+import { JwtPayload } from './auth.types';
 
 @Controller('auth')
 export class AuthController {
@@ -69,22 +71,12 @@ export class AuthController {
   }
 
   @Get('refresh')
+  @UseGuards(RefreshTokenGuard)
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies['refreshToken'];
-
-    if (!refreshToken) {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-
-    const payload = await this.authService.verifyRefreshToken(refreshToken);
-
-    if (!payload) {
-      res.clearCookie('refreshToken');
-      throw new UnauthorizedException('Invalid refresh token');
-    }
+    const payload = req.user as JwtPayload;
 
     const accessToken = await this.authService.generateToken('ACCESS', payload);
     const newRefreshToken = await this.authService.generateToken(
