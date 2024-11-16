@@ -2,7 +2,10 @@ import { z } from 'zod';
 
 const envConfigSchema = z.object({
   APP_PORT: z.coerce.number().int().positive(),
-  CLIENT_URL: z.string(),
+  ALLOWED_ORIGINS: z
+    .string()
+    .transform((s) => s.split(',').map((origin) => origin.trim().toLowerCase()))
+    .pipe(z.array(z.string())),
 
   NODE_ENV: z.enum(['development', 'production', 'test']),
 

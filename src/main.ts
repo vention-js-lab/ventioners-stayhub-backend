@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { EnvConfig, ValidationConfig } from './shared/configs';
-import { parseCorsOrigins } from './shared/helpers';
 import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
@@ -18,8 +17,9 @@ async function bootstrap() {
   app.useGlobalPipes(ValidationConfig);
   app.use(cookieParser());
 
+  console.log(configService.get('ALLOWED_ORIGINS'));
   app.enableCors({
-    origin: parseCorsOrigins(configService.get('CLIENT_URL')),
+    origin: configService.get('ALLOWED_ORIGINS'),
     credentials: true,
   });
 
