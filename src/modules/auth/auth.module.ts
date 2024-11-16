@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
-import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
+import { RefreshTokenStrategy } from './strategies';
 
 @Module({
   imports: [JwtModule, UsersModule, PassportModule],

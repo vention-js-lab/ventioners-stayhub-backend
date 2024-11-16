@@ -1,21 +1,14 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
-import { RegisterDto } from './dto/request/register.dto';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { RegisterDto } from './dto/request/register.dto';
 import { LoginDto } from './dto/request/login.dto';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { RefreshTokenGuard } from './guards';
+import { JwtPayload } from './auth.types';
+import { GetUser } from 'src/shared/decorators';
 import { isProd } from 'src/shared/helpers';
 import ms from 'ms';
-import { RefreshTokenGuard } from './guards/refresh-token.guard';
-import { JwtPayload } from './auth.types';
 
 @Controller('auth')
 export class AuthController {
@@ -73,11 +66,9 @@ export class AuthController {
   @Get('refresh')
   @UseGuards(RefreshTokenGuard)
   async refresh(
-    @Req() req: Request,
+    @GetUser() payload: JwtPayload,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const payload = req.user as JwtPayload;
-
     const accessToken = await this.authService.generateToken('ACCESS', payload);
     const newRefreshToken = await this.authService.generateToken(
       'REFRESH',
