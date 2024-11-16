@@ -72,14 +72,4 @@ export class AuthService {
 
     return token;
   }
-
-  async verifyRefreshToken(refreshToken: string) {
-    try {
-      return await this.jwtService.verifyAsync(refreshToken, {
-        secret: this.configService.get('AUTH_REFRESH_TOKEN_SECRET'),
-      });
-    } catch (error) {
-      return null;
-    }
-  }
 }
