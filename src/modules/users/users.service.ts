@@ -70,4 +70,24 @@ export class UsersService {
       throw new NotFoundException(`User with id ${userId} not found`);
     }
   }
+
+  async wishlistAccommodation(
+    userId: string,
+    accommodationId: string,
+  ): Promise<User> {
+    const user = await this.usersRepository.getUserBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    const isAlreadyInWishlist = user.wishlist.includes(accommodationId);
+    if (isAlreadyInWishlist) {
+      user.wishlist = user.wishlist.filter((id) => id !== accommodationId);
+    } else {
+      user.wishlist.push(accommodationId);
+    }
+
+    user.updatedAt = new Date();
+    return await this.usersRepository.save(user);
+  }
 }

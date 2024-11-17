@@ -43,6 +43,9 @@ export class User {
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role: string;
 
+  @Column('simple-array', { nullable: true })
+  wishlist?: string[];
+
   @CreateDateColumn({
     name: 'created_at',
   })

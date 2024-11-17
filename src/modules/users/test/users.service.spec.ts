@@ -29,6 +29,7 @@ const mockUsersRepository = {
   deleteUser: jest.fn().mockImplementation((userId: string) => ({
     affected: userId === 'existing-user-id' ? 1 : 0,
   })),
+  save: jest.fn().mockImplementation((user: User) => Promise.resolve(user)),
 };
 
 describe('UsersService', () => {
@@ -130,6 +131,53 @@ describe('UsersService', () => {
     it('throws NotFoundException if user does not exist', async () => {
       expect(service.deleteUser('non-existing-user-id')).rejects.toThrow(
         NotFoundException,
+      );
+    });
+  });
+
+  describe('wishlistAccommodation', () => {
+    it('should add accommodation to wishlist if not already in', async () => {
+      const userId = 'existing-user-id';
+      const accommodationId = 'accommodation-2';
+
+      const updatedUser = await service.wishlistAccommodation(
+        userId,
+        accommodationId,
+      );
+
+      expect(updatedUser.wishlist).toContain(accommodationId);
+      expect(usersRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          wishlist: expect.arrayContaining([accommodationId]),
+        }),
+      );
+    });
+
+    it('should remove accommodation from wishlist if already in', async () => {
+      const userId = 'existing-user-id';
+      const accommodationId = 'accommodation-1';
+
+      const updatedUser = await service.wishlistAccommodation(
+        userId,
+        accommodationId,
+      );
+
+      expect(updatedUser.wishlist).not.toContain(accommodationId);
+      expect(usersRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          wishlist: expect.arrayContaining([]),
+        }),
+      );
+    });
+
+    it('should throw NotFoundException if user does not exist', async () => {
+      const userId = 'non-existing-user-id';
+      const accommodationId = 'accommodation-2';
+
+      await expect(
+        service.wishlistAccommodation(userId, accommodationId),
+      ).rejects.toThrowError(
+        new NotFoundException(`User with id ${userId} not found`),
       );
     });
   });

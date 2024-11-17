@@ -6,6 +6,8 @@ import { User } from '../entities/user.entity';
 import { CreateUserReqDto } from '../dto/request/create-user.dto';
 import { UpdateUserReqDto } from '../dto/request/update-user.dto';
 import { mockUsers } from './users.mock';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -43,6 +45,19 @@ describe('UsersController', () => {
               .fn<Promise<User>, [UpdateUserReqDto, string]>()
               .mockResolvedValue(mockUsers[0]),
             deleteUser: jest.fn<Promise<void>, [string]>().mockResolvedValue(),
+            wishlistAccommodation: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockReturnValue('someValue'),
+          },
+        },
+        {
+          provide: JwtService,
+          useValue: {
+            sign: jest.fn().mockReturnValue('someSignedToken'),
           },
         },
       ],
@@ -106,6 +121,61 @@ describe('UsersController', () => {
   describe('deleteUser', () => {
     it('deletes a user', () => {
       expect(controller.deleteUser('1')).resolves.toBeUndefined();
+    });
+  });
+
+  describe('wishlistAccommodation', () => {
+    it('should add accommodation to wishlist if not already in', async () => {
+      const userId = mockUsers[0].id;
+      const accommodationId = 'accommodation-2'; // New accommodation ID
+      const mockRequest = { user: { sub: userId } }; // Mocking the request object
+
+      // Mock the service method to resolve successfully
+      jest.spyOn(service, 'wishlistAccommodation').mockResolvedValue(undefined);
+
+      await expect(
+        controller.wishlistAccommodation(accommodationId, mockRequest),
+      ).resolves.not.toThrow();
+
+      // Check if the service method was called with the correct arguments
+      expect(service.wishlistAccommodation).toHaveBeenCalledWith(
+        userId,
+        accommodationId,
+      );
+    });
+
+    it('should remove accommodation from wishlist if already in', async () => {
+      const userId = mockUsers[0].id;
+      const accommodationId = 'accommodation-1'; // Already in the wishlist
+      const mockRequest = { user: { sub: userId } };
+
+      // Mock the service method to resolve successfully
+      jest.spyOn(service, 'wishlistAccommodation').mockResolvedValue(undefined);
+
+      await expect(
+        controller.wishlistAccommodation(accommodationId, mockRequest),
+      ).resolves.not.toThrow();
+
+      // Check if the service method was called with the correct arguments
+      expect(service.wishlistAccommodation).toHaveBeenCalledWith(
+        userId,
+        accommodationId,
+      );
+    });
+
+    it('should throw NotFoundException if user or accommodation not found', async () => {
+      const userId = 'non-existing-user-id'; // Invalid user ID
+      const accommodationId = 'accommodation-1'; // Valid accommodation ID
+      const mockRequest = { user: { sub: userId } };
+
+      // Simulate the service throwing an error
+      jest
+        .spyOn(service, 'wishlistAccommodation')
+        .mockRejectedValue(new Error('Not found'));
+
+      await expect(
+        controller.wishlistAccommodation(accommodationId, mockRequest),
+      ).rejects.toThrowError('User or accommodation not found');
     });
   });
 });
