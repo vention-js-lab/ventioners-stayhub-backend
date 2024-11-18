@@ -8,12 +8,13 @@ import {
   AccommodationCategory,
   Amenity,
 } from 'src/modules/accommodations/entities';
+import { Seeder } from 'typeorm-extension';
 import { User } from 'src/modules/users/entities/user.entity';
 
-export class MainSeeder {
+export class MainSeeder implements Seeder {
   constructor(private readonly dataSource: DataSource) {}
 
-  async execute() {
+  async run() {
     await this.dataSource.initialize();
 
     const seeders = [
@@ -38,7 +39,7 @@ const mainSeeder = new MainSeeder(
 );
 
 (async function () {
-  await mainSeeder.execute();
+  await mainSeeder.run();
   Logger.log('Seeding completed');
   process.exit(0);
 })();
