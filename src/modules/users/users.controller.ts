@@ -9,7 +9,6 @@ import {
   Post,
   Put,
   Query,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -26,8 +25,11 @@ import {
   GetUserSwaggerDecorator,
   GetUsersSwaggerDecorator,
   UpdateUserSwaggerDecorator,
+  UpdateUserWishlistSwaggerDecorator,
 } from './decorators/swagger.decorator';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { GetUser } from 'src/shared/decorators/user.decorator';
+import { JwtPayload } from 'jsonwebtoken';
 
 @ApiTags('Users')
 @Controller('users')
@@ -92,16 +94,19 @@ export class UsersController {
 
   @Put('/wishlist/:accommodationId')
   @UseGuards(JwtAuthGuard)
-  @UpdateUserSwaggerDecorator()
-  async wishlistAccommodation(
+  @UpdateUserWishlistSwaggerDecorator()
+  async toggleWishlistAccommodation(
     @Param('accommodationId', new ParseUUIDV4Pipe()) accommodationId: string,
-    @Request() req: any,
+    @GetUser() payload: JwtPayload,
   ) {
     try {
-      const userId = req.user.sub;
+      const userId = payload.sub;
       await this.usersService.wishlistAccommodation(userId, accommodationId);
     } catch (error) {
-      throw new NotFoundException('User or accommodation not found');
+      throw new NotFoundException({
+        message: 'User or accommodation not found',
+        error,
+      });
     }
   }
 }

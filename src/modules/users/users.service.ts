@@ -87,7 +87,6 @@ export class UsersService {
       user.wishlist.push(accommodationId);
     }
 
-    user.updatedAt = new Date();
     return await this.usersRepository.save(user);
   }
 }

@@ -176,7 +176,7 @@ describe('UsersService', () => {
 
       await expect(
         service.wishlistAccommodation(userId, accommodationId),
-      ).rejects.toThrowError(
+      ).rejects.toThrow(
         new NotFoundException(`User with id ${userId} not found`),
       );
     });

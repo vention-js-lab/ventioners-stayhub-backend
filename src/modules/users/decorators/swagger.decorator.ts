@@ -55,6 +55,17 @@ export function UpdateUserSwaggerDecorator() {
   );
 }
 
+export function UpdateUserWishlistSwaggerDecorator() {
+  return applyDecorators(
+    ApiOkResponse({
+      description: 'Accommmodation added to wishlist successfully',
+    }),
+    ApiNotFoundResponse({
+      description: 'User or accommodation not found',
+    }),
+  );
+}
+
 export function DeleteUserSwaggerDecorator() {
   return applyDecorators(
     ApiNoContentResponse({

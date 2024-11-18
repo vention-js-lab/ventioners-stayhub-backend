@@ -1,9 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class MigrationNamePlaceholder1731879052218
-  implements MigrationInterface
-{
-  name = 'MigrationNamePlaceholder1731879052218';
+export class AddWishlistOnUserTable1731879052218 implements MigrationInterface {
+  name = 'AddWishlistOnUserTable1731879052218';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`ALTER TABLE "user" ADD "wishlist" text`);
