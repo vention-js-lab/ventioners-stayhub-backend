@@ -9,7 +9,6 @@ import {
   Amenity,
 } from 'src/modules/accommodations/entities';
 import { Seeder } from 'typeorm-extension';
-import { User } from 'src/modules/users/entities/user.entity';
 
 export class MainSeeder implements Seeder {
   constructor(private readonly dataSource: DataSource) {}
@@ -33,7 +32,7 @@ export class MainSeeder implements Seeder {
 const mainSeeder = new MainSeeder(
   new DataSource({
     ...dataSourceConfig,
-    entities: [AccommodationCategory, Amenity, Accommodation, User],
+    entities: [AccommodationCategory, Amenity, Accommodation],
     logging: true,
   }),
 );
