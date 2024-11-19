@@ -14,19 +14,19 @@ export class AuthTokenStrategy extends PassportStrategy(
   constructor(private readonly configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (req: Request) => req.cookies['refreshToken'],
+        (req: Request) => req.cookies['accessToken'],
       ]),
-      secretOrKey: configService.get<string>('AUTH_REFRESH_TOKEN_SECRET'),
+      secretOrKey: configService.get<string>('AUTH_ACCESS_TOKEN_SECRET'),
       passReqToCallback: true,
     });
   }
 
   async validate(req: Request, payload: JwtPayload, done: VerifiedCallback) {
-    const refreshToken = req.cookies['refreshToken'];
+    const accessToken = req.cookies['accessToken'];
 
-    if (!refreshToken || !payload) {
-      req.res.clearCookie('refreshToken');
-      return done(new UnauthorizedException('Invalid refresh token'), false);
+    if (!accessToken || !payload) {
+      req.res.clearCookie('accessToken');
+      return done(new UnauthorizedException('Invalid access token'), false);
     }
 
     return done(null, payload);
