@@ -3,11 +3,8 @@ import { AccommodationCategorySeeder } from './seeders/accommodation-category.se
 import { AccommodationAmenitySeeder } from './seeders/accommodation-amenity.seeder';
 import { Logger } from '@nestjs/common';
 import { dataSourceConfig } from 'src/shared/configs/data-source.config';
-import {
-  Accommodation,
-  AccommodationCategory,
-  Amenity,
-} from 'src/modules/accommodations/entities';
+import { Accommodation, Amenity } from 'src/modules/accommodations/entities';
+import { AccommodationCategory } from 'src/modules/categories/entities/category.entity';
 import { Seeder } from 'typeorm-extension';
 
 export class MainSeeder implements Seeder {

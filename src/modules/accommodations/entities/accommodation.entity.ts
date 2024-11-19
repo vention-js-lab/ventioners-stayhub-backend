@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Amenity } from './amenity.entity';
-import { AccommodationCategory } from './category.entity';
+import { AccommodationCategory } from 'src/modules/categories/entities/category.entity';
 
 @Entity()
 export class Accommodation {
@@ -45,7 +45,7 @@ export class Accommodation {
 
   @ManyToMany(() => Amenity)
   @JoinTable({
-    name: 'accommodation_amenities', // name of the junction table
+    name: 'accommodation_amenities',
     joinColumn: {
       name: 'accommodation_id',
       referencedColumnName: 'id',

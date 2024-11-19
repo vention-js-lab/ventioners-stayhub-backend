@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Accommodation } from './accommodation.entity';
+import { Accommodation } from 'src/modules/accommodations/entities';
 
 @Entity()
 export class AccommodationCategory {
