@@ -1,4 +1,4 @@
-import { Amenity } from 'src/modules/accommodations/entities';
+import { Amenity } from 'src/modules/amenities/entities';
 
 export const accommodationAmenities: Pick<Amenity, 'name' | 'description'>[] = [
   {
