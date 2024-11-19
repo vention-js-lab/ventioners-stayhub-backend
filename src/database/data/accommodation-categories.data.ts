@@ -1,4 +1,4 @@
-import { AccommodationCategory } from 'src/modules/categories/entities/category.entity';
+import { AccommodationCategory } from 'src/modules/categories/entities';
 
 export const accommodationCategories: Pick<AccommodationCategory, 'name'>[] = [
   { name: 'Hotels' },

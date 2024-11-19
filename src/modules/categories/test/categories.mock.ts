@@ -1,4 +1,4 @@
-import { AccommodationCategory } from '../entities/category.entity';
+import { AccommodationCategory } from '../entities';
 
 export const mockCategories: AccommodationCategory[] = [
   {

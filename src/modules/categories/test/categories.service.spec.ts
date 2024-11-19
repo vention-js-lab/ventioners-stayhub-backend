@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { mockCategories } from './categories.mock';
 import { CategoriesService } from '../categories.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { AccommodationCategory } from '../entities/category.entity';
+import { AccommodationCategory } from '../entities';
 
 const mockCategoriesRepository = {
   find: jest.fn().mockResolvedValue(mockCategories),

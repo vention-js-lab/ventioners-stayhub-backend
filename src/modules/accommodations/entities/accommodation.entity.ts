@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Amenity } from './amenity.entity';
-import { AccommodationCategory } from 'src/modules/categories/entities/category.entity';
+import { AccommodationCategory } from 'src/modules/categories/entities';
 
 @Entity()
 export class Accommodation {

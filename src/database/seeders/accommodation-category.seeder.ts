@@ -1,4 +1,4 @@
-import { AccommodationCategory } from '../../modules/categories/entities/category.entity';
+import { AccommodationCategory } from '../../modules/categories/entities';
 import { DataSource } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
 import { accommodationCategories } from '../data/accommodation-categories.data';

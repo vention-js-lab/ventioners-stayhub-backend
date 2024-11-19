@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AccommodationCategory } from './entities/category.entity';
+import { AccommodationCategory } from './entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 

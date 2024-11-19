@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CategoriesController } from '../categories.controller';
 import { CategoriesService } from '../categories.service';
-import { AccommodationCategory } from '../entities/category.entity';
+import { AccommodationCategory } from '../entities';
 import { mockCategories } from './categories.mock';
 
 describe('CategoriesController', () => {
