@@ -11,12 +11,9 @@ export class AccommodationCategorySeeder implements Seeder {
     const categoryRepository = this.dataSource.getRepository(
       AccommodationCategory,
     );
+    const queryRunner = this.dataSource.createQueryRunner();
 
-    const existingCategories = await categoryRepository.find();
-
-    if (existingCategories.length > 0) {
-      throw new Error('Categories are already seeded');
-    }
+    await queryRunner.query('TRUNCATE TABLE accommodation_category CASCADE');
 
     const categories = categoryRepository.create(accommodationCategories);
 

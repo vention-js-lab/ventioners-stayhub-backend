@@ -9,12 +9,11 @@ export class AccommodationAmenitySeeder implements Seeder {
 
   async run(): Promise<void> {
     const amenityRepository = this.dataSource.getRepository(Amenity);
+    const queryRunner = this.dataSource.createQueryRunner();
 
-    const existingAmenities = await amenityRepository.find();
+    await queryRunner.query('TRUNCATE TABLE accommodation_amenities CASCADE');
 
-    if (existingAmenities.length > 0) {
-      throw new Error('Amenities are already seeded');
-    }
+    await queryRunner.query('TRUNCATE TABLE amenity CASCADE');
 
     const amenities = amenityRepository.create(accommodationAmenities);
 
