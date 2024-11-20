@@ -1,11 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import {
-  Accommodation,
-  AccommodationCategory,
-  Amenity,
-} from 'src/modules/accommodations/entities';
+import { Accommodation, Amenity } from 'src/modules/accommodations/entities';
+import { AccommodationCategory } from 'src/modules/categories/entities';
 import { User } from 'src/modules/users/entities/user.entity';
 @Module({
   imports: [
