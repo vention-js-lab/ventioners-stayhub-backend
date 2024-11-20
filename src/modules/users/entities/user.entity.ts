@@ -1,8 +1,10 @@
+import { AccommodationLike } from 'src/modules/accommodations/entities/wishlist.entity';
 import { UserRole } from 'src/shared/constants/user-role.constant';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -42,6 +44,9 @@ export class User {
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role: string;
+
+  @OneToMany(() => AccommodationLike, (like) => like.user)
+  accommodationLikes?: AccommodationLike[];
 
   @CreateDateColumn({
     name: 'created_at',

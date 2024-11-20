@@ -1,15 +1,25 @@
-import { Injectable } from '@nestjs/common';
-import { Accommodation } from './entities';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Accommodation, AccommodationLike } from './entities';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SearchAccommodationQueryParamsDto } from './dto/request';
+import {
+  LikeAccommodationDto,
+  SearchAccommodationQueryParamsDto,
+} from './dto/request';
 import { PaginatedResult } from './interfaces';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class AccommodationsService {
   constructor(
     @InjectRepository(Accommodation)
     private readonly accommodationRepository: Repository<Accommodation>,
+
+    @InjectRepository(AccommodationLike)
+    private readonly accommodationLikeRepository: Repository<AccommodationLike>,
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async getAccommodations(
@@ -51,5 +61,37 @@ export class AccommodationsService {
       limit,
       totalPages: Math.ceil(totalCount / limit),
     };
+  }
+
+  async toggleLikeAccommodation(
+    payload: LikeAccommodationDto,
+  ): Promise<boolean> {
+    const { userId, accommodationId } = payload;
+
+    const existingLike = await this.accommodationLikeRepository.findOne({
+      where: { user: { id: userId }, accommodation: { id: accommodationId } },
+    });
+
+    if (existingLike) {
+      await this.accommodationLikeRepository.remove(existingLike);
+      return false;
+    } else {
+      const accommodation = await this.accommodationRepository.findOne({
+        where: { id: accommodationId },
+      });
+
+      if (!accommodation) {
+        throw new NotFoundException('Accommodation not found');
+      }
+
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+
+      const userLike = new AccommodationLike();
+      userLike.user = user;
+      userLike.accommodation = accommodation;
+
+      await this.accommodationLikeRepository.save(userLike);
+      return true;
+    }
   }
 }
