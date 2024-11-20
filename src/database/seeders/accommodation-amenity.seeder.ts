@@ -1,4 +1,4 @@
-import { Amenity } from 'src/modules/accommodations/entities';
+import { Amenity } from 'src/modules/amenities/entities';
 import { DataSource } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
 import { accommodationAmenities } from '../data/accommodation-amenities.data';

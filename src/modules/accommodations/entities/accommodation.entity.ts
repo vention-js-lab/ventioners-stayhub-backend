@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Amenity } from './amenity.entity';
+import { Amenity } from 'src/modules/amenities/entities';
 import { AccommodationCategory } from 'src/modules/categories/entities';
 
 @Entity()

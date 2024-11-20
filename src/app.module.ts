@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { OAuthModule } from './modules';
 import { AccommodationsModule } from './modules/accommodations/accommodations.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { AmenitiesModule } from './modules/amenities/amenities.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
     OAuthModule,
     AccommodationsModule,
     CategoriesModule,
+    AmenitiesModule,
   ],
 })
 export class AppModule {}
