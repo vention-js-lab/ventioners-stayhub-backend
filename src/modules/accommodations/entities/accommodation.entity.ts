@@ -5,11 +5,13 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Amenity } from 'src/modules/amenities/entities';
 import { AccommodationCategory } from 'src/modules/categories/entities';
+import { Wishlist } from './wishlist.entity';
 
 @Entity()
 export class Accommodation {
@@ -59,6 +61,9 @@ export class Accommodation {
 
   @ManyToOne(() => AccommodationCategory, (category) => category.accommodations)
   category: AccommodationCategory;
+
+  @OneToMany(() => Wishlist, (like) => like.accommodation)
+  likes?: Wishlist[];
 
   @CreateDateColumn({
     name: 'created_at',
