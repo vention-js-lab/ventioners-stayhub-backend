@@ -6,6 +6,9 @@ import { CreateUserReqDto, UpdateUserReqDto } from '../dto/request';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { FindOptionsWhere } from 'typeorm';
 import { User } from '../entities/user.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Wishlist } from 'src/modules/accommodations';
+import { mockAccommodations } from './accommodations.mock';
 
 const mockUser = mockUsers[0];
 
@@ -31,6 +34,16 @@ const mockUsersRepository = {
   })),
 };
 
+const mockWishlistRepository = {
+  find: jest.fn().mockResolvedValue(
+    mockAccommodations.map((acc, idx) => ({
+      id: idx.toString(),
+      likedAt: new Date(),
+      accommodation: acc,
+    })),
+  ),
+};
+
 describe('UsersService', () => {
   let service: UsersService;
   // eslint-disable-next-line
@@ -41,6 +54,10 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         { provide: UsersRepository, useValue: mockUsersRepository },
+        {
+          provide: getRepositoryToken(Wishlist),
+          useValue: mockWishlistRepository,
+        },
       ],
     }).compile();
 
@@ -131,6 +148,12 @@ describe('UsersService', () => {
       expect(service.deleteUser('non-existing-user-id')).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('getWishlist', () => {
+    it('returns a user wishlist', async () => {
+      expect(service.getWishlist('1')).resolves.toEqual(mockAccommodations);
     });
   });
 });
