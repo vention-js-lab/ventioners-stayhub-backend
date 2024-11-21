@@ -1,8 +1,10 @@
+import { Accommodation } from 'src/modules/accommodations/entities';
 import { UserRole } from 'src/shared/constants/user-role.constant';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -42,6 +44,9 @@ export class User {
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role: string;
+
+  @OneToMany(() => Accommodation, (accommodation) => accommodation.owner)
+  accommodations: Accommodation[];
 
   @CreateDateColumn({
     name: 'created_at',

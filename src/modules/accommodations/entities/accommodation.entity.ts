@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Amenity } from './amenity.entity';
 import { AccommodationCategory } from './category.entity';
+import { User } from 'src/modules/users/entities/user.entity';
 
 @Entity()
 export class Accommodation {
@@ -59,6 +60,9 @@ export class Accommodation {
 
   @ManyToOne(() => AccommodationCategory, (category) => category.accommodations)
   category: AccommodationCategory;
+
+  @ManyToOne(() => User, (user) => user.accommodations, { nullable: false }) // Define relation with User
+  owner: User;
 
   @CreateDateColumn({
     name: 'created_at',
