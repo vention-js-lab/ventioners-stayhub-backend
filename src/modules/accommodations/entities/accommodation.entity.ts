@@ -12,6 +12,7 @@ import {
 import { Amenity } from 'src/modules/amenities/entities';
 import { AccommodationCategory } from 'src/modules/categories/entities';
 import { Wishlist } from './wishlist.entity';
+import { User } from 'src/modules/users/entities/user.entity';
 
 @Entity()
 export class Accommodation {
@@ -61,6 +62,11 @@ export class Accommodation {
 
   @ManyToOne(() => AccommodationCategory, (category) => category.accommodations)
   category: AccommodationCategory;
+
+  @ManyToOne(() => User, (user) => user.accommodations, {
+    onDelete: 'CASCADE',
+  })
+  user: User;
 
   @OneToMany(() => Wishlist, (like) => like.accommodation)
   likes?: Wishlist[];

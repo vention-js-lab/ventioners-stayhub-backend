@@ -1,10 +1,30 @@
-import { Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AccommodationsService } from './accommodations.service';
 import { SearchAccommodationQueryParamsDto } from './dto/request';
-import { GetAccommodationsSwaggerDecorator } from './decorators/swagger.decorator';
+import {
+  CreateAccommodationSwaggerDecorator,
+  DeleteAccommodationSwaggerDecorator,
+  GetAccommodationsSwaggerDecorator,
+  GetByIdSwaggerDecorator,
+  UpdateAccommodationSwaggerDecorator,
+} from './decorators/swagger.decorator';
 import { GetUser } from 'src/shared/decorators';
 import { JwtPayload } from '../auth/auth.types';
 import { AuthTokenGuard } from 'src/shared/guards';
+import { CreateAccommodationDto } from './dto/request/create-accommodation.dto';
+import { ParseUUIDV4Pipe } from 'src/shared/pipes';
+import { UpdateAccommodationDto } from './dto/request/update-accommodation.dto';
 
 @Controller('accommodations')
 export class AccommodationsController {
@@ -25,6 +45,58 @@ export class AccommodationsController {
       page: searchQueryParams.page,
       limit: searchQueryParams.limit,
     };
+  }
+
+  @Post()
+  @CreateAccommodationSwaggerDecorator()
+  @UseGuards(AuthTokenGuard)
+  async createAccommodation(
+    @Body() createDto: CreateAccommodationDto,
+    @GetUser() payload: JwtPayload,
+  ) {
+    const newAccommodation = this.accommodationsService.createAccommodation(
+      createDto,
+      payload.sub,
+    );
+    return { data: newAccommodation };
+  }
+
+  @Get(':id')
+  @GetByIdSwaggerDecorator()
+  async getAccommodationById(@Param('id', ParseUUIDV4Pipe) id: string) {
+    const accommodationData =
+      this.accommodationsService.getAccommodationById(id);
+    return { data: accommodationData };
+  }
+
+  @Put(':id')
+  @UpdateAccommodationSwaggerDecorator()
+  @UseGuards(AuthTokenGuard)
+  async updateAccommodation(
+    @Param('id', ParseUUIDV4Pipe) id: string,
+    @Body() updateDto: UpdateAccommodationDto,
+    @GetUser() payload: JwtPayload,
+  ) {
+    const updatedData = this.accommodationsService.updateAccommodation(
+      id,
+      updateDto,
+      payload.sub,
+    );
+    return { data: updatedData };
+  }
+
+  @Delete(':id')
+  @DeleteAccommodationSwaggerDecorator()
+  @HttpCode(204)
+  @UseGuards(AuthTokenGuard)
+  async deleteAccommodation(
+    @Param('id', ParseUUIDV4Pipe) id: string,
+    @GetUser() payload: JwtPayload,
+  ) {
+    return await this.accommodationsService.deleteAccommodation(
+      id,
+      payload.sub,
+    );
   }
 
   @Post(':id/like')

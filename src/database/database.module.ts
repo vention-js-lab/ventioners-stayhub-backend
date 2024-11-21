@@ -24,6 +24,7 @@ import { User } from 'src/modules/users/entities/user.entity';
           AccommodationCategory,
           Wishlist,
         ],
+        synchronize: true,
         migrations: [`./migrations/**/*{.ts,.js}`],
         ssl: configService.get('NODE_ENV') === 'production',
       }),

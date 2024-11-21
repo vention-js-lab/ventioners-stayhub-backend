@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Accommodation, Wishlist } from './entities';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +12,10 @@ import {
 } from './dto/request';
 import { PaginatedResult } from './interfaces';
 import { User } from '../users/entities/user.entity';
+import { AmenitiesService } from '../amenities/amenities.service';
+import { CategoriesService } from '../categories/categories.service';
+import { UpdateAccommodationDto } from './dto/request/update-accommodation.dto';
+import { CreateAccommodationDto } from './dto/request/create-accommodation.dto';
 
 @Injectable()
 export class AccommodationsService {
@@ -20,6 +28,8 @@ export class AccommodationsService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly amenitiesService: AmenitiesService,
+    private readonly categoryService: CategoriesService,
   ) {}
 
   async getAccommodations(
@@ -61,6 +71,99 @@ export class AccommodationsService {
       limit,
       totalPages: Math.ceil(totalCount / limit),
     };
+  }
+
+  async createAccommodation(
+    createDto: CreateAccommodationDto,
+    userId: string,
+  ): Promise<Accommodation> {
+    const { amenities, categoryId, ...accommodationData } = createDto;
+    const allAmenities = await this.amenitiesService.getAllAmenities();
+    const resolvedAmenities = amenities
+      ? allAmenities.filter((amenity) => amenities.includes(amenity.id))
+      : [];
+
+    const allCategories = await this.categoryService.getAllCategories();
+    const resolvedCategory = allCategories.find(
+      (category) => category.id === categoryId,
+    );
+
+    if (!resolvedCategory) {
+      throw new NotFoundException(`Category with ID ${categoryId} not found`);
+    }
+
+    const newAccommodation = this.accommodationRepository.create({
+      ...accommodationData,
+      amenities: resolvedAmenities,
+      category: resolvedCategory,
+      user: { id: userId },
+    });
+
+    return this.accommodationRepository.save(newAccommodation);
+  }
+
+  async getAccommodationById(id: string): Promise<Accommodation> {
+    const accommodation = await this.accommodationRepository.findOne({
+      where: { id },
+      relations: ['amenities', 'category', 'owner'],
+    });
+
+    if (!accommodation) {
+      throw new NotFoundException(`Accommodation with ID ${id} not found`);
+    }
+
+    return accommodation;
+  }
+
+  async updateAccommodation(
+    id: string,
+    updateDto: UpdateAccommodationDto,
+    userId: string,
+  ): Promise<Accommodation> {
+    const { amenities, categoryId, ...updateData } = updateDto;
+
+    const accommodation = await this.getAccommodationById(id);
+    if (accommodation.user.id !== userId) {
+      throw new UnauthorizedException(
+        'You are not authorized to update this accommodation',
+      );
+    }
+    if (amenities) {
+      const allAmenities = await this.amenitiesService.getAllAmenities();
+      accommodation.amenities = allAmenities.filter((amenity) =>
+        amenities.includes(amenity.id),
+      );
+    }
+    if (categoryId) {
+      const allCategories = await this.categoryService.getAllCategories();
+      const category = allCategories.find((cat) => cat.id === categoryId);
+
+      if (!category) {
+        throw new NotFoundException(`Category with ID ${categoryId} not found`);
+      }
+
+      accommodation.category = category;
+    }
+
+    Object.assign(accommodation, updateData);
+
+    return this.accommodationRepository.save(accommodation);
+  }
+
+  async deleteAccommodation(id: string, userId: string): Promise<void> {
+    const accommodation = await this.accommodationRepository.findOne({
+      where: { id },
+    });
+
+    if (!accommodation) {
+      throw new NotFoundException(`Accommodation with id ${id} not found`);
+    }
+
+    if (accommodation.user.id !== userId) {
+      throw new UnauthorizedException(
+        'You are not authorized to delete this accommodation',
+      );
+    }
   }
 
   async toggleLikeAccommodation(

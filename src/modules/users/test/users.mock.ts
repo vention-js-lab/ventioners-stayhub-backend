@@ -11,6 +11,7 @@ export const mockUsers: User[] = [
     role: UserRole.USER,
     createdAt: new Date(),
     updatedAt: new Date(),
+    accommodations: [],
   },
   {
     id: '2',
@@ -21,5 +22,6 @@ export const mockUsers: User[] = [
     role: UserRole.USER,
     createdAt: new Date(),
     updatedAt: new Date(),
+    accommodations: [],
   },
 ];
