@@ -11,7 +11,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AccommodationsService } from './accommodations.service';
-import { SearchAccommodationQueryParamsDto } from './dto/request';
+import {
+  SearchAccommodationQueryParamsDto,
+  CreateAccommodationDto,
+  UpdateAccommodationDto,
+} from './dto/request';
 import {
   CreateAccommodationSwaggerDecorator,
   DeleteAccommodationSwaggerDecorator,
@@ -22,9 +26,7 @@ import {
 import { GetUser } from 'src/shared/decorators';
 import { JwtPayload } from '../auth/auth.types';
 import { AuthTokenGuard } from 'src/shared/guards';
-import { CreateAccommodationDto } from './dto/request/create-accommodation.dto';
 import { ParseUUIDV4Pipe } from 'src/shared/pipes';
-import { UpdateAccommodationDto } from './dto/request/update-accommodation.dto';
 
 @Controller('accommodations')
 export class AccommodationsController {

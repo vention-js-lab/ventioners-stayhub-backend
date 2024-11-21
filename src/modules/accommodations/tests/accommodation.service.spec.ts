@@ -5,13 +5,16 @@ import { Repository } from 'typeorm';
 import { Wishlist } from '../entities';
 import { Accommodation } from '../entities';
 import { User } from 'src/modules/users/entities/user.entity';
+import { AmenitiesService } from 'src/modules/amenities/amenities.service';
+import { CategoriesService } from 'src/modules/categories/categories.service';
 
 describe('AccommodationsService - toggleLikeAccommodation', () => {
   let service: AccommodationsService;
   let mockWishlistRepo: Partial<Repository<Wishlist>>;
   let mockAccommodationRepo: Partial<Repository<Accommodation>>;
   let mockUserRepo: Partial<Repository<User>>;
-
+  let mockAmenitiesService: Partial<AmenitiesService>;
+  let mockCategoriesService: Partial<CategoriesService>;
   beforeEach(async () => {
     mockWishlistRepo = {
       findOne: jest.fn().mockResolvedValue(null),
@@ -24,7 +27,8 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
     mockUserRepo = {
       findOne: jest.fn().mockResolvedValue({}),
     };
-
+    mockAmenitiesService = {};
+    mockCategoriesService = {};
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AccommodationsService,
@@ -39,6 +43,14 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
         {
           provide: getRepositoryToken(User),
           useValue: mockUserRepo,
+        },
+        {
+          provide: AmenitiesService,
+          useValue: mockAmenitiesService,
+        },
+        {
+          provide: CategoriesService,
+          useValue: mockCategoriesService,
         },
       ],
     }).compile();

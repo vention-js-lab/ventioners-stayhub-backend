@@ -9,13 +9,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   LikeAccommodationDto,
   SearchAccommodationQueryParamsDto,
+  UpdateAccommodationDto,
+  CreateAccommodationDto,
 } from './dto/request';
 import { PaginatedResult } from './interfaces';
 import { User } from '../users/entities/user.entity';
 import { AmenitiesService } from '../amenities/amenities.service';
 import { CategoriesService } from '../categories/categories.service';
-import { UpdateAccommodationDto } from './dto/request/update-accommodation.dto';
-import { CreateAccommodationDto } from './dto/request/create-accommodation.dto';
 
 @Injectable()
 export class AccommodationsService {
