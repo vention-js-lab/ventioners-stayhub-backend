@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Post,
   Put,
@@ -21,6 +20,7 @@ import {
 import { CreateAccommodationDto } from './dto/request/create-accommodation.dto';
 import { UpdateAccommodationDto } from './dto/request/update-accommodation.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { ParseUUIDV4Pipe } from 'src/shared/pipes';
 
 @Controller('accommodations')
 @ApiTags('Accommodation')
@@ -47,32 +47,37 @@ export class AccommodationsController {
   @Post()
   @CreateAccommodationSwaggerDecorator()
   async createAccommodation(@Body() createDto: CreateAccommodationDto) {
-    return this.accommodationsService.createAccommodation(createDto);
+    const newAccommodation =
+      this.accommodationsService.createAccommodation(createDto);
+    return { data: newAccommodation };
   }
 
   @Get(':id')
   @GetByIdSwaggerDecorator()
-  async getAccommodationById(@Param('id') id: string) {
-    return this.accommodationsService.getAccommodationById(id);
+  async getAccommodationById(@Param('id', ParseUUIDV4Pipe) id: string) {
+    const accommodationData =
+      this.accommodationsService.getAccommodationById(id);
+    return { data: accommodationData };
   }
 
   @Put(':id')
   @UpdateAccommodationSwaggerDecorator()
   async updateAccommodation(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDV4Pipe) id: string,
     @Body() updateDto: UpdateAccommodationDto,
   ) {
-    return this.accommodationsService.updateAccommodation(id, updateDto);
+    const updatedData = this.accommodationsService.updateAccommodation(
+      id,
+      updateDto,
+    );
+    return { data: updatedData };
   }
 
   @Delete(':id')
   @DeleteAccommodationSwaggerDecorator()
-  async deleteAccommodation(@Param('id') id: string) {
-    const accommodation =
+  async deleteAccommodation(@Param('id', ParseUUIDV4Pipe) id: string) {
+    const deletedAccommodation =
       await this.accommodationsService.getAccommodationById(id);
-    if (!accommodation) {
-      throw new NotFoundException(`Accommodation with ID ${id} not found`);
-    }
-    return this.accommodationsService.deleteAccommodation(id);
+    return { data: deletedAccommodation };
   }
 }

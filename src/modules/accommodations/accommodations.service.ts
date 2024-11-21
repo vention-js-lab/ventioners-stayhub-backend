@@ -65,7 +65,6 @@ export class AccommodationsService {
     createDto: CreateAccommodationDto,
   ): Promise<Accommodation> {
     const { amenities, categoryId, ...accommodationData } = createDto;
-    console.log(createDto);
     const allAmenities = await this.amenitiesService.getAllAmenities();
     const resolvedAmenities = amenities
       ? allAmenities.filter((amenity) => amenities.includes(amenity.id))
@@ -132,6 +131,10 @@ export class AccommodationsService {
   }
 
   async deleteAccommodation(id: string): Promise<void> {
-    await this.accommodationRepository.delete(id);
+    const deleteResult = await this.accommodationRepository.delete(id);
+
+    if (deleteResult.affected === 0) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
   }
 }
