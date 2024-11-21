@@ -24,6 +24,7 @@ import {
   GetUserSwaggerDecorator,
   GetUsersSwaggerDecorator,
   UpdateUserSwaggerDecorator,
+  GetWishlistSwaggerDecorator,
 } from './decorators/swagger.decorator';
 import { AuthTokenGuard } from 'src/shared/guards';
 import { GetUser } from 'src/shared/decorators';
@@ -36,6 +37,7 @@ export class UsersController {
 
   @Get('wishlist')
   @UseGuards(AuthTokenGuard)
+  @GetWishlistSwaggerDecorator()
   async getWishlist(@GetUser() user: JwtPayload) {
     const accommodations = await this.usersService.getWishlist(user.sub);
 

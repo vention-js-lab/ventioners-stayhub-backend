@@ -9,6 +9,7 @@ import {
   GetUsersResponseBodyDto,
   UserDataResponseBodyDto,
 } from '../dto/response';
+import { GetWishlistResponseBody } from '../dto/response/get-wishlist.dto';
 
 export function GetUsersSwaggerDecorator() {
   return applyDecorators(
@@ -62,6 +63,15 @@ export function DeleteUserSwaggerDecorator() {
     }),
     ApiNotFoundResponse({
       description: 'User not found',
+    }),
+  );
+}
+
+export function GetWishlistSwaggerDecorator() {
+  return applyDecorators(
+    ApiOkResponse({
+      description: 'Wishlist retrieved successfully',
+      type: GetWishlistResponseBody,
     }),
   );
 }
