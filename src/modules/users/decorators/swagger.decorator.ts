@@ -4,6 +4,7 @@ import {
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiSecurity,
 } from '@nestjs/swagger';
 import {
   GetUsersResponseBodyDto,
@@ -69,6 +70,7 @@ export function DeleteUserSwaggerDecorator() {
 
 export function GetWishlistSwaggerDecorator() {
   return applyDecorators(
+    ApiSecurity('cookie-auth'),
     ApiOkResponse({
       description: 'Wishlist retrieved successfully',
       type: GetWishlistResponseBody,
