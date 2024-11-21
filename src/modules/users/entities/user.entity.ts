@@ -46,7 +46,7 @@ export class User {
   role: string;
 
   @OneToMany(() => Wishlist, (like) => like.user)
-  accommodationLikes?: Wishlist[];
+  wishlist?: Wishlist[];
 
   @CreateDateColumn({
     name: 'created_at',

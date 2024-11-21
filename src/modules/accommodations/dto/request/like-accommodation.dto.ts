@@ -1,9 +1,4 @@
-import { IsUUID } from 'class-validator';
-
-export class LikeAccommodationDto {
-  @IsUUID()
+export type LikeAccommodationDto = {
   userId: string;
-
-  @IsUUID()
   accommodationId: string;
-}
+};

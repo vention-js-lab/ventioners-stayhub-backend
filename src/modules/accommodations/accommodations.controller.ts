@@ -2,9 +2,9 @@ import { Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { AccommodationsService } from './accommodations.service';
 import { SearchAccommodationQueryParamsDto } from './dto/request';
 import { GetAccommodationsSwaggerDecorator } from './decorators/swagger.decorator';
-import { RefreshTokenGuard } from '../auth/guards';
 import { GetUser } from 'src/shared/decorators';
 import { JwtPayload } from '../auth/auth.types';
+import { AuthTokenGuard } from 'src/shared/guards';
 
 @Controller('accommodations')
 export class AccommodationsController {
@@ -28,7 +28,7 @@ export class AccommodationsController {
   }
 
   @Post(':id/like')
-  @UseGuards(RefreshTokenGuard)
+  @UseGuards(AuthTokenGuard)
   async toggleLikeAccommodation(
     @Param('id') accommodationId: string,
     @GetUser() payload: JwtPayload,
