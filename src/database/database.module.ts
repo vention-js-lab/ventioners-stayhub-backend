@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Accommodation } from 'src/modules/accommodations/entities';
-import { AccommodationLike } from '@modules';
+import { Wishlist } from '@modules';
 import { Amenity } from 'src/modules/amenities/entities';
 import { AccommodationCategory } from 'src/modules/categories/entities';
 import { User } from 'src/modules/users/entities/user.entity';
@@ -22,7 +22,7 @@ import { User } from 'src/modules/users/entities/user.entity';
           Accommodation,
           Amenity,
           AccommodationCategory,
-          AccommodationLike,
+          Wishlist,
         ],
         migrations: [`./migrations/**/*{.ts,.js}`],
         ssl: configService.get('NODE_ENV') === 'production',

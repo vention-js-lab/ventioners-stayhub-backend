@@ -10,7 +10,7 @@ import { User } from 'src/modules/users/entities/user.entity';
 
 @Entity({ name: 'accommodation_like' })
 @Unique(['user', 'accommodation'])
-export class AccommodationLike {
+export class Wishlist {
   @PrimaryGeneratedColumn('uuid') id: string;
   @ManyToOne(() => User, (user) => user.accommodationLikes, {
     onDelete: 'CASCADE',

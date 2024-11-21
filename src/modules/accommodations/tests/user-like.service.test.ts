@@ -2,13 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AccommodationsService } from '../accommodations.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AccommodationLike } from '../entities';
+import { Wishlist } from '../entities';
 import { Accommodation } from '../entities';
 import { User } from 'src/modules/users/entities/user.entity';
 
 describe('AccommodationsService - toggleLikeAccommodation', () => {
   let service: AccommodationsService;
-  let mockAccommodationLikeRepo: Partial<Repository<AccommodationLike>>;
+  let mockAccommodationLikeRepo: Partial<Repository<Wishlist>>;
   let mockAccommodationRepo: Partial<Repository<Accommodation>>;
   let mockUserRepo: Partial<Repository<User>>;
 
@@ -29,7 +29,7 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
       providers: [
         AccommodationsService,
         {
-          provide: getRepositoryToken(AccommodationLike),
+          provide: getRepositoryToken(Wishlist),
           useValue: mockAccommodationLikeRepo,
         },
         {

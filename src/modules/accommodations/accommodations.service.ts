@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Accommodation, AccommodationLike } from './entities';
+import { Accommodation, Wishlist } from './entities';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
@@ -15,8 +15,8 @@ export class AccommodationsService {
     @InjectRepository(Accommodation)
     private readonly accommodationRepository: Repository<Accommodation>,
 
-    @InjectRepository(AccommodationLike)
-    private readonly accommodationLikeRepository: Repository<AccommodationLike>,
+    @InjectRepository(Wishlist)
+    private readonly accommodationLikeRepository: Repository<Wishlist>,
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -86,7 +86,7 @@ export class AccommodationsService {
 
       const user = await this.userRepository.findOne({ where: { id: userId } });
 
-      const userLike = new AccommodationLike();
+      const userLike = new Wishlist();
       userLike.user = user;
       userLike.accommodation = accommodation;
 
