@@ -1,6 +1,6 @@
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
-  IsDecimal,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -9,33 +9,66 @@ import {
 
 export class UpdateAccommodationDto {
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(125)
-  name: string;
+  @ApiPropertyOptional({
+    description: 'Name of the accommodation',
+    maxLength: 125,
+    example: 'Beachside Villa',
+  })
+  name?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(255)
-  description: string;
-
-  @IsArray()
-  @IsNotEmpty()
-  images: string[];
-
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(200)
-  location: string;
-
-  @IsDecimal()
-  @IsNotEmpty()
-  pricePerNight: number;
+  @ApiPropertyOptional({
+    description: 'Description of the accommodation',
+    maxLength: 255,
+    example: 'A beautiful villa near the beach.',
+  })
+  description?: string;
 
   @IsArray()
   @IsOptional()
+  @ApiPropertyOptional({
+    description: 'Array of image URLs for the accommodation',
+    type: [String],
+    example: ['image1.jpg', 'image2.jpg'],
+  })
+  images?: string[];
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(200)
+  @ApiPropertyOptional({
+    description: 'Location of the accommodation',
+    maxLength: 200,
+    example: 'Malibu, California',
+  })
+  location?: string;
+
+  @IsNotEmpty()
+  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'Price per night for the accommodation',
+    example: 200.0,
+  })
+  pricePerNight?: number;
+
+  @IsArray()
+  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'Array of amenity IDs for the accommodation (optional)',
+    type: [String],
+    example: ['amenity1', 'amenity2'],
+  })
   amenities?: string[];
 
   @IsString()
-  @IsNotEmpty()
-  categoryId: string;
+  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'Category ID of the accommodation',
+    example: 'categoryId',
+  })
+  categoryId?: string;
 }

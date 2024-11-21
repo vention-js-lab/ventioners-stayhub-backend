@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -39,7 +40,7 @@ export class Accommodation {
 
   @Column({
     name: 'price_per_night',
-    type: 'decimal',
+    type: 'numeric',
   })
   pricePerNight: number;
 
@@ -60,7 +61,8 @@ export class Accommodation {
   @ManyToOne(() => AccommodationCategory, (category) => category.accommodations)
   category: AccommodationCategory;
 
-  @ManyToOne(() => User, (user) => user.accommodations, { nullable: false }) // Define relation with User
+  @ManyToOne(() => User, (user) => user.accommodations, { nullable: false })
+  @JoinColumn({ name: 'ownerId' })
   owner: User;
 
   @CreateDateColumn({

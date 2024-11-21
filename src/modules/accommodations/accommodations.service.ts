@@ -44,6 +44,8 @@ export class AccommodationsService {
       );
     }
 
+    query.innerJoinAndSelect('accommodation.owner', 'owner');
+
     const totalCount = await query.getCount();
 
     query.skip(skip).take(limit);
@@ -63,7 +65,7 @@ export class AccommodationsService {
     createDto: CreateAccommodationDto,
   ): Promise<Accommodation> {
     const { amenities, categoryId, ...accommodationData } = createDto;
-
+    console.log(createDto);
     const allAmenities = await this.amenitiesService.getAllAmenities();
     const resolvedAmenities = amenities
       ? allAmenities.filter((amenity) => amenities.includes(amenity.id))
@@ -90,7 +92,7 @@ export class AccommodationsService {
   async getAccommodationById(id: string): Promise<Accommodation> {
     const accommodation = await this.accommodationRepository.findOne({
       where: { id },
-      relations: ['amenities', 'category'],
+      relations: ['amenities', 'category', 'owner'],
     });
 
     if (!accommodation) {
