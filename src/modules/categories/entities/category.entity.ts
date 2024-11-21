@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Accommodation } from './accommodation.entity';
+import { Accommodation } from 'src/modules/accommodations/entities';
 
 @Entity()
 export class AccommodationCategory {
@@ -16,14 +16,9 @@ export class AccommodationCategory {
   @Column({
     type: 'varchar',
     length: 125,
+    unique: true,
   })
   name: string;
-
-  @Column({
-    type: 'varchar',
-    length: 255,
-  })
-  icon: string;
 
   @OneToMany(() => Accommodation, (accommodation) => accommodation.category)
   accommodations: Accommodation[];

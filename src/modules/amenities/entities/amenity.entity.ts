@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Accommodation } from './accommodation.entity';
+import { Accommodation } from 'src/modules/accommodations/entities';
 
 @Entity()
 export class Amenity {
@@ -16,14 +16,12 @@ export class Amenity {
   @Column({
     type: 'varchar',
     length: 100,
+    unique: true,
   })
   name: string;
 
   @Column({ type: 'text', nullable: true })
   description: string;
-
-  @Column({ type: 'varchar' })
-  icon: string;
 
   @ManyToMany(() => Accommodation)
   accommodations: Accommodation[];
