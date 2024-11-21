@@ -19,7 +19,7 @@ import {
   UpdateAccommodationSwaggerDecorator,
 } from './decorators/swagger.decorator';
 import { CreateAccommodationDto } from './dto/request/create-accommodation.dto';
-import { UpdateAccommodationDto } from './dto/request/update-accommodatio.dto';
+import { UpdateAccommodationDto } from './dto/request/update-accommodation.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('accommodations')

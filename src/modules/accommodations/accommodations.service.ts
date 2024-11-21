@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { SearchAccommodationQueryParamsDto } from './dto/request';
 import { PaginatedResult } from './interfaces';
 import { CreateAccommodationDto } from './dto/request/create-accommodation.dto';
-import { UpdateAccommodationDto } from './dto/request/update-accommodatio.dto';
+import { UpdateAccommodationDto } from './dto/request/update-accommodation.dto';
 import { AmenitiesService } from '../amenities/amenities.service';
 import { CategoriesService } from '../categories/categories.service';
 
