@@ -19,6 +19,12 @@ const envConfigSchema = z.object({
   REDIS_PORT: z.coerce.number().int().positive(),
   REDIS_PASSWORD: z.string(),
 
+  MINIO_HOST: z.string(),
+  MINIO_PORT: z.coerce.number().int().positive(),
+  MINIO_ROOT_USER: z.string(),
+  MINIO_ROOT_PASSWORD: z.string(),
+  MINIO_BUCKET_NAME: z.string(),
+
   AUTH_ACCESS_TOKEN_SECRET: z.string(),
   AUTH_ACCESS_TOKEN_EXPIRES_IN: z.string(),
 
