@@ -1,3 +1,6 @@
+import { Amenity } from 'src/modules/amenities/entities';
+import { AccommodationCategory } from 'src/modules/categories/entities';
+import { User } from 'src/modules/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,

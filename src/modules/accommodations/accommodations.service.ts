@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Accommodation } from './entities';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,16 +6,16 @@ import { SearchAccommodationQueryParamsDto } from './dto/request';
 import { PaginatedResult } from './interfaces';
 import { CreateAccommodationDto } from './dto/request/create-accommodation.dto';
 import { UpdateAccommodationDto } from './dto/request/update-accommodatio.dto';
-import { AmenityService } from '../amenities/amenities.service';
-import { CategoryService } from '../categories/categories.service';
+import { AmenitiesService } from '../amenities/amenities.service';
+import { CategoriesService } from '../categories/categories.service';
 
 @Injectable()
 export class AccommodationsService {
   constructor(
     @InjectRepository(Accommodation)
     private readonly accommodationRepository: Repository<Accommodation>,
-    private readonly amenitiesService: AmenityService,
-    private readonly categoryService: CategoryService,
+    private readonly amenitiesService: AmenitiesService,
+    private readonly categoryService: CategoriesService,
   ) {}
 
   async getAccommodations(
@@ -65,23 +65,25 @@ export class AccommodationsService {
     const { amenities, categoryId, ...accommodationData } = createDto;
 
     const allAmenities = await this.amenitiesService.getAllAmenities();
-    const amenity = amenities
+    const resolvedAmenities = amenities
       ? allAmenities.filter((amenity) => amenities.includes(amenity.id))
       : [];
 
     const allCategories = await this.categoryService.getAllCategories();
-    const category = categoryId
-      ? allCategories.filter((category) => categoryId.includes(category.id))
-      : '';
-    if (!category) {
-      throw new NotFoundException(`Category ${category} not found`);
+    const resolvedCategory = allCategories.find(
+      (category) => category.id === categoryId,
+    );
+
+    if (!resolvedCategory) {
+      throw new NotFoundException(`Category with ID ${categoryId} not found`);
     }
 
     const newAccommodation = this.accommodationRepository.create({
       ...accommodationData,
-      amenities: amenity,
-      category,
+      amenities: resolvedAmenities,
+      category: resolvedCategory,
     });
+
     return this.accommodationRepository.save(newAccommodation);
   }
 
