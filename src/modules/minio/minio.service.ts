@@ -1,5 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { isProd } from 'src/shared/helpers';
 import * as Minio from 'minio';
 
 @Injectable()
@@ -11,7 +12,7 @@ export class MinioService {
     this.minioClient = new Minio.Client({
       endPoint: this.configService.get('MINIO_HOST'),
       port: Number(this.configService.get('MINIO_PORT')),
-      useSSL: false,
+      useSSL: isProd(this.configService.get('NODE_ENV')),
       accessKey: this.configService.get('MINIO_ROOT_USER'),
       secretKey: this.configService.get('MINIO_ROOT_PASSWORD'),
     });
