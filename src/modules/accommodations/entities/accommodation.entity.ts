@@ -1,5 +1,3 @@
-import { Amenity } from 'src/modules/amenities/entities';
-import { AccommodationCategory } from 'src/modules/categories/entities';
 import { User } from 'src/modules/users/entities/user.entity';
 import {
   Column,
@@ -11,7 +9,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
+import { Amenity } from 'src/modules/amenities/entities';
+import { AccommodationCategory } from 'src/modules/categories/entities';
 @Entity()
 export class Accommodation {
   @PrimaryGeneratedColumn('uuid')
