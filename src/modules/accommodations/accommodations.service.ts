@@ -16,7 +16,7 @@ export class AccommodationsService {
     private readonly accommodationRepository: Repository<Accommodation>,
 
     @InjectRepository(Wishlist)
-    private readonly accommodationLikeRepository: Repository<Wishlist>,
+    private readonly wishlistRepository: Repository<Wishlist>,
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -68,12 +68,12 @@ export class AccommodationsService {
   ): Promise<boolean> {
     const { userId, accommodationId } = payload;
 
-    const existingLike = await this.accommodationLikeRepository.findOne({
+    const existingLike = await this.wishlistRepository.findOne({
       where: { user: { id: userId }, accommodation: { id: accommodationId } },
     });
 
     if (existingLike) {
-      await this.accommodationLikeRepository.remove(existingLike);
+      await this.wishlistRepository.remove(existingLike);
       return false;
     } else {
       const accommodation = await this.accommodationRepository.findOne({
@@ -90,7 +90,7 @@ export class AccommodationsService {
       userLike.user = user;
       userLike.accommodation = accommodation;
 
-      await this.accommodationLikeRepository.save(userLike);
+      await this.wishlistRepository.save(userLike);
       return true;
     }
   }
