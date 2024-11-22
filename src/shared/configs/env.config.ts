@@ -21,6 +21,7 @@ const envConfigSchema = z.object({
 
   MINIO_HOST: z.string(),
   MINIO_PORT: z.coerce.number().int().positive(),
+  MINIO_CONSOLE_PORT: z.coerce.number().int().positive(),
   MINIO_ROOT_USER: z.string(),
   MINIO_ROOT_PASSWORD: z.string(),
   MINIO_BUCKET_NAME: z.string(),
