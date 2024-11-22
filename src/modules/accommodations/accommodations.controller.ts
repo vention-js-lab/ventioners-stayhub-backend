@@ -56,18 +56,19 @@ export class AccommodationsController {
     @Body() createDto: CreateAccommodationDto,
     @GetUser() payload: JwtPayload,
   ) {
-    const newAccommodation = this.accommodationsService.createAccommodation(
-      createDto,
-      payload.sub,
-    );
+    const newAccommodation =
+      await this.accommodationsService.createAccommodation(
+        createDto,
+        payload.sub,
+      );
     return { data: newAccommodation };
   }
 
   @Get(':id')
   @GetByIdSwaggerDecorator()
-  async getAccommodationById(@Param('id', ParseUUIDV4Pipe) id: string) {
+  async getAccommodationById(@Param('id', new ParseUUIDV4Pipe()) id: string) {
     const accommodationData =
-      this.accommodationsService.getAccommodationById(id);
+      await this.accommodationsService.getAccommodationById(id);
     return { data: accommodationData };
   }
 
@@ -75,11 +76,11 @@ export class AccommodationsController {
   @UpdateAccommodationSwaggerDecorator()
   @UseGuards(AuthTokenGuard)
   async updateAccommodation(
-    @Param('id', ParseUUIDV4Pipe) id: string,
+    @Param('id', new ParseUUIDV4Pipe()) id: string,
     @Body() updateDto: UpdateAccommodationDto,
     @GetUser() payload: JwtPayload,
   ) {
-    const updatedData = this.accommodationsService.updateAccommodation(
+    const updatedData = await this.accommodationsService.updateAccommodation(
       id,
       updateDto,
       payload.sub,
@@ -92,13 +93,10 @@ export class AccommodationsController {
   @HttpCode(204)
   @UseGuards(AuthTokenGuard)
   async deleteAccommodation(
-    @Param('id', ParseUUIDV4Pipe) id: string,
+    @Param('id', new ParseUUIDV4Pipe()) id: string,
     @GetUser() payload: JwtPayload,
   ) {
-    return await this.accommodationsService.deleteAccommodation(
-      id,
-      payload.sub,
-    );
+    await this.accommodationsService.deleteAccommodation(id, payload.sub);
   }
 
   @Post(':id/like')

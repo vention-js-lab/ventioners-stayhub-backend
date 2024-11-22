@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Accommodation, Wishlist } from './entities';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   LikeAccommodationDto,
@@ -16,6 +16,8 @@ import { PaginatedResult } from './interfaces';
 import { User } from '../users/entities/user.entity';
 import { AmenitiesService } from '../amenities/amenities.service';
 import { CategoriesService } from '../categories/categories.service';
+import { Amenity } from '../amenities/entities';
+import { AccommodationCategory } from '../categories/entities';
 
 @Injectable()
 export class AccommodationsService {
@@ -26,8 +28,12 @@ export class AccommodationsService {
     @InjectRepository(Wishlist)
     private readonly wishlistRepository: Repository<Wishlist>,
 
+    @InjectRepository(Amenity)
+    private readonly amenityRepository: Repository<Amenity>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(AccommodationCategory)
+    private readonly categoryRepository: Repository<AccommodationCategory>,
     private readonly amenitiesService: AmenitiesService,
     private readonly categoryService: CategoriesService,
   ) {}
@@ -78,34 +84,32 @@ export class AccommodationsService {
     userId: string,
   ): Promise<Accommodation> {
     const { amenities, categoryId, ...accommodationData } = createDto;
-    const allAmenities = await this.amenitiesService.getAllAmenities();
-    const resolvedAmenities = amenities
-      ? allAmenities.filter((amenity) => amenities.includes(amenity.id))
+    const resolvedAmenities = amenities?.length
+      ? await this.amenityRepository.findBy({ id: In(amenities) })
       : [];
 
-    const allCategories = await this.categoryService.getAllCategories();
-    const resolvedCategory = allCategories.find(
-      (category) => category.id === categoryId,
-    );
+    const resolvedCategory = await this.categoryRepository.findOneBy({
+      id: categoryId,
+    });
 
     if (!resolvedCategory) {
       throw new NotFoundException(`Category with ID ${categoryId} not found`);
     }
-
-    const newAccommodation = this.accommodationRepository.create({
+    console.log(resolvedCategory + '-' + resolvedAmenities);
+    const newAccommodation = await this.accommodationRepository.create({
       ...accommodationData,
       amenities: resolvedAmenities,
       category: resolvedCategory,
       user: { id: userId },
     });
 
-    return this.accommodationRepository.save(newAccommodation);
+    return await this.accommodationRepository.save(newAccommodation);
   }
 
   async getAccommodationById(id: string): Promise<Accommodation> {
     const accommodation = await this.accommodationRepository.findOne({
       where: { id },
-      relations: ['amenities', 'category', 'owner'],
+      relations: ['amenities', 'category', 'user'],
     });
 
     if (!accommodation) {
@@ -124,9 +128,7 @@ export class AccommodationsService {
 
     const accommodation = await this.getAccommodationById(id);
     if (accommodation.user.id !== userId) {
-      throw new UnauthorizedException(
-        'You are not authorized to update this accommodation',
-      );
+      throw new UnauthorizedException('Access denied.');
     }
     if (amenities) {
       const allAmenities = await this.amenitiesService.getAllAmenities();
@@ -147,22 +149,25 @@ export class AccommodationsService {
 
     Object.assign(accommodation, updateData);
 
-    return this.accommodationRepository.save(accommodation);
+    return await this.accommodationRepository.save(accommodation);
   }
 
   async deleteAccommodation(id: string, userId: string): Promise<void> {
     const accommodation = await this.accommodationRepository.findOne({
       where: { id },
+      relations: ['user'],
     });
-
     if (!accommodation) {
       throw new NotFoundException(`Accommodation with id ${id} not found`);
     }
 
     if (accommodation.user.id !== userId) {
-      throw new UnauthorizedException(
-        'You are not authorized to delete this accommodation',
-      );
+      throw new UnauthorizedException('Access denied.');
+    }
+
+    const deletedAccommodation = await this.accommodationRepository.delete(id);
+    if (deletedAccommodation.affected === 0) {
+      throw new NotFoundException(`User with id ${userId} not found`);
     }
   }
 

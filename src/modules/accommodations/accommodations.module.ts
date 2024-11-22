@@ -6,10 +6,18 @@ import { Accommodation, Wishlist } from './entities';
 import { User } from '../users/entities/user.entity';
 import { CategoriesModule } from '../categories/categories.module';
 import { AmenitiesModule } from '../amenities/amenities.module';
+import { Amenity } from '../amenities/entities';
+import { AccommodationCategory } from '../categories/entities';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Accommodation, Wishlist, User]),
+    TypeOrmModule.forFeature([
+      Accommodation,
+      Wishlist,
+      User,
+      Amenity,
+      AccommodationCategory,
+    ]),
     AmenitiesModule,
     CategoriesModule,
   ],
