@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ParseUUIDV4Pipe } from 'src/shared/pipes';
@@ -23,12 +24,27 @@ import {
   GetUserSwaggerDecorator,
   GetUsersSwaggerDecorator,
   UpdateUserSwaggerDecorator,
+  GetWishlistSwaggerDecorator,
 } from './decorators/swagger.decorator';
+import { AuthTokenGuard } from 'src/shared/guards';
+import { GetUser } from 'src/shared/decorators';
+import { JwtPayload } from '../auth/auth.types';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Get('wishlist')
+  @UseGuards(AuthTokenGuard)
+  @GetWishlistSwaggerDecorator()
+  async getWishlist(@GetUser() user: JwtPayload) {
+    const accommodations = await this.usersService.getWishlist(user.sub);
+
+    return {
+      data: accommodations,
+    };
+  }
 
   @Get('')
   @GetUsersSwaggerDecorator()
