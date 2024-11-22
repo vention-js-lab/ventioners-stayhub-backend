@@ -23,8 +23,7 @@
     "migration:generate": "npx ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d ./src/shared/configs/data-source.config.ts ./src/database/migrations/migration-name-placeholder",
     "migration:create": "npx ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create ./src/database/migrations/migration-name-placeholder",
     "migration:run": "npx ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d ./src/shared/configs/data-source.config.ts",
-    "migration:revert": "npx ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d ./src/shared/configs/data-source.config.ts",
-    "seed": "npx ts-node -P ./tsconfig.json -r tsconfig-paths/register ./src/database/run-seed.ts"
+    "migration:revert": "npx ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d ./src/shared/configs/data-source.config.ts"
   },
   "dependencies": {
     "@nestjs/cache-manager": "^2.3.0",
