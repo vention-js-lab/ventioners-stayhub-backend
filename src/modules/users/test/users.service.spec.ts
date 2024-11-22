@@ -7,7 +7,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { FindOptionsWhere } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Wishlist } from 'src/modules/accommodations';
+import { Accommodation } from 'src/modules/accommodations';
 import { mockAccommodations } from './accommodations.mock';
 
 const mockUser = mockUsers[0];
@@ -34,14 +34,13 @@ const mockUsersRepository = {
   })),
 };
 
-const mockWishlistRepository = {
-  find: jest.fn().mockResolvedValue(
-    mockAccommodations.map((acc, idx) => ({
-      id: idx.toString(),
-      likedAt: new Date(),
-      accommodation: acc,
-    })),
-  ),
+const mockAccommodationsRepository = {
+  createQueryBuilder: jest.fn().mockReturnValue({
+    innerJoinAndSelect: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    select: jest.fn().mockReturnThis(),
+    getMany: jest.fn().mockResolvedValue(mockAccommodations),
+  }),
 };
 
 describe('UsersService', () => {
@@ -55,8 +54,8 @@ describe('UsersService', () => {
         UsersService,
         { provide: UsersRepository, useValue: mockUsersRepository },
         {
-          provide: getRepositoryToken(Wishlist),
-          useValue: mockWishlistRepository,
+          provide: getRepositoryToken(Accommodation),
+          useValue: mockAccommodationsRepository,
         },
       ],
     }).compile();

@@ -11,7 +11,7 @@ import {
   UpdateUserReqDto,
 } from './dto/request';
 import { Hasher } from 'src/shared/libs';
-import { Accommodation, Wishlist } from '../accommodations';
+import { Accommodation } from '../accommodations';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -19,8 +19,8 @@ import { Repository } from 'typeorm';
 export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
-    @InjectRepository(Wishlist)
-    private readonly wishlistRepository: Repository<Wishlist>,
+    @InjectRepository(Accommodation)
+    private readonly accommodationRepository: Repository<Accommodation>,
   ) {}
 
   async getUsers(
@@ -79,11 +79,11 @@ export class UsersService {
   }
 
   async getWishlist(userId: string): Promise<Accommodation[]> {
-    const wishlist = await this.wishlistRepository.find({
-      where: { user: { id: userId } },
-      relations: ['accommodation'],
-    });
-
-    return wishlist.map((item) => item.accommodation);
+    return this.accommodationRepository
+      .createQueryBuilder('accommodation')
+      .innerJoinAndSelect('accommodation.likes', 'wishlist')
+      .where('wishlist.user.id = :userId', { userId })
+      .select('accommodation')
+      .getMany();
   }
 }
