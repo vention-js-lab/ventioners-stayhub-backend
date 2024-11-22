@@ -8,12 +8,14 @@ import { User } from 'src/modules/users/entities/user.entity';
 import { AmenitiesService } from 'src/modules/amenities/amenities.service';
 import { CategoriesService } from 'src/modules/categories/categories.service';
 import { Amenity } from 'src/modules/amenities/entities';
+import { AccommodationCategory } from 'src/modules/categories/entities';
 describe('AccommodationsService - toggleLikeAccommodation', () => {
   let service: AccommodationsService;
   let mockWishlistRepo: Partial<Repository<Wishlist>>;
   let mockAccommodationRepo: Partial<Repository<Accommodation>>;
   let mockUserRepo: Partial<Repository<User>>;
   let mockAmenityRepo: Partial<Repository<Amenity>>;
+  let mockAccommodatioCategoryRepo: Partial<Repository<AccommodationCategory>>;
   let mockAmenitiesService: Partial<AmenitiesService>;
   let mockCategoriesService: Partial<CategoriesService>;
   beforeEach(async () => {
@@ -31,6 +33,7 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
     mockAmenitiesService = {};
     mockAmenityRepo = {};
     mockCategoriesService = {};
+    mockAccommodatioCategoryRepo = {};
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AccommodationsService,
@@ -55,8 +58,12 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
           useValue: mockCategoriesService,
         },
         {
-          provide: getRepositoryToken(User),
+          provide: getRepositoryToken(Amenity),
           useValue: mockAmenityRepo,
+        },
+        {
+          provide: getRepositoryToken(AccommodationCategory),
+          useValue: mockAccommodatioCategoryRepo,
         },
       ],
     }).compile();

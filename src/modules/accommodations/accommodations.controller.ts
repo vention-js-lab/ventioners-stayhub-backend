@@ -96,6 +96,7 @@ export class AccommodationsController {
     @Param('id', new ParseUUIDV4Pipe()) id: string,
     @GetUser() payload: JwtPayload,
   ) {
+    console.log(payload);
     await this.accommodationsService.deleteAccommodation(id, payload.sub);
   }
 

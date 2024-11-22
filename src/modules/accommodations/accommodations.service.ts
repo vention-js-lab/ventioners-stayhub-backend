@@ -88,6 +88,16 @@ export class AccommodationsService {
       ? await this.amenityRepository.findBy({ id: In(amenities) })
       : [];
 
+    const invalidAmenities = amenities?.filter(
+      (id) => !resolvedAmenities.some((amenity) => amenity.id === id),
+    );
+
+    if (invalidAmenities.length > 0) {
+      throw new NotFoundException(
+        `Amenity with ID ${invalidAmenities.join(', ')} not found.`,
+      );
+    }
+
     const resolvedCategory = await this.categoryRepository.findOneBy({
       id: categoryId,
     });
@@ -95,7 +105,6 @@ export class AccommodationsService {
     if (!resolvedCategory) {
       throw new NotFoundException(`Category with ID ${categoryId} not found`);
     }
-    console.log(resolvedCategory + '-' + resolvedAmenities);
     const newAccommodation = await this.accommodationRepository.create({
       ...accommodationData,
       amenities: resolvedAmenities,
@@ -130,23 +139,35 @@ export class AccommodationsService {
     if (accommodation.user.id !== userId) {
       throw new UnauthorizedException('Access denied.');
     }
-    if (amenities) {
-      const allAmenities = await this.amenitiesService.getAllAmenities();
-      accommodation.amenities = allAmenities.filter((amenity) =>
-        amenities.includes(amenity.id),
-      );
-    }
-    if (categoryId) {
-      const allCategories = await this.categoryService.getAllCategories();
-      const category = allCategories.find((cat) => cat.id === categoryId);
 
-      if (!category) {
+    if (amenities) {
+      const resolvedAmenities = await this.amenityRepository.findBy({
+        id: In(amenities),
+      });
+      const invalidAmenities = amenities.filter(
+        (id) => !resolvedAmenities.some((amenity) => amenity.id === id),
+      );
+
+      if (invalidAmenities.length > 0) {
+        throw new NotFoundException(
+          `Amenities with IDs ${invalidAmenities.join(', ')} not found.`,
+        );
+      }
+
+      accommodation.amenities = resolvedAmenities;
+    }
+
+    if (categoryId) {
+      const resolvedCategory = await this.categoryRepository.findOneBy({
+        id: categoryId,
+      });
+
+      if (!resolvedCategory) {
         throw new NotFoundException(`Category with ID ${categoryId} not found`);
       }
 
-      accommodation.category = category;
+      accommodation.category = resolvedCategory;
     }
-
     Object.assign(accommodation, updateData);
 
     return await this.accommodationRepository.save(accommodation);
