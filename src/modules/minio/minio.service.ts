@@ -1,12 +1,13 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { BucketName } from './minio.constants';
 import { isProd } from 'src/shared/helpers';
 import * as Minio from 'minio';
 
 @Injectable()
 export class MinioService {
   private minioClient: Minio.Client;
-  private bucketName: string;
+  private bucketName: BucketName;
 
   constructor(private readonly configService: ConfigService) {
     this.minioClient = new Minio.Client({
@@ -17,11 +18,11 @@ export class MinioService {
       secretKey: this.configService.get('MINIO_ROOT_PASSWORD'),
     });
 
-    this.bucketName = this.configService.get('MINIO_BUCKET_NAME');
     this.createBucketIfNotExists();
   }
 
-  async createBucketIfNotExists() {
+  async createBucketIfNotExists(bucketName = BucketName.Images) {
+    this.bucketName = bucketName;
     const bucketExists = await this.minioClient.bucketExists(this.bucketName);
     if (!bucketExists) {
       await this.minioClient.makeBucket(this.bucketName);
