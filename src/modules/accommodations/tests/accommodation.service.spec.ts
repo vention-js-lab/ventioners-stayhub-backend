@@ -7,12 +7,13 @@ import { Accommodation } from '../entities';
 import { User } from 'src/modules/users/entities/user.entity';
 import { AmenitiesService } from 'src/modules/amenities/amenities.service';
 import { CategoriesService } from 'src/modules/categories/categories.service';
-
+import { Amenity } from 'src/modules/amenities/entities';
 describe('AccommodationsService - toggleLikeAccommodation', () => {
   let service: AccommodationsService;
   let mockWishlistRepo: Partial<Repository<Wishlist>>;
   let mockAccommodationRepo: Partial<Repository<Accommodation>>;
   let mockUserRepo: Partial<Repository<User>>;
+  let mockAmenityRepo: Partial<Repository<Amenity>>;
   let mockAmenitiesService: Partial<AmenitiesService>;
   let mockCategoriesService: Partial<CategoriesService>;
   beforeEach(async () => {
@@ -28,6 +29,7 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
       findOne: jest.fn().mockResolvedValue({}),
     };
     mockAmenitiesService = {};
+    mockAmenityRepo = {};
     mockCategoriesService = {};
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -51,6 +53,10 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
         {
           provide: CategoriesService,
           useValue: mockCategoriesService,
+        },
+        {
+          provide: getRepositoryToken(User),
+          useValue: mockAmenityRepo,
         },
       ],
     }).compile();
