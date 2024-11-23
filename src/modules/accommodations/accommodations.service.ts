@@ -188,7 +188,7 @@ export class AccommodationsService {
 
     const deletedAccommodation = await this.accommodationRepository.delete(id);
     if (deletedAccommodation.affected === 0) {
-      throw new NotFoundException(`User with id ${userId} not found`);
+      throw new NotFoundException(`User with id ${id} not found`);
     }
   }
 

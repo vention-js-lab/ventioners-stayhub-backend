@@ -1,8 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class MigrationNamePlaceholder1732227911346
-  implements MigrationInterface
-{
+export class AddAccommodationOwner1732227911346 implements MigrationInterface {
   name = 'AddAccommodationOwner1732227911346';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
