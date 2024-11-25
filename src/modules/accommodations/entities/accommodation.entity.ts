@@ -13,7 +13,7 @@ import { Amenity } from 'src/modules/amenities/entities';
 import { AccommodationCategory } from 'src/modules/categories/entities';
 import { Wishlist } from './wishlist.entity';
 import { User } from 'src/modules/users/entities/user.entity';
-import { Image } from './image.entity';
+
 @Entity()
 export class Accommodation {
   @PrimaryGeneratedColumn('uuid')
@@ -31,10 +31,8 @@ export class Accommodation {
   })
   description: string;
 
-  @OneToMany(() => Image, (image) => image.accommodation, {
-    cascade: true,
-  })
-  images: Image[];
+  @Column('text', { array: true })
+  images: string[];
 
   @Column({
     type: 'varchar',
