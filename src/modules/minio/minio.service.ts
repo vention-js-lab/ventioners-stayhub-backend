@@ -1,12 +1,18 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AccessPolicy, BucketName } from './minio.constants';
 import { isProd } from 'src/shared/helpers';
+import { randomUUID } from 'crypto';
 import * as Minio from 'minio';
 
 @Injectable()
 export class MinioService {
   private minioClient: Minio.Client;
+  private readonly logger = new Logger(MinioService.name, { timestamp: true });
 
   constructor(private readonly configService: ConfigService) {
     this.minioClient = new Minio.Client({
@@ -42,13 +48,12 @@ export class MinioService {
       ],
     };
 
-    let prevPolicy: typeof bucketPolicyRead;
+    let prevPolicy = bucketPolicyRead;
     try {
       const policy = await this.minioClient.getBucketPolicy(bucketName);
       prevPolicy = JSON.parse(policy);
     } catch (err) {
-      console.error(err.message);
-      prevPolicy = bucketPolicyRead;
+      this.logger.error('Could not fetch the bucket policy', err.stack);
     }
 
     if (
@@ -67,7 +72,7 @@ export class MinioService {
         JSON.stringify(prevPolicy),
       );
     } catch (err) {
-      console.error(err.message);
+      this.logger.error('Could not set the bucket policy', err.stack);
       throw new InternalServerErrorException('Failed to initialize bucket');
     }
   }
@@ -81,7 +86,7 @@ export class MinioService {
   }
 
   async uploadFile(file: Express.Multer.File, bucketName = BucketName.Images) {
-    const fileName = `${Date.now()}-${file.originalname}`;
+    const fileName = `${randomUUID()}-${file.originalname}`;
 
     try {
       await this.minioClient.putObject(
@@ -93,7 +98,7 @@ export class MinioService {
 
       return fileName;
     } catch (err) {
-      console.error(err.message);
+      this.logger.error('Could not upload the object', err.stack);
       throw new InternalServerErrorException('Object upload failed');
     }
   }
@@ -102,7 +107,7 @@ export class MinioService {
     try {
       await this.minioClient.removeObject(bucketName, fileName);
     } catch (err) {
-      console.error(err.message);
+      this.logger.error('Could not delete the object', err.stack);
       throw new InternalServerErrorException('Object removal failed');
     }
   }
@@ -111,7 +116,7 @@ export class MinioService {
     try {
       await this.minioClient.removeObjects(bucketName, fileNames);
     } catch (err) {
-      console.error(err.message);
+      this.logger.error('Could not delete the objects', err.stack);
       throw new InternalServerErrorException('Objects removal failed');
     }
   }
