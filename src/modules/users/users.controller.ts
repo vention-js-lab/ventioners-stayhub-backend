@@ -28,7 +28,6 @@ import {
 } from './decorators/swagger.decorator';
 import { AuthTokenGuard } from 'src/shared/guards';
 import { GetUser } from 'src/shared/decorators';
-import { JwtPayload } from '../auth/auth.types';
 import { User } from './entities/user.entity';
 import { omit } from 'src/shared/helpers/omit-from-object.helper';
 
@@ -40,8 +39,8 @@ export class UsersController {
   @Get('wishlist')
   @UseGuards(AuthTokenGuard)
   @GetWishlistSwaggerDecorator()
-  async getWishlist(@GetUser() user: JwtPayload) {
-    const accommodations = await this.usersService.getWishlist(user.sub);
+  async getWishlist(@GetUser() user: User) {
+    const accommodations = await this.usersService.getWishlist(user.id);
 
     return {
       data: accommodations,
