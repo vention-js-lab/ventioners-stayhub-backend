@@ -29,6 +29,8 @@ import {
 import { AuthTokenGuard } from 'src/shared/guards';
 import { GetUser } from 'src/shared/decorators';
 import { JwtPayload } from '../auth/auth.types';
+import { User } from './entities/user.entity';
+import { omit } from 'src/shared/helpers/omit-from-object.helper';
 
 @ApiTags('Users')
 @Controller('users')
@@ -57,6 +59,18 @@ export class UsersController {
       totalCount: totalCount,
       totalPages: totalPages,
     };
+  }
+
+  @Get('me')
+  @UseGuards(AuthTokenGuard)
+  async getCurrentUser(@GetUser() user: User) {
+    const publicUser = omit<User>(user, [
+      'passwordHash',
+      'updatedAt',
+      'createdAt',
+    ]);
+
+    return { user: publicUser };
   }
 
   @Get(':userId')
