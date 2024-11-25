@@ -25,6 +25,9 @@ import {
 } from './decorators/swagger.decorator';
 import { GetUser } from 'src/shared/decorators';
 import { AuthTokenGuard } from 'src/shared/guards';
+import { User } from '../users/entities/user.entity';
+import { ParseUUIDV4Pipe } from 'src/shared/pipes';
+import { JwtPayload } from 'jsonwebtoken';
 
 @Controller('accommodations')
 export class AccommodationsController {
