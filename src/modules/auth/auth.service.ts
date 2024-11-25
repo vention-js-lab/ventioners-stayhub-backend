@@ -35,7 +35,7 @@ export class AuthService {
     const accessToken = await this.generateToken('ACCESS', payload);
     const refreshToken = await this.generateToken('REFRESH', payload);
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, existingUser };
   }
 
   async login(loginDto: LoginDto) {
@@ -58,7 +58,7 @@ export class AuthService {
     const accessToken = await this.generateToken('ACCESS', payload);
     const refreshToken = await this.generateToken('REFRESH', payload);
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, user };
   }
 
   async generateToken(tokenType: 'REFRESH' | 'ACCESS', payload: JwtPayload) {

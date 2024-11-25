@@ -9,6 +9,8 @@ import { JwtPayload } from './auth.types';
 import { GetUser } from 'src/shared/decorators';
 import { isProd } from 'src/shared/helpers';
 import ms from 'ms';
+import { omit } from 'src/shared/helpers/omit-from-object.helper';
+import { User } from '../users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +24,8 @@ export class AuthController {
     @Body() registerDto: RegisterDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const tokens = await this.authService.register(registerDto);
+    const { existingUser: user, ...tokens } =
+      await this.authService.register(registerDto);
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
@@ -38,6 +41,14 @@ export class AuthController {
         this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
       ),
     });
+
+    const publicUser = omit<User>(user, [
+      'passwordHash',
+      'updatedAt',
+      'createdAt',
+    ]);
+
+    return { user: publicUser };
   }
 
   @Post('login')
@@ -45,7 +56,7 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const tokens = await this.authService.login(loginDto);
+    const { user, ...tokens } = await this.authService.login(loginDto);
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
@@ -61,6 +72,14 @@ export class AuthController {
         this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
       ),
     });
+
+    const publicUser = omit<User>(user, [
+      'passwordHash',
+      'updatedAt',
+      'createdAt',
+    ]);
+
+    return { user: publicUser };
   }
 
   @Get('refresh')
