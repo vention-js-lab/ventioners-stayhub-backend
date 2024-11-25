@@ -9,7 +9,6 @@ import { JwtPayload } from './auth.types';
 import { GetUser } from 'src/shared/decorators';
 import { isProd } from 'src/shared/helpers';
 import ms from 'ms';
-import { omit } from 'src/shared/helpers/omit-from-object.helper';
 import { User } from '../users/entities/user.entity';
 
 @Controller('auth')
@@ -24,8 +23,7 @@ export class AuthController {
     @Body() registerDto: RegisterDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { existingUser: user, ...tokens } =
-      await this.authService.register(registerDto);
+    const tokens = await this.authService.register(registerDto);
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
@@ -41,14 +39,6 @@ export class AuthController {
         this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
       ),
     });
-
-    const publicUser = omit<User>(user, [
-      'passwordHash',
-      'updatedAt',
-      'createdAt',
-    ]);
-
-    return { user: publicUser };
   }
 
   @Post('login')
@@ -56,7 +46,7 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { user, ...tokens } = await this.authService.login(loginDto);
+    const tokens = await this.authService.login(loginDto);
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
@@ -72,14 +62,6 @@ export class AuthController {
         this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
       ),
     });
-
-    const publicUser = omit<User>(user, [
-      'passwordHash',
-      'updatedAt',
-      'createdAt',
-    ]);
-
-    return { user: publicUser };
   }
 
   @Get('logout')
@@ -91,13 +73,21 @@ export class AuthController {
   @Get('refresh')
   @UseGuards(RefreshTokenGuard)
   async refresh(
-    @GetUser() payload: JwtPayload,
+    @GetUser() user: User,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const accessToken = await this.authService.generateToken('ACCESS', payload);
+    const jwtPayload: JwtPayload = {
+      sub: user.id,
+      userEmail: user.email,
+    };
+
+    const accessToken = await this.authService.generateToken(
+      'ACCESS',
+      jwtPayload,
+    );
     const newRefreshToken = await this.authService.generateToken(
       'REFRESH',
-      payload,
+      jwtPayload,
     );
 
     res.cookie('accessToken', accessToken, {
