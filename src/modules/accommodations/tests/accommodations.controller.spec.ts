@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AccommodationsController } from '../accommodations.controller';
 import { AccommodationsService } from '../accommodations.service';
-import { JwtPayload } from 'src/modules/auth/auth.types';
+import { mockUsers } from 'src/modules/users/test/users.mock';
 
 describe('AccommodationsController', () => {
   let controller: AccommodationsController;
@@ -26,43 +26,37 @@ describe('AccommodationsController', () => {
 
   it('should like an accommodation and return the correct response', async () => {
     const accommodationId = 'accommodation-id-123';
-    const payload: JwtPayload = {
-      sub: 'user-id-123',
-      userEmail: '',
-    };
+    const user = mockUsers[0];
 
     jest.spyOn(service, 'toggleLikeAccommodation').mockResolvedValueOnce(true);
 
     const response = await controller.toggleLikeAccommodation(
       accommodationId,
-      payload,
+      user,
     );
 
     expect(response).toEqual({ message: 'Liked' });
     expect(service.toggleLikeAccommodation).toHaveBeenCalledWith({
       accommodationId,
-      userId: payload.sub,
+      userId: user.id,
     });
   });
 
   it('should unlike an accommodation and return the correct response', async () => {
     const accommodationId = 'accommodation-id-123';
-    const payload: JwtPayload = {
-      sub: 'user-id-123',
-      userEmail: '',
-    };
+    const user = mockUsers[0];
 
     jest.spyOn(service, 'toggleLikeAccommodation').mockResolvedValueOnce(false);
 
     const response = await controller.toggleLikeAccommodation(
       accommodationId,
-      payload,
+      user,
     );
 
     expect(response).toEqual({ message: 'Unliked' });
     expect(service.toggleLikeAccommodation).toHaveBeenCalledWith({
       accommodationId,
-      userId: payload.sub,
+      userId: user.id,
     });
   });
 });
