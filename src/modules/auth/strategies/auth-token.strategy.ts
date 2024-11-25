@@ -45,6 +45,6 @@ export class AuthTokenStrategy extends PassportStrategy(
       return done(new BadRequestException('User does not exist'), false);
     }
 
-    return done(null, payload);
+    return done(null, user);
   }
 }
