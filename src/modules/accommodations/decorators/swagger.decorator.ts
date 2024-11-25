@@ -1,6 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiQuery } from '@nestjs/swagger';
 import { GetManyAccommodationResponseDto } from '../dto/response';
+import { AccommodationResponseDto } from '../dto/response/crud-accommodation-response.dto';
 
 export function GetAccommodationsSwaggerDecorator() {
   return applyDecorators(
@@ -48,7 +49,8 @@ export function GetAccommodationsSwaggerDecorator() {
 export function CreateAccommodationSwaggerDecorator() {
   return applyDecorators(
     ApiOkResponse({
-      description: 'User retrieved successfully',
+      description: 'Accommodation created successfully',
+      type: AccommodationResponseDto,
     }),
   );
 }
@@ -57,6 +59,7 @@ export function GetByIdSwaggerDecorator() {
   return applyDecorators(
     ApiOkResponse({
       description: 'Accommodation found successfully',
+      type: AccommodationResponseDto,
     }),
     ApiNotFoundResponse({
       description: 'Accommodation not found',
@@ -68,6 +71,7 @@ export function UpdateAccommodationSwaggerDecorator() {
   return applyDecorators(
     ApiOkResponse({
       description: 'Accommodation updated successfully',
+      type: AccommodationResponseDto,
     }),
   );
 }
