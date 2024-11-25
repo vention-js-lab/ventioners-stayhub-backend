@@ -6,6 +6,8 @@ import { User } from '../entities/user.entity';
 import { CreateUserReqDto } from '../dto/request/create-user.dto';
 import { UpdateUserReqDto } from '../dto/request/update-user.dto';
 import { mockUsers } from './users.mock';
+import { AccommodationDto } from 'src/modules/accommodations/dto';
+import { mockAccommodations } from './accommodations.mock';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -43,6 +45,9 @@ describe('UsersController', () => {
               .fn<Promise<User>, [UpdateUserReqDto, string]>()
               .mockResolvedValue(mockUsers[0]),
             deleteUser: jest.fn<Promise<void>, [string]>().mockResolvedValue(),
+            getWishlist: jest
+              .fn<Promise<AccommodationDto[]>, [string]>()
+              .mockResolvedValue(mockAccommodations),
           },
         },
       ],
@@ -106,6 +111,16 @@ describe('UsersController', () => {
   describe('deleteUser', () => {
     it('deletes a user', () => {
       expect(controller.deleteUser('1')).resolves.toBeUndefined();
+    });
+  });
+
+  describe('getWishlist', () => {
+    it('returns a user wishlist', () => {
+      const user = mockUsers[0];
+
+      expect(controller.getWishlist(user)).resolves.toEqual({
+        data: mockAccommodations,
+      });
     });
   });
 });

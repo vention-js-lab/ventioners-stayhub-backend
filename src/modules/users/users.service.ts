@@ -11,10 +11,17 @@ import {
   UpdateUserReqDto,
 } from './dto/request';
 import { Hasher } from 'src/shared/libs';
+import { Accommodation } from '../accommodations';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    @InjectRepository(Accommodation)
+    private readonly accommodationRepository: Repository<Accommodation>,
+  ) {}
 
   async getUsers(
     searchParams: UserSearchParamsReqDto,
@@ -69,5 +76,14 @@ export class UsersService {
     if (deleteResult.affected === 0) {
       throw new NotFoundException(`User with id ${userId} not found`);
     }
+  }
+
+  async getWishlist(userId: string): Promise<Accommodation[]> {
+    return this.accommodationRepository
+      .createQueryBuilder('accommodation')
+      .innerJoinAndSelect('accommodation.likes', 'wishlist')
+      .where('wishlist.user.id = :userId', { userId })
+      .select('accommodation')
+      .getMany();
   }
 }

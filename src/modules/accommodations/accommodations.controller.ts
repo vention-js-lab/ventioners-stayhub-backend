@@ -24,9 +24,7 @@ import {
   UpdateAccommodationSwaggerDecorator,
 } from './decorators/swagger.decorator';
 import { GetUser } from 'src/shared/decorators';
-import { JwtPayload } from '../auth/auth.types';
 import { AuthTokenGuard } from 'src/shared/guards';
-import { ParseUUIDV4Pipe } from 'src/shared/pipes';
 
 @Controller('accommodations')
 export class AccommodationsController {
@@ -103,11 +101,11 @@ export class AccommodationsController {
   @UseGuards(AuthTokenGuard)
   async toggleLikeAccommodation(
     @Param('id') accommodationId: string,
-    @GetUser() payload: JwtPayload,
+    @GetUser() user: User,
   ) {
     const result = await this.accommodationsService.toggleLikeAccommodation({
       accommodationId,
-      userId: payload.sub,
+      userId: user.id,
     });
 
     return { message: result ? 'Liked' : 'Unliked' };

@@ -1,9 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
 import { EnvConfig, ValidationConfig } from './shared/configs';
 import cookieParser from 'cookie-parser';
+import { swaggerConfig } from './shared/configs/swagger.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -24,13 +25,9 @@ async function bootstrap() {
     infer: true,
   });
 
-  const config = new DocumentBuilder()
-    .setTitle('Stayhub API')
-    .setDescription('The Stayhub API description')
-    .setVersion('1.0')
-    .addTag('stayhub')
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  const documentFactory = () =>
+    SwaggerModule.createDocument(app, swaggerConfig);
+
   SwaggerModule.setup('api/docs', app, documentFactory);
 
   await app.listen(port);

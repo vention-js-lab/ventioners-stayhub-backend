@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ParseUUIDV4Pipe } from 'src/shared/pipes';
@@ -23,12 +24,28 @@ import {
   GetUserSwaggerDecorator,
   GetUsersSwaggerDecorator,
   UpdateUserSwaggerDecorator,
+  GetWishlistSwaggerDecorator,
 } from './decorators/swagger.decorator';
+import { AuthTokenGuard } from 'src/shared/guards';
+import { GetUser } from 'src/shared/decorators';
+import { User } from './entities/user.entity';
+import { omit } from 'src/shared/helpers/omit-from-object.helper';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Get('wishlist')
+  @UseGuards(AuthTokenGuard)
+  @GetWishlistSwaggerDecorator()
+  async getWishlist(@GetUser() user: User) {
+    const accommodations = await this.usersService.getWishlist(user.id);
+
+    return {
+      data: accommodations,
+    };
+  }
 
   @Get('')
   @GetUsersSwaggerDecorator()
@@ -41,6 +58,18 @@ export class UsersController {
       totalCount: totalCount,
       totalPages: totalPages,
     };
+  }
+
+  @Get('me')
+  @UseGuards(AuthTokenGuard)
+  async getCurrentUser(@GetUser() user: User) {
+    const publicUser = omit<User>(user, [
+      'passwordHash',
+      'updatedAt',
+      'createdAt',
+    ]);
+
+    return { user: publicUser };
   }
 
   @Get(':userId')

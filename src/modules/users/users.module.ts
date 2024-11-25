@@ -4,9 +4,11 @@ import { UsersController } from './users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersRepository } from './users.repository';
 import { DataSource } from 'typeorm';
+import { Accommodation, Wishlist } from '../accommodations';
+import { User } from './entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule],
+  imports: [TypeOrmModule.forFeature([Accommodation, Wishlist, User])],
   controllers: [UsersController],
   providers: [
     {

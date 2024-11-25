@@ -6,6 +6,9 @@ import { CreateUserReqDto, UpdateUserReqDto } from '../dto/request';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { FindOptionsWhere } from 'typeorm';
 import { User } from '../entities/user.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Accommodation } from 'src/modules/accommodations';
+import { mockAccommodations } from './accommodations.mock';
 
 const mockUser = mockUsers[0];
 
@@ -31,6 +34,15 @@ const mockUsersRepository = {
   })),
 };
 
+const mockAccommodationsRepository = {
+  createQueryBuilder: jest.fn().mockReturnValue({
+    innerJoinAndSelect: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    select: jest.fn().mockReturnThis(),
+    getMany: jest.fn().mockResolvedValue(mockAccommodations),
+  }),
+};
+
 describe('UsersService', () => {
   let service: UsersService;
   // eslint-disable-next-line
@@ -41,6 +53,10 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         { provide: UsersRepository, useValue: mockUsersRepository },
+        {
+          provide: getRepositoryToken(Accommodation),
+          useValue: mockAccommodationsRepository,
+        },
       ],
     }).compile();
 
@@ -90,7 +106,7 @@ describe('UsersService', () => {
       const createUserDto: CreateUserReqDto = {
         firstName: mockUser.firstName,
         lastName: mockUser.lastName,
-        email: 'existingemail@example.com',
+        email: 'existingemail@gmail.com',
         password: 'password123',
       };
 
@@ -131,6 +147,12 @@ describe('UsersService', () => {
       expect(service.deleteUser('non-existing-user-id')).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('getWishlist', () => {
+    it('returns a user wishlist', async () => {
+      expect(service.getWishlist('1')).resolves.toEqual(mockAccommodations);
     });
   });
 });
