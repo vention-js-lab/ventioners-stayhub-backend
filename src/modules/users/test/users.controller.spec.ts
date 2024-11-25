@@ -7,7 +7,6 @@ import { CreateUserReqDto } from '../dto/request/create-user.dto';
 import { UpdateUserReqDto } from '../dto/request/update-user.dto';
 import { mockUsers } from './users.mock';
 import { AccommodationDto } from 'src/modules/accommodations/dto';
-import { JwtPayload } from 'src/modules/auth/auth.types';
 import { mockAccommodations } from './accommodations.mock';
 
 describe('UsersController', () => {
@@ -117,10 +116,7 @@ describe('UsersController', () => {
 
   describe('getWishlist', () => {
     it('returns a user wishlist', () => {
-      const user: JwtPayload = {
-        sub: '1',
-        userEmail: 'test@gmail.com',
-      };
+      const user = mockUsers[0];
 
       expect(controller.getWishlist(user)).resolves.toEqual({
         data: mockAccommodations,
