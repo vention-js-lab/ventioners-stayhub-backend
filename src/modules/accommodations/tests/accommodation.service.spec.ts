@@ -2,22 +2,24 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AccommodationsService } from '../accommodations.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Wishlist } from '../entities';
+import { Image, Wishlist } from '../entities';
 import { Accommodation } from '../entities';
 import { User } from 'src/modules/users/entities/user.entity';
 import { AmenitiesService } from 'src/modules/amenities/amenities.service';
 import { CategoriesService } from 'src/modules/categories/categories.service';
-import { Amenity } from 'src/modules/amenities/entities';
-import { AccommodationCategory } from 'src/modules/categories/entities';
+import { MinioService } from 'src/modules/minio/minio.service';
+import { ConfigService } from '@nestjs/config';
 describe('AccommodationsService - toggleLikeAccommodation', () => {
   let service: AccommodationsService;
   let mockWishlistRepo: Partial<Repository<Wishlist>>;
   let mockAccommodationRepo: Partial<Repository<Accommodation>>;
   let mockUserRepo: Partial<Repository<User>>;
-  let mockAmenityRepo: Partial<Repository<Amenity>>;
-  let mockAccommodatioCategoryRepo: Partial<Repository<AccommodationCategory>>;
   let mockAmenitiesService: Partial<AmenitiesService>;
   let mockCategoriesService: Partial<CategoriesService>;
+  let mockImageRepo: Partial<Image>;
+  let mockMinioService: Partial<MinioService>;
+  let mockConfigService: Partial<ConfigService>;
+
   beforeEach(async () => {
     mockWishlistRepo = {
       findOne: jest.fn().mockResolvedValue(null),
@@ -31,9 +33,9 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
       findOne: jest.fn().mockResolvedValue({}),
     };
     mockAmenitiesService = {};
-    mockAmenityRepo = {};
     mockCategoriesService = {};
-    mockAccommodatioCategoryRepo = {};
+    mockImageRepo = {};
+    mockMinioService = {};
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AccommodationsService,
@@ -58,12 +60,16 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
           useValue: mockCategoriesService,
         },
         {
-          provide: getRepositoryToken(Amenity),
-          useValue: mockAmenityRepo,
+          provide: getRepositoryToken(Image),
+          useValue: mockImageRepo,
         },
         {
-          provide: getRepositoryToken(AccommodationCategory),
-          useValue: mockAccommodatioCategoryRepo,
+          provide: MinioService,
+          useValue: mockMinioService,
+        },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
         },
       ],
     }).compile();
