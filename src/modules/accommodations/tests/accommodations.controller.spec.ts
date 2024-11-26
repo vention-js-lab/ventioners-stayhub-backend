@@ -14,7 +14,7 @@ describe('AccommodationsController', () => {
         {
           provide: AccommodationsService,
           useValue: {
-            toggleLikeAccommodation: jest.fn(),
+            toggleWishlistAccommodation: jest.fn(),
           },
         },
       ],
@@ -31,15 +31,17 @@ describe('AccommodationsController', () => {
       userEmail: '',
     };
 
-    jest.spyOn(service, 'toggleLikeAccommodation').mockResolvedValueOnce(true);
+    jest
+      .spyOn(service, 'toggleWishlistAccommodation')
+      .mockResolvedValueOnce(true);
 
-    const response = await controller.toggleLikeAccommodation(
+    const response = await controller.toggleWishlistAccommodation(
       accommodationId,
       payload,
     );
 
-    expect(response).toEqual({ message: 'Liked' });
-    expect(service.toggleLikeAccommodation).toHaveBeenCalledWith({
+    expect(response).toEqual({ message: 'Wishlisted' });
+    expect(service.toggleWishlistAccommodation).toHaveBeenCalledWith({
       accommodationId,
       userId: payload.sub,
     });
@@ -52,15 +54,17 @@ describe('AccommodationsController', () => {
       userEmail: '',
     };
 
-    jest.spyOn(service, 'toggleLikeAccommodation').mockResolvedValueOnce(false);
+    jest
+      .spyOn(service, 'toggleWishlistAccommodation')
+      .mockResolvedValueOnce(false);
 
-    const response = await controller.toggleLikeAccommodation(
+    const response = await controller.toggleWishlistAccommodation(
       accommodationId,
       payload,
     );
 
-    expect(response).toEqual({ message: 'Unliked' });
-    expect(service.toggleLikeAccommodation).toHaveBeenCalledWith({
+    expect(response).toEqual({ message: 'UnWishlisted' });
+    expect(service.toggleWishlistAccommodation).toHaveBeenCalledWith({
       accommodationId,
       userId: payload.sub,
     });

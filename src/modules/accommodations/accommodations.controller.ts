@@ -27,17 +27,19 @@ export class AccommodationsController {
     };
   }
 
-  @Post(':id/like')
+  @Post(':id/wishlist')
   @UseGuards(AuthTokenGuard)
-  async toggleLikeAccommodation(
+  async toggleWishlistAccommodation(
     @Param('id') accommodationId: string,
     @GetUser() payload: JwtPayload,
   ) {
-    const result = await this.accommodationsService.toggleLikeAccommodation({
-      accommodationId,
-      userId: payload.sub,
-    });
+    const result = await this.accommodationsService.toggleWishlistAccommodation(
+      {
+        accommodationId,
+        userId: payload.sub,
+      },
+    );
 
-    return { message: result ? 'Liked' : 'Unliked' };
+    return { message: result ? 'Wishlisted' : 'UnWishlisted' };
   }
 }
