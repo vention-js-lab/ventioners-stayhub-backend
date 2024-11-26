@@ -46,12 +46,12 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
     service = module.get<AccommodationsService>(AccommodationsService);
   });
 
-  describe('toggleLikeAccommodation', () => {
+  describe('toggleWishlistAccommodation', () => {
     it('should unlike an accommodation if it is already liked', async () => {
       const payload = { userId: 'user123', accommodationId: 'acc123' };
       (mockWishlistRepo.findOne as jest.Mock).mockResolvedValue({});
 
-      const result = await service.toggleLikeAccommodation(payload);
+      const result = await service.toggleWishlistAccommodation(payload);
 
       expect(mockWishlistRepo.findOne).toHaveBeenCalled();
       expect(mockWishlistRepo.remove).toHaveBeenCalled();
@@ -64,7 +64,7 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
       (mockAccommodationRepo.findOne as jest.Mock).mockResolvedValue({});
       (mockUserRepo.findOne as jest.Mock).mockResolvedValue({});
 
-      const result = await service.toggleLikeAccommodation(payload);
+      const result = await service.toggleWishlistAccommodation(payload);
 
       expect(mockWishlistRepo.findOne).toHaveBeenCalled();
       expect(mockWishlistRepo.save).toHaveBeenCalled();
