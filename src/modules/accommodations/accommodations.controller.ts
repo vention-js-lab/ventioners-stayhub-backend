@@ -33,13 +33,9 @@ export class AccommodationsController {
     @Param('id') accommodationId: string,
     @GetUser() user: User,
   ) {
-    const result = await this.accommodationsService.toggleWishlistAccommodation(
-      {
-        accommodationId,
-        userId: user.id,
-      },
-    );
-
-    return { message: result ? 'InWishlist' : 'OutOfWishlist' };
+    await this.accommodationsService.toggleWishlistAccommodation({
+      accommodationId,
+      userId: user.id,
+    });
   }
 }

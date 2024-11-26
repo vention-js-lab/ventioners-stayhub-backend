@@ -37,7 +37,7 @@ describe('AccommodationsController', () => {
       user,
     );
 
-    expect(response).toEqual({ message: 'InWishlist' });
+    expect(response).toEqual(void 0);
     expect(service.toggleWishlistAccommodation).toHaveBeenCalledWith({
       accommodationId,
       userId: user.id,
@@ -57,7 +57,7 @@ describe('AccommodationsController', () => {
       user,
     );
 
-    expect(response).toEqual({ message: 'OutOfWishlist' });
+    expect(response).toEqual(void 0);
     expect(service.toggleWishlistAccommodation).toHaveBeenCalledWith({
       accommodationId,
       userId: user.id,
