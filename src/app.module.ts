@@ -9,6 +9,7 @@ import { OAuthModule } from './modules';
 import { AccommodationsModule } from './modules/accommodations/accommodations.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { AmenitiesModule } from './modules/amenities/amenities.module';
+import { MinioModule } from './modules/minio/minio.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AmenitiesModule } from './modules/amenities/amenities.module';
     AccommodationsModule,
     CategoriesModule,
     AmenitiesModule,
+    MinioModule,
   ],
 })
 export class AppModule {}

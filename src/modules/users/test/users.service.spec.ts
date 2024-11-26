@@ -106,7 +106,7 @@ describe('UsersService', () => {
       const createUserDto: CreateUserReqDto = {
         firstName: mockUser.firstName,
         lastName: mockUser.lastName,
-        email: 'existingemail@example.com',
+        email: 'existingemail@gmail.com',
         password: 'password123',
       };
 

@@ -9,6 +9,7 @@ import { JwtPayload } from './auth.types';
 import { GetUser } from 'src/shared/decorators';
 import { isProd } from 'src/shared/helpers';
 import ms from 'ms';
+import { User } from '../users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -63,16 +64,30 @@ export class AuthController {
     });
   }
 
+  @Get('logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+  }
+
   @Get('refresh')
   @UseGuards(RefreshTokenGuard)
   async refresh(
-    @GetUser() payload: JwtPayload,
+    @GetUser() user: User,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const accessToken = await this.authService.generateToken('ACCESS', payload);
+    const jwtPayload: JwtPayload = {
+      sub: user.id,
+      userEmail: user.email,
+    };
+
+    const accessToken = await this.authService.generateToken(
+      'ACCESS',
+      jwtPayload,
+    );
     const newRefreshToken = await this.authService.generateToken(
       'REFRESH',
-      payload,
+      jwtPayload,
     );
 
     res.cookie('accessToken', accessToken, {

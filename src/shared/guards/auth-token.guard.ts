@@ -5,13 +5,13 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 @Injectable()
 export class AuthTokenGuard extends PAuthGuard(AuthConfig.AuthTokenKey) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handleRequest(err: any, payload: any, _info: any) {
-    if (err || !payload) {
+  handleRequest(err: any, user: any, _info: any) {
+    if (err || !user) {
       throw new UnauthorizedException(
         'Sign in required to perform this action',
       );
     }
 
-    return payload;
+    return user;
   }
 }

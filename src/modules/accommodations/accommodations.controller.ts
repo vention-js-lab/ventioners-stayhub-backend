@@ -3,8 +3,8 @@ import { AccommodationsService } from './accommodations.service';
 import { SearchAccommodationQueryParamsDto } from './dto/request';
 import { GetAccommodationsSwaggerDecorator } from './decorators/swagger.decorator';
 import { GetUser } from 'src/shared/decorators';
-import { JwtPayload } from '../auth/auth.types';
 import { AuthTokenGuard } from 'src/shared/guards';
+import { User } from '../users/entities/user.entity';
 
 @Controller('accommodations')
 export class AccommodationsController {
@@ -31,7 +31,7 @@ export class AccommodationsController {
   @UseGuards(AuthTokenGuard)
   async toggleWishlistAccommodation(
     @Param('id') accommodationId: string,
-    @GetUser() payload: JwtPayload,
+    @GetUser() user: User,
   ) {
     const result = await this.accommodationsService.toggleWishlistAccommodation(
       {
