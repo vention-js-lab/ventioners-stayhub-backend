@@ -26,7 +26,7 @@ describe('AccommodationsController', () => {
 
   it('should like an accommodation and return the correct response', async () => {
     const accommodationId = 'accommodation-id-123';
-    const user = mockUsers[0];
+    const payload = { sub: mockUsers[0].id, userEmail: mockUsers[0].email };
 
     jest
       .spyOn(service, 'toggleWishlistAccommodation')
@@ -34,13 +34,13 @@ describe('AccommodationsController', () => {
 
     const response = await controller.toggleWishlistAccommodation(
       accommodationId,
-      user,
+      payload,
     );
 
     expect(response).toEqual({ message: 'Wishlisted' });
     expect(service.toggleWishlistAccommodation).toHaveBeenCalledWith({
       accommodationId,
-      userId: user.id,
+      userId: payload.sub,
     });
   });
 
@@ -54,7 +54,7 @@ describe('AccommodationsController', () => {
 
     const response = await controller.toggleWishlistAccommodation(
       accommodationId,
-      user,
+      { sub: user.id, userEmail: user.email },
     );
 
     expect(response).toEqual({ message: 'UnWishlisted' });
