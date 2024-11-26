@@ -20,15 +20,14 @@ export class CreateAccommodationDto {
   @ApiProperty({ default: 'A beautiful villa near the beach.', maxLength: 255 })
   description: string;
 
-  @IsArray()
-  @IsNotEmpty()
-  @IsOptional()
-  @ApiProperty({
-    type: [String],
-    default: ['image1.jpg', 'image2.jpg'],
-    description: 'Array of image URLs',
-  })
-  images: string[];
+  // @IsArray()
+  // @IsOptional()
+  // @ApiProperty({
+  //   type: [String],
+  //   default: ['image1.jpg', 'image2.jpg'],
+  //   description: 'Array of image URLs',
+  // })
+  // images: string[];
 
   @IsString()
   @IsNotEmpty()

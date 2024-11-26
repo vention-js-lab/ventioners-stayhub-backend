@@ -3,8 +3,8 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Accommodation, Wishlist } from './entities';
-import { In, Repository } from 'typeorm';
+import { Accommodation, Image, Wishlist } from './entities';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   LikeAccommodationDto,
@@ -14,28 +14,27 @@ import {
 } from './dto/request';
 import { PaginatedResult } from './interfaces';
 import { User } from '../users/entities/user.entity';
-import { AmenitiesService } from '../amenities/amenities.service';
+import { MinioService } from '../minio/minio.service';
+import { AccessPolicy, BucketName } from '../minio/minio.constants';
+import { ConfigService } from '@nestjs/config';
 import { CategoriesService } from '../categories/categories.service';
-import { Amenity } from '../amenities/entities';
-import { AccommodationCategory } from '../categories/entities';
+import { AmenitiesService } from '../amenities/amenities.service';
 
 @Injectable()
 export class AccommodationsService {
   constructor(
     @InjectRepository(Accommodation)
     private readonly accommodationRepository: Repository<Accommodation>,
-
     @InjectRepository(Wishlist)
     private readonly wishlistRepository: Repository<Wishlist>,
-
-    @InjectRepository(Amenity)
-    private readonly amenityRepository: Repository<Amenity>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(AccommodationCategory)
-    private readonly categoryRepository: Repository<AccommodationCategory>,
-    private readonly amenitiesService: AmenitiesService,
+    @InjectRepository(Image)
+    private readonly imageRepository: Repository<Image>,
+    private readonly minioService: MinioService,
+    private readonly configService: ConfigService,
     private readonly categoryService: CategoriesService,
+    private readonly amenitiesService: AmenitiesService,
   ) {}
 
   async getAccommodations(
@@ -80,32 +79,20 @@ export class AccommodationsService {
   }
 
   async createAccommodation(
-    createDto: CreateAccommodationDto,
+    CreateAccommodationDto: CreateAccommodationDto,
     userId: string,
   ): Promise<Accommodation> {
-    const { amenities, categoryId, ...accommodationData } = createDto;
+    const { amenities, categoryId, ...accommodationData } =
+      CreateAccommodationDto;
+
     const resolvedAmenities = amenities?.length
-      ? await this.amenityRepository.findBy({ id: In(amenities) })
+      ? await this.amenitiesService.getAmenitiesByIds(amenities)
       : [];
 
-    const invalidAmenities = amenities?.filter(
-      (id) => !resolvedAmenities.some((amenity) => amenity.id === id),
-    );
+    const resolvedCategory =
+      await this.categoryService.getCategoryById(categoryId);
 
-    if (invalidAmenities.length > 0) {
-      throw new NotFoundException(
-        `Amenity with ID ${invalidAmenities.join(', ')} not found.`,
-      );
-    }
-
-    const resolvedCategory = await this.categoryRepository.findOneBy({
-      id: categoryId,
-    });
-
-    if (!resolvedCategory) {
-      throw new NotFoundException(`Category with ID ${categoryId} not found`);
-    }
-    const newAccommodation = await this.accommodationRepository.create({
+    const newAccommodation = this.accommodationRepository.create({
       ...accommodationData,
       amenities: resolvedAmenities,
       category: resolvedCategory,
@@ -118,7 +105,7 @@ export class AccommodationsService {
   async getAccommodationById(id: string): Promise<Accommodation> {
     const accommodation = await this.accommodationRepository.findOne({
       where: { id },
-      relations: ['amenities', 'category', 'user'],
+      relations: ['amenities', 'category', 'user', 'images'],
     });
 
     if (!accommodation) {
@@ -130,10 +117,11 @@ export class AccommodationsService {
 
   async updateAccommodation(
     id: string,
-    updateDto: UpdateAccommodationDto,
+    UpdateAccommodationDto: UpdateAccommodationDto,
     userId: string,
   ): Promise<Accommodation> {
-    const { amenities, categoryId, ...updateData } = updateDto;
+    const { amenities, categoryId, ...updateAccommodationData } =
+      UpdateAccommodationDto;
 
     const accommodation = await this.getAccommodationById(id);
     if (accommodation.user.id !== userId) {
@@ -141,34 +129,20 @@ export class AccommodationsService {
     }
 
     if (amenities) {
-      const resolvedAmenities = await this.amenityRepository.findBy({
-        id: In(amenities),
-      });
-      const invalidAmenities = amenities.filter(
-        (id) => !resolvedAmenities.some((amenity) => amenity.id === id),
-      );
-
-      if (invalidAmenities.length > 0) {
-        throw new NotFoundException(
-          `Amenities with IDs ${invalidAmenities.join(', ')} not found.`,
-        );
-      }
+      const resolvedAmenities = amenities?.length
+        ? await this.amenitiesService.getAmenitiesByIds(amenities)
+        : [];
 
       accommodation.amenities = resolvedAmenities;
     }
 
     if (categoryId) {
-      const resolvedCategory = await this.categoryRepository.findOneBy({
-        id: categoryId,
-      });
-
-      if (!resolvedCategory) {
-        throw new NotFoundException(`Category with ID ${categoryId} not found`);
-      }
+      const resolvedCategory =
+        await this.categoryService.getCategoryById(categoryId);
 
       accommodation.category = resolvedCategory;
     }
-    Object.assign(accommodation, updateData);
+    Object.assign(accommodation, updateAccommodationData);
 
     return await this.accommodationRepository.save(accommodation);
   }
@@ -222,5 +196,80 @@ export class AccommodationsService {
       await this.wishlistRepository.save(userLike);
       return true;
     }
+  }
+
+  async addImagesToAccommodation(
+    accommodationId: string,
+    files: Express.Multer.File[],
+    userId: string,
+  ) {
+    const accommodation = await this.getAccommodationById(accommodationId);
+
+    if (accommodation.user.id !== userId) {
+      throw new UnauthorizedException('Access denied.');
+    }
+
+    await this.minioService.initializeBucket(
+      BucketName.Images,
+      AccessPolicy.Public,
+    );
+
+    const uploadedImages = [];
+
+    for (const [index, file] of files.entries()) {
+      const fileName = await this.minioService.uploadFile(file);
+      const image = this.imageRepository.create({
+        url: `https://${this.configService.get('MINIO_HOST')}:${this.configService.get('MINIO_PORT')}/${BucketName.Images}/${fileName}`,
+        order: index,
+        accommodation,
+      });
+      uploadedImages.push(image);
+    }
+
+    return await this.imageRepository.save(uploadedImages);
+  }
+
+  async deleteImage(
+    accommodationId: string,
+    imageId: string,
+    userId: string,
+  ): Promise<void> {
+    const accommodation = await this.getAccommodationById(accommodationId);
+    if (accommodation.user.id !== userId) {
+      throw new UnauthorizedException('Access denied.');
+    }
+
+    const image = await this.imageRepository.findOneBy({ id: imageId });
+
+    if (!image) {
+      throw new NotFoundException('Image not found.');
+    }
+
+    await this.minioService.deleteFile(image.url.split('/').pop());
+    await this.imageRepository.remove(image);
+  }
+
+  async deleteImages(accommodationId: string, userId: string): Promise<void> {
+    const accommodation = await this.getAccommodationById(accommodationId);
+    if (!accommodation) {
+      throw new NotFoundException(
+        `Accommodation with ID ${accommodationId} not found.`,
+      );
+    }
+
+    if (accommodation.user.id !== userId) {
+      throw new UnauthorizedException('Access denied.');
+    }
+
+    const fileNames = accommodation.images.map((image) => image.url);
+
+    if (!fileNames.length) {
+      throw new NotFoundException('No images found to delete.');
+    }
+
+    await this.minioService.deleteFiles(
+      fileNames.map((url) => url.split('/').pop()),
+    );
+    await this.imageRepository.remove(accommodation.images);
   }
 }

@@ -8,7 +8,9 @@ import {
   Post,
   Put,
   Query,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AccommodationsService } from './accommodations.service';
 import {
@@ -27,7 +29,7 @@ import { GetUser } from 'src/shared/decorators';
 import { AuthTokenGuard } from 'src/shared/guards';
 import { User } from '../users/entities/user.entity';
 import { ParseUUIDV4Pipe } from 'src/shared/pipes';
-import { JwtPayload } from 'jsonwebtoken';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('accommodations')
 export class AccommodationsController {
@@ -55,12 +57,12 @@ export class AccommodationsController {
   @UseGuards(AuthTokenGuard)
   async createAccommodation(
     @Body() createDto: CreateAccommodationDto,
-    @GetUser() payload: JwtPayload,
+    @GetUser() payload: User,
   ) {
     const newAccommodation =
       await this.accommodationsService.createAccommodation(
         createDto,
-        payload.sub,
+        payload.id,
       );
     return { data: newAccommodation };
   }
@@ -79,12 +81,12 @@ export class AccommodationsController {
   async updateAccommodation(
     @Param('id', new ParseUUIDV4Pipe()) id: string,
     @Body() updateDto: UpdateAccommodationDto,
-    @GetUser() payload: JwtPayload,
+    @GetUser() payload: User,
   ) {
     const updatedData = await this.accommodationsService.updateAccommodation(
       id,
       updateDto,
-      payload.sub,
+      payload.id,
     );
     return { data: updatedData };
   }
@@ -95,15 +97,15 @@ export class AccommodationsController {
   @UseGuards(AuthTokenGuard)
   async deleteAccommodation(
     @Param('id', new ParseUUIDV4Pipe()) id: string,
-    @GetUser() payload: JwtPayload,
+    @GetUser() payload: User,
   ) {
-    await this.accommodationsService.deleteAccommodation(id, payload.sub);
+    await this.accommodationsService.deleteAccommodation(id, payload.id);
   }
 
   @Post(':id/like')
   @UseGuards(AuthTokenGuard)
   async toggleLikeAccommodation(
-    @Param('id') accommodationId: string,
+    @Param('id', new ParseUUIDV4Pipe()) accommodationId: string,
     @GetUser() user: User,
   ) {
     const result = await this.accommodationsService.toggleLikeAccommodation({
@@ -112,5 +114,48 @@ export class AccommodationsController {
     });
 
     return { message: result ? 'Liked' : 'Unliked' };
+  }
+
+  @Post(':id/images')
+  @UseInterceptors(FilesInterceptor('files'))
+  @UseGuards(AuthTokenGuard)
+  async addImages(
+    @Param('id', new ParseUUIDV4Pipe()) id: string,
+    @UploadedFiles() files: Express.Multer.File[],
+    @GetUser() payload: User,
+  ) {
+    const accommodation =
+      await this.accommodationsService.addImagesToAccommodation(
+        id,
+        files,
+        payload.id,
+      );
+
+    return { data: accommodation };
+  }
+
+  @Delete(':id/images/:imageId')
+  @HttpCode(204)
+  @UseGuards(AuthTokenGuard)
+  async deleteImage(
+    @Param('id', new ParseUUIDV4Pipe()) accommodationId: string,
+    @Param('imageId') imageId: string,
+    @GetUser() payload: User,
+  ) {
+    await this.accommodationsService.deleteImage(
+      accommodationId,
+      imageId,
+      payload.id,
+    );
+  }
+
+  @Delete(':id/images')
+  @UseGuards(AuthTokenGuard)
+  @HttpCode(204)
+  async deleteAccommodationImages(
+    @Param('id', new ParseUUIDV4Pipe()) accommodationId: string,
+    @GetUser() user: User,
+  ) {
+    await this.accommodationsService.deleteImages(accommodationId, user.id);
   }
 }
