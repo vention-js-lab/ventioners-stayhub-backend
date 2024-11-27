@@ -108,14 +108,10 @@ export class AccommodationsController {
     @Param('id', new ParseUUIDV4Pipe()) accommodationId: string,
     @GetUser() user: User,
   ) {
-    const result = await this.accommodationsService.toggleWishlistAccommodation(
-      {
-        accommodationId,
-        userId: user.id,
-      },
-    );
-
-    return { message: result ? 'Added to Wishlist' : 'Removed from Wishlist' };
+    await this.accommodationsService.toggleWishlistAccommodation({
+      accommodationId,
+      userId: user.id,
+    });
   }
 
   @Post(':id/images')
