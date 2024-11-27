@@ -6,6 +6,8 @@ import { Wishlist } from '@modules';
 import { Amenity } from 'src/modules/amenities/entities';
 import { AccommodationCategory } from 'src/modules/categories/entities';
 import { User } from 'src/modules/users/entities/user.entity';
+import { Booking } from 'src/modules/bookings/entities/booking.entity';
+
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
@@ -24,6 +26,7 @@ import { User } from 'src/modules/users/entities/user.entity';
           AccommodationCategory,
           Wishlist,
           Image,
+          Booking,
         ],
         migrations: [`./migrations/**/*{.ts,.js}`],
         ssl: configService.get('NODE_ENV') === 'production',
