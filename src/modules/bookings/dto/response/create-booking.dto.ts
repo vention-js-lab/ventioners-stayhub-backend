@@ -11,7 +11,7 @@ class UserIdDto {
   id: string;
 }
 
-class BookingDtoWithAccommodationAndUserId extends BookingDto {
+export class BookingDtoWithAccommodationAndUserId extends BookingDto {
   @ApiProperty()
   user: UserIdDto;
 
