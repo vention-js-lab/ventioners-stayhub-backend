@@ -7,7 +7,7 @@ import { Accommodation, Image, Wishlist } from './entities';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
-  LikeAccommodationDto,
+  WishlistAccommodationDto,
   SearchAccommodationQueryParamsDto,
   UpdateAccommodationDto,
   CreateAccommodationDto,
@@ -168,17 +168,17 @@ export class AccommodationsService {
     }
   }
 
-  async toggleLikeAccommodation(
-    payload: LikeAccommodationDto,
+  async toggleWishlistAccommodation(
+    payload: WishlistAccommodationDto,
   ): Promise<boolean> {
     const { userId, accommodationId } = payload;
 
-    const existingLike = await this.wishlistRepository.findOne({
+    const isInWishlist = await this.wishlistRepository.findOne({
       where: { user: { id: userId }, accommodation: { id: accommodationId } },
     });
 
-    if (existingLike) {
-      await this.wishlistRepository.remove(existingLike);
+    if (isInWishlist) {
+      await this.wishlistRepository.remove(isInWishlist);
       return false;
     } else {
       const accommodation = await this.accommodationRepository.findOne({
@@ -191,11 +191,11 @@ export class AccommodationsService {
 
       const user = await this.userRepository.findOne({ where: { id: userId } });
 
-      const userLike = new Wishlist();
-      userLike.user = user;
-      userLike.accommodation = accommodation;
+      const userWishlist = new Wishlist();
+      userWishlist.user = user;
+      userWishlist.accommodation = accommodation;
 
-      await this.wishlistRepository.save(userLike);
+      await this.wishlistRepository.save(userWishlist);
       return true;
     }
   }
