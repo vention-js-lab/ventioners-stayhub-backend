@@ -10,6 +10,7 @@ import { AccommodationsModule } from './modules/accommodations/accommodations.mo
 import { CategoriesModule } from './modules/categories/categories.module';
 import { AmenitiesModule } from './modules/amenities/amenities.module';
 import { MinioModule } from './modules/minio/minio.module';
+import { BookingsModule } from './modules/bookings/bookings.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { MinioModule } from './modules/minio/minio.module';
     CategoriesModule,
     AmenitiesModule,
     MinioModule,
+    BookingsModule,
   ],
 })
 export class AppModule {}
