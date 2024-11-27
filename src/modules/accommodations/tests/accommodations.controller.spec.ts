@@ -14,7 +14,7 @@ describe('AccommodationsController', () => {
         {
           provide: AccommodationsService,
           useValue: {
-            toggleLikeAccommodation: jest.fn(),
+            toggleWishlistAccommodation: jest.fn(),
           },
         },
       ],
