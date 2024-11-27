@@ -54,14 +54,17 @@ export class AccommodationsController {
 
   @Post()
   @CreateAccommodationSwaggerDecorator()
+  @UseInterceptors(FilesInterceptor('files'))
   @UseGuards(AuthTokenGuard)
   async createAccommodation(
     @Body() createDto: CreateAccommodationDto,
     @GetUser() payload: User,
+    @UploadedFiles() files: Express.Multer.File[],
   ) {
     const newAccommodation =
       await this.accommodationsService.createAccommodation(
         createDto,
+        files,
         payload.id,
       );
     return { data: newAccommodation };
@@ -112,24 +115,6 @@ export class AccommodationsController {
       accommodationId,
       userId: user.id,
     });
-  }
-
-  @Post(':id/images')
-  @UseInterceptors(FilesInterceptor('files'))
-  @UseGuards(AuthTokenGuard)
-  async addImages(
-    @Param('id', new ParseUUIDV4Pipe()) id: string,
-    @UploadedFiles() files: Express.Multer.File[],
-    @GetUser() payload: User,
-  ) {
-    const accommodation =
-      await this.accommodationsService.addImagesToAccommodation(
-        id,
-        files,
-        payload.id,
-      );
-
-    return { data: accommodation };
   }
 
   @Delete(':id/images/:imageId')
