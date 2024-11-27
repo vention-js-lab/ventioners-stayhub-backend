@@ -104,11 +104,6 @@ export class AccommodationsController {
   ) {
     await this.accommodationsService.deleteAccommodation(id, payload.id);
   }
-
-  @Post(':id/wishlist')
-  @UseGuards(AuthTokenGuard)
-  async toggleWishlistAccommodation(
-    @Param('id', new ParseUUIDV4Pipe()) accommodationId: string,
   @Post(':id/wishlist')
   @UseGuards(AuthTokenGuard)
   async toggleWishlistAccommodation(
