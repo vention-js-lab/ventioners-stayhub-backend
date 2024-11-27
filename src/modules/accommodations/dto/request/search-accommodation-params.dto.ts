@@ -8,7 +8,7 @@ import {
   Max,
   IsUUID,
 } from 'class-validator';
-import { TransformToDate, TransformToInt } from 'src/shared/decorators';
+import { TransformToDate, TransformToNumber } from 'src/shared/transformers';
 
 export class SearchAccommodationQueryParamsDto {
   @IsString()
@@ -50,7 +50,7 @@ export class SearchAccommodationQueryParamsDto {
   })
   toDate?: Date;
 
-  @TransformToInt()
+  @TransformToNumber()
   @IsInt()
   @IsOptional()
   @Min(1)
@@ -61,7 +61,7 @@ export class SearchAccommodationQueryParamsDto {
   })
   page?: number = 1;
 
-  @TransformToInt()
+  @TransformToNumber()
   @IsInt()
   @IsOptional()
   @Min(1)
