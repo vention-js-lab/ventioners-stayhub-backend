@@ -115,7 +115,7 @@ export class AccommodationsController {
       },
     );
 
-    return { message: result ? 'Liked' : 'Unliked' };
+    return { message: result ? 'Added to Wishlist' : 'Removed from Wishlist' };
   }
 
   @Post(':id/images')
