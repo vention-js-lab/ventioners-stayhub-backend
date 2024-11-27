@@ -77,7 +77,7 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
     service = module.get<AccommodationsService>(AccommodationsService);
   });
 
-  describe('toggleLikeAccommodation', () => {
+  describe('toggleWishlistAccommodation', () => {
     it('should unlike an accommodation if it is already liked', async () => {
       const payload = { userId: 'user123', accommodationId: 'acc123' };
       (mockWishlistRepo.findOne as jest.Mock).mockResolvedValue({});
