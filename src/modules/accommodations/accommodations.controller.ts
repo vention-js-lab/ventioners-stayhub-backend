@@ -106,6 +106,10 @@ export class AccommodationsController {
   @UseGuards(AuthTokenGuard)
   async toggleWishlistAccommodation(
     @Param('id', new ParseUUIDV4Pipe()) accommodationId: string,
+  @Post(':id/wishlist')
+  @UseGuards(AuthTokenGuard)
+  async toggleWishlistAccommodation(
+    @Param('id') accommodationId: string,
     @GetUser() user: User,
   ) {
     await this.accommodationsService.toggleWishlistAccommodation({
