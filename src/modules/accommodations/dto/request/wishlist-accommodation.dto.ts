@@ -1,4 +1,4 @@
-export type LikeAccommodationDto = {
+export type WishlistAccommodationDto = {
   userId: string;
   accommodationId: string;
 };
