@@ -148,14 +148,4 @@ export class AccommodationsController {
       payload.id,
     );
   }
-
-  @Delete(':id/images')
-  @UseGuards(AuthTokenGuard)
-  @HttpCode(204)
-  async deleteAccommodationImages(
-    @Param('id', new ParseUUIDV4Pipe()) accommodationId: string,
-    @GetUser() user: User,
-  ) {
-    await this.accommodationsService.deleteImages(accommodationId, user.id);
-  }
 }

@@ -68,7 +68,7 @@ export class Accommodation {
   @ManyToOne(() => User, (user) => user.accommodations, {
     onDelete: 'CASCADE',
   })
-  user: User;
+  owner: User;
 
   @OneToMany(() => Wishlist, (like) => like.accommodation)
   likes?: Wishlist[];

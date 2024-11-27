@@ -15,10 +15,12 @@ import {
 import { PaginatedResult } from './interfaces';
 import { User } from '../users/entities/user.entity';
 import { MinioService } from '../minio/minio.service';
-import { AccessPolicy, BucketName } from '../minio/minio.constants';
+import { BucketName } from '../minio/minio.constants';
 import { ConfigService } from '@nestjs/config';
 import { CategoriesService } from '../categories/categories.service';
 import { AmenitiesService } from '../amenities/amenities.service';
+import { buildMinioFileUrl } from 'src/shared/util/urlBuilder';
+import { extractFileNameFromUrl } from 'src/shared/util/exractFileName';
 
 @Injectable()
 export class AccommodationsService {
@@ -96,7 +98,7 @@ export class AccommodationsService {
       ...accommodationData,
       amenities: resolvedAmenities,
       category: resolvedCategory,
-      user: { id: userId },
+      owner: { id: userId },
     });
 
     return await this.accommodationRepository.save(newAccommodation);
@@ -105,7 +107,7 @@ export class AccommodationsService {
   async getAccommodationById(id: string): Promise<Accommodation> {
     const accommodation = await this.accommodationRepository.findOne({
       where: { id },
-      relations: ['amenities', 'category', 'user', 'images'],
+      relations: ['amenities', 'category', 'owner', 'images'],
     });
 
     if (!accommodation) {
@@ -124,7 +126,7 @@ export class AccommodationsService {
       UpdateAccommodationDto;
 
     const accommodation = await this.getAccommodationById(id);
-    if (accommodation.user.id !== userId) {
+    if (accommodation.owner.id !== userId) {
       throw new UnauthorizedException('Access denied.');
     }
 
@@ -150,13 +152,13 @@ export class AccommodationsService {
   async deleteAccommodation(id: string, userId: string): Promise<void> {
     const accommodation = await this.accommodationRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: ['owner'],
     });
     if (!accommodation) {
       throw new NotFoundException(`Accommodation with id ${id} not found`);
     }
 
-    if (accommodation.user.id !== userId) {
+    if (accommodation.owner.id !== userId) {
       throw new UnauthorizedException('Access denied.');
     }
 
@@ -205,21 +207,28 @@ export class AccommodationsService {
   ) {
     const accommodation = await this.getAccommodationById(accommodationId);
 
-    if (accommodation.user.id !== userId) {
+    if (!accommodation) {
+      throw new NotFoundException(
+        `Accommodation with ${accommodationId} not found`,
+      );
+    }
+    if (accommodation.owner.id !== userId) {
       throw new UnauthorizedException('Access denied.');
     }
-
-    await this.minioService.initializeBucket(
-      BucketName.Images,
-      AccessPolicy.Public,
-    );
 
     const uploadedImages = [];
 
     for (const [index, file] of files.entries()) {
       const fileName = await this.minioService.uploadFile(file);
+
+      const url = buildMinioFileUrl(
+        this.configService.get('MINIO_HOST'),
+        this.configService.get('MINIO_PORT'),
+        BucketName.Images,
+        fileName,
+      );
       const image = this.imageRepository.create({
-        url: `https://${this.configService.get('MINIO_HOST')}:${this.configService.get('MINIO_PORT')}/${BucketName.Images}/${fileName}`,
+        url,
         order: index,
         accommodation,
       });
@@ -235,7 +244,12 @@ export class AccommodationsService {
     userId: string,
   ): Promise<void> {
     const accommodation = await this.getAccommodationById(accommodationId);
-    if (accommodation.user.id !== userId) {
+    if (!accommodation) {
+      throw new NotFoundException(
+        `Accommodation with ${accommodationId} not found`,
+      );
+    }
+    if (accommodation.owner.id !== userId) {
       throw new UnauthorizedException('Access denied.');
     }
 
@@ -244,32 +258,8 @@ export class AccommodationsService {
     if (!image) {
       throw new NotFoundException('Image not found.');
     }
-
-    await this.minioService.deleteFile(image.url.split('/').pop());
+    const fileName = extractFileNameFromUrl(image.url);
+    await this.minioService.deleteFile(fileName);
     await this.imageRepository.remove(image);
-  }
-
-  async deleteImages(accommodationId: string, userId: string): Promise<void> {
-    const accommodation = await this.getAccommodationById(accommodationId);
-    if (!accommodation) {
-      throw new NotFoundException(
-        `Accommodation with ID ${accommodationId} not found.`,
-      );
-    }
-
-    if (accommodation.user.id !== userId) {
-      throw new UnauthorizedException('Access denied.');
-    }
-
-    const fileNames = accommodation.images.map((image) => image.url);
-
-    if (!fileNames.length) {
-      throw new NotFoundException('No images found to delete.');
-    }
-
-    await this.minioService.deleteFiles(
-      fileNames.map((url) => url.split('/').pop()),
-    );
-    await this.imageRepository.remove(accommodation.images);
   }
 }

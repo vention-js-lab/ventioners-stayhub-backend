@@ -46,7 +46,7 @@ export class User {
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role: string;
 
-  @OneToMany(() => Accommodation, (accommodation) => accommodation.user)
+  @OneToMany(() => Accommodation, (accommodation) => accommodation.owner)
   accommodations: Accommodation[];
 
   @OneToMany(() => Wishlist, (like) => like.user)
