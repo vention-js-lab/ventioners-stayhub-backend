@@ -15,11 +15,18 @@ import { AuthTokenGuard } from 'src/shared/guards';
 import { GetUser } from 'src/shared/decorators';
 import { User } from '../users/entities/user.entity';
 import { BookingsQueryParamsReqDto } from './dto/request/bookings-query-params.dto';
+import {
+  GetMyBookingsSwaggerDecorator,
+  GetBookingSwaggerDecorator,
+  CreateBookingSwaggerDecorator,
+  UpdateBookingStatusSwaggerDecorator,
+} from './decorators/swagger.decorator';
 
 @Controller('bookings')
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
+  @GetMyBookingsSwaggerDecorator()
   @Get('my')
   @UseGuards(AuthTokenGuard)
   async getMyBookings(
@@ -36,6 +43,7 @@ export class BookingsController {
     };
   }
 
+  @GetBookingSwaggerDecorator()
   @Get(':id')
   @UseGuards(AuthTokenGuard)
   async getBooking(
@@ -49,6 +57,7 @@ export class BookingsController {
     };
   }
 
+  @CreateBookingSwaggerDecorator()
   @Post('')
   @UseGuards(AuthTokenGuard)
   async createBooking(@Body() dto: CreateBookingReqDto, @GetUser() user: User) {
@@ -59,6 +68,7 @@ export class BookingsController {
     };
   }
 
+  @UpdateBookingStatusSwaggerDecorator()
   @Patch(':id/status')
   @UseGuards(AuthTokenGuard)
   async updateStatus(
