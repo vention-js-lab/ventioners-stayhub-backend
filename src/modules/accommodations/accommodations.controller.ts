@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -54,13 +55,16 @@ export class AccommodationsController {
 
   @Post()
   @CreateAccommodationSwaggerDecorator()
-  @UseInterceptors(FilesInterceptor('files'))
+  @UseInterceptors(FilesInterceptor('images'))
   @UseGuards(AuthTokenGuard)
   async createAccommodation(
     @Body() createAccommodationDto: CreateAccommodationDto,
     @GetUser() payload: User,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
+    if (!files || files?.length === 0) {
+      throw new BadRequestException('At least one image is required');
+    }
     const newAccommodation =
       await this.accommodationsService.createAccommodation(
         createAccommodationDto,
