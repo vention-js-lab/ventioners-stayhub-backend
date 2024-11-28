@@ -65,8 +65,6 @@ const mockAccommodationsRepository = {
 
 describe('UsersService', () => {
   let service: UsersService;
-  // eslint-disable-next-line
-  let usersRepository: UsersRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -83,7 +81,6 @@ describe('UsersService', () => {
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    usersRepository = module.get<UsersRepository>(UsersRepository);
   });
 
   it('should be defined', () => {
