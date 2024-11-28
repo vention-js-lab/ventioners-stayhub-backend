@@ -54,7 +54,7 @@ export class AccommodationsController {
 
   @Post()
   @CreateAccommodationSwaggerDecorator()
-  @UseInterceptors(FilesInterceptor('files'))
+  @UseInterceptors(FilesInterceptor('images'))
   @UseGuards(AuthTokenGuard)
   async createAccommodation(
     @Body() createAccommodationDto: CreateAccommodationDto,
