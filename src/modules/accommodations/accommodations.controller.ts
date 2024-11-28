@@ -38,7 +38,7 @@ export class AccommodationsController {
 
   @Get()
   @GetAccommodationsSwaggerDecorator()
-  async getManyAccommodations(
+  async getAccommodations(
     @Query() searchQueryParams: SearchAccommodationQueryParamsDto,
   ) {
     const responseData =
@@ -112,6 +112,7 @@ export class AccommodationsController {
   ) {
     await this.accommodationsService.deleteAccommodation(id, payload.id);
   }
+
   @Post(':id/wishlist')
   @UseGuards(AuthTokenGuard)
   async toggleWishlistAccommodation(

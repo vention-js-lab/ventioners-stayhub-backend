@@ -171,7 +171,7 @@ export class AccommodationsService {
 
   async toggleWishlistAccommodation(
     payload: WishlistAccommodationDto,
-  ): Promise<boolean> {
+  ): Promise<void> {
     const { userId, accommodationId } = payload;
 
     const isInWishlist = await this.wishlistRepository.findOne({
@@ -180,25 +180,25 @@ export class AccommodationsService {
 
     if (isInWishlist) {
       await this.wishlistRepository.remove(isInWishlist);
-      return false;
-    } else {
-      const accommodation = await this.accommodationRepository.findOne({
-        where: { id: accommodationId },
-      });
 
-      if (!accommodation) {
-        throw new NotFoundException('Accommodation not found');
-      }
-
-      const user = await this.userRepository.findOne({ where: { id: userId } });
-
-      const userWishlist = new Wishlist();
-      userWishlist.user = user;
-      userWishlist.accommodation = accommodation;
-
-      await this.wishlistRepository.save(userWishlist);
-      return true;
+      return;
     }
+
+    const accommodation = await this.accommodationRepository.findOne({
+      where: { id: accommodationId },
+    });
+
+    if (!accommodation) {
+      throw new NotFoundException('Accommodation not found');
+    }
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    const userWishlist = new Wishlist();
+    userWishlist.user = user;
+    userWishlist.accommodation = accommodation;
+
+    await this.wishlistRepository.save(userWishlist);
   }
 
   async addImagesToAccommodation(
