@@ -62,7 +62,7 @@ export class AccommodationsController {
     @GetUser() payload: User,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    if (files?.length === 0) {
+    if (!files || files?.length === 0) {
       throw new BadRequestException('At least one image is required');
     }
     const newAccommodation =
