@@ -8,9 +8,9 @@ import { OAuthResponse } from './oAuth.types';
 import ms from 'ms';
 
 @Controller('auth')
-export class OAppController {
+export class OAuthController {
   constructor(
-    private readonly appService: OAuthService,
+    private readonly oAuthService: OAuthService,
     private configService: ConfigService,
   ) {}
 
@@ -24,7 +24,7 @@ export class OAppController {
     @GetUser() user: OAuthResponse,
     @Res() res: Response,
   ) {
-    const tokens = await this.appService.googleLogin(user);
+    const tokens = await this.oAuthService.googleLogin(user);
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,

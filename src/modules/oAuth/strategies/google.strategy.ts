@@ -25,10 +25,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       return done(new Error('Email is required'), null);
     }
     const user = {
-      email: emails[0]?.value,
-      firstName: name?.givenName,
-      lastName: name?.familyName,
-      picture: photos[0]?.value,
+      email: emails[0]?.value || '',
+      firstName: name?.givenName || '',
+      lastName: name?.familyName || '',
+      picture: photos[0]?.value || '',
       accessToken,
       refreshToken,
     };
