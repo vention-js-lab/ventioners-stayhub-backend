@@ -82,7 +82,6 @@ export class AccommodationsService {
 
   async createAccommodation(
     CreateAccommodationDto: CreateAccommodationDto,
-    files: Express.Multer.File[],
     userId: string,
   ): Promise<Accommodation> {
     const { amenities, categoryId, ...accommodationData } =
@@ -101,31 +100,7 @@ export class AccommodationsService {
       category: resolvedCategory,
       owner: { id: userId },
     });
-    const savedAccommodation =
-      await this.accommodationRepository.save(newAccommodation);
-
-    const uploadedImages = [];
-    for (const [index, file] of files.entries()) {
-      const fileName = await this.minioService.uploadFile(file);
-
-      const url = buildMinioFileUrl(
-        this.configService.get('MINIO_HOST'),
-        this.configService.get('MINIO_PORT'),
-        BucketName.Images,
-        fileName,
-      );
-
-      const image = this.imageRepository.create({
-        url,
-        order: index,
-        accommodation: savedAccommodation,
-      });
-      uploadedImages.push(image);
-    }
-
-    await this.imageRepository.save(uploadedImages);
-
-    return savedAccommodation;
+    return await this.accommodationRepository.save(newAccommodation);
   }
 
   async getAccommodationById(id: string): Promise<Accommodation> {
@@ -222,6 +197,44 @@ export class AccommodationsService {
       await this.wishlistRepository.save(userWishlist);
       return true;
     }
+  }
+
+  async addImagesToAccommodation(
+    accommodationId: string,
+    files: Express.Multer.File[],
+    userId: string,
+  ) {
+    const accommodation = await this.getAccommodationById(accommodationId);
+
+    if (!accommodation) {
+      throw new NotFoundException(
+        `Accommodation with ${accommodationId} not found`,
+      );
+    }
+    if (accommodation.owner.id !== userId) {
+      throw new UnauthorizedException('Access denied.');
+    }
+
+    const uploadedImages = [];
+
+    for (const [index, file] of files.entries()) {
+      const fileName = await this.minioService.uploadFile(file);
+
+      const url = buildMinioFileUrl(
+        this.configService.get('MINIO_HOST'),
+        this.configService.get('MINIO_PORT'),
+        BucketName.Images,
+        fileName,
+      );
+      const image = this.imageRepository.create({
+        url,
+        order: index,
+        accommodation,
+      });
+      uploadedImages.push(image);
+    }
+
+    return await this.imageRepository.save(uploadedImages);
   }
 
   async deleteImage(

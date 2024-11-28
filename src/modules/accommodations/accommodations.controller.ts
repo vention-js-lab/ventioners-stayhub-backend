@@ -64,10 +64,14 @@ export class AccommodationsController {
     const newAccommodation =
       await this.accommodationsService.createAccommodation(
         createDto,
-        files,
         payload.id,
       );
-    return { data: newAccommodation };
+    const newImage = await this.accommodationsService.addImagesToAccommodation(
+      newAccommodation.id,
+      files,
+      payload.id,
+    );
+    return { data: newAccommodation, newImage };
   }
 
   @Get(':id')
