@@ -120,6 +120,24 @@ export class AccommodationsController {
     });
   }
 
+  @Post(':id/images')
+  @UseInterceptors(FilesInterceptor('files'))
+  @UseGuards(AuthTokenGuard)
+  async addImages(
+    @Param('id', new ParseUUIDV4Pipe()) accommodationId: string,
+    @UploadedFiles() files: Express.Multer.File[],
+    @GetUser() payload: User,
+  ) {
+    const uploadedImage =
+      await this.accommodationsService.addImagesToAccommodation(
+        accommodationId,
+        files,
+        payload.id,
+      );
+
+    return { data: uploadedImage };
+  }
+
   @Delete(':id/images/:imageId')
   @HttpCode(204)
   @UseGuards(AuthTokenGuard)
