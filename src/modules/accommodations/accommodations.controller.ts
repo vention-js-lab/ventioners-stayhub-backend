@@ -57,21 +57,21 @@ export class AccommodationsController {
   @UseInterceptors(FilesInterceptor('files'))
   @UseGuards(AuthTokenGuard)
   async createAccommodation(
-    @Body() createDto: CreateAccommodationDto,
+    @Body() createAccommodationDto: CreateAccommodationDto,
     @GetUser() payload: User,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
     const newAccommodation =
       await this.accommodationsService.createAccommodation(
-        createDto,
+        createAccommodationDto,
         payload.id,
       );
-    const newImage = await this.accommodationsService.addImagesToAccommodation(
+    await this.accommodationsService.addImagesToAccommodation(
       newAccommodation.id,
       files,
       payload.id,
     );
-    return { data: newAccommodation, newImage };
+    return { data: newAccommodation };
   }
 
   @Get(':id')

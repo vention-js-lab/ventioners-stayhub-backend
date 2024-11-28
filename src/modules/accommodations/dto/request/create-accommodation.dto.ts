@@ -2,8 +2,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   MaxLength,
 } from 'class-validator';
 
@@ -26,6 +28,7 @@ export class CreateAccommodationDto {
   @ApiProperty({ default: 'Malibu, California', maxLength: 200 })
   location: string;
 
+  @IsNumber()
   @IsNotEmpty()
   @ApiProperty({ default: 200.0, description: 'Price per night' })
   pricePerNight: number;
@@ -39,7 +42,7 @@ export class CreateAccommodationDto {
   })
   amenities?: string[];
 
-  @IsString()
+  @IsUUID()
   @IsNotEmpty()
   @ApiProperty({
     default: 'categoryId',

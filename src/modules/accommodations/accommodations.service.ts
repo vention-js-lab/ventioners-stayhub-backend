@@ -81,11 +81,11 @@ export class AccommodationsService {
   }
 
   async createAccommodation(
-    CreateAccommodationDto: CreateAccommodationDto,
+    createAccommodationDto: CreateAccommodationDto,
     userId: string,
   ): Promise<Accommodation> {
     const { amenities, categoryId, ...accommodationData } =
-      CreateAccommodationDto;
+      createAccommodationDto;
 
     const resolvedAmenities = amenities?.length
       ? await this.amenitiesService.getAmenitiesByIds(amenities)
