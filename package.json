@@ -102,6 +102,14 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
+    "coveragePathIgnorePatterns": [
+      "database",
+      "redis",
+      "minio",
+      ".module.ts",
+      "main.ts",
+      ".mock.ts"
+    ],
     "testEnvironment": "node",
     "moduleNameMapper": {
       "^src/(.*)$": "<rootDir>/$1"
