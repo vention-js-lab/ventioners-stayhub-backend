@@ -13,7 +13,6 @@ import {
   CreateAccommodationDto,
 } from './dto/request';
 import { PaginatedResult } from './interfaces';
-import { User } from '../users/entities/user.entity';
 import { MinioService } from '../minio/minio.service';
 import { BucketName } from '../minio/minio.constants';
 import { ConfigService } from '@nestjs/config';
@@ -29,8 +28,6 @@ export class AccommodationsService {
     private readonly accommodationRepository: Repository<Accommodation>,
     @InjectRepository(Wishlist)
     private readonly wishlistRepository: Repository<Wishlist>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     @InjectRepository(Image)
     private readonly imageRepository: Repository<Image>,
     private readonly minioService: MinioService,
@@ -192,11 +189,10 @@ export class AccommodationsService {
       throw new NotFoundException('Accommodation not found');
     }
 
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-
-    const userWishlist = new Wishlist();
-    userWishlist.user = user;
-    userWishlist.accommodation = accommodation;
+    const userWishlist = this.wishlistRepository.create({
+      user: { id: userId },
+      accommodation,
+    });
 
     await this.wishlistRepository.save(userWishlist);
   }

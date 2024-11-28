@@ -21,7 +21,13 @@ export const mockMyBookings: BookingDtoWithAccommodation[] = [
       name: 'Hotel California',
       description:
         'You can check out any time you like, but you can never leave',
-      images: ['https://example.com/hotel-california.jpg'],
+      images: [
+        {
+          id: '1',
+          url: 'https://example.com/hotel-california.jpg',
+          order: 1,
+        },
+      ],
       location: 'California, USA',
       pricePerNight: 1000,
       createdAt: new Date('2021-08-01'),
@@ -42,7 +48,13 @@ export const mockMyBookings: BookingDtoWithAccommodation[] = [
       name: 'Hotel California II',
       description:
         'You can check out any time you like, but you can never leave',
-      images: ['https://example.com/hotel-california-ii.jpg'],
+      images: [
+        {
+          id: '1',
+          url: 'https://example.com/hotel-california.jpg',
+          order: 1,
+        },
+      ],
       location: 'California, USA',
       pricePerNight: 2000,
       createdAt: new Date('2021-08-01'),

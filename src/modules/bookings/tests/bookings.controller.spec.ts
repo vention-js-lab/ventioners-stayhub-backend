@@ -23,8 +23,6 @@ import { mockUsers } from 'src/modules/users/test/users.mock';
 
 describe('BookingsController', () => {
   let controller: BookingsController;
-  // eslint-disable-next-line
-  let service: BookingsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -63,7 +61,6 @@ describe('BookingsController', () => {
     }).compile();
 
     controller = module.get(BookingsController);
-    service = module.get(BookingsService);
   });
 
   it('should be defined', () => {
