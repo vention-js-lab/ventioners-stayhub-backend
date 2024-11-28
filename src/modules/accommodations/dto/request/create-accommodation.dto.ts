@@ -8,7 +8,7 @@ import {
   IsUUID,
   MaxLength,
 } from 'class-validator';
-import { TransformToInt } from '../../../../shared/decorators';
+import { TransformToNumber } from 'src/shared/transformers';
 
 export class CreateAccommodationDto {
   @IsString()
@@ -29,7 +29,7 @@ export class CreateAccommodationDto {
   @ApiProperty({ default: 'Malibu, California', maxLength: 200 })
   location: string;
 
-  @TransformToInt()
+  @TransformToNumber()
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({ default: 200.0, description: 'Price per night' })

@@ -26,5 +26,6 @@ import { MinioModule } from '../minio/minio.module';
   ],
   controllers: [AccommodationsController],
   providers: [AccommodationsService],
+  exports: [AccommodationsService],
 })
 export class AccommodationsModule {}

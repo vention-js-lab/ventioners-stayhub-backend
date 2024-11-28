@@ -1,25 +1,27 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateBookingReqDto, UpdateBookingStatusReqDto } from './dto/request';
 import { Booking } from './entities/booking.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BookingsQueryParamsReqDto } from './dto/request/bookings-query-params.dto';
-import { Accommodation } from '../accommodations';
 import { BookingStatus } from './constants/booking-status.constant';
 import { BOOKING_SERVICE_FEE } from './constants/booking-service-fee.constant';
 import { BookingStatusTransitions } from './constants/bookings-status-transition.constant';
+import { AccommodationsService } from '../accommodations/accommodations.service';
 
 @Injectable()
 export class BookingsService {
   constructor(
     @InjectRepository(Booking)
     private readonly bookingRepository: Repository<Booking>,
-    @InjectRepository(Accommodation)
-    private readonly accommodationRepository: Repository<Accommodation>, // TODO: will replace with service once Akilbek's pr is merged
+    @Inject(AccommodationsService)
+    private readonly accommodationsService: AccommodationsService,
   ) {}
 
   async getMyBookings(
@@ -46,14 +48,17 @@ export class BookingsService {
   async getBooking(userId: string, bookingId: string): Promise<Booking> {
     const booking = await this.bookingRepository.findOne({
       where: { id: bookingId },
-      relations: ['accommodation', 'user'],
+      relations: ['accommodation', 'user', 'accommodation.owner'],
     });
 
-    // TODO: will uncomment this after Akilbek's pr is merged and accommodation has ownner field
-    //
-    // if (booking.accommodation.ownerId !== userId) {
-    //     throw new UnauthorizedException('You are not allowed to update this booking');
-    // }
+    if (
+      booking.accommodation.owner.id !== userId &&
+      booking.user.id !== userId
+    ) {
+      throw new UnauthorizedException(
+        'You are not allowed to view this booking',
+      );
+    }
 
     if (!booking) {
       throw new NotFoundException(`Booking with id ${bookingId} not found`);
@@ -66,14 +71,18 @@ export class BookingsService {
     dto: CreateBookingReqDto,
     userId: string,
   ): Promise<Booking> {
-    const accommodation = await this.accommodationRepository.findOne({
-      where: { id: dto.accommodationId },
-    });
+    const accommodation = await this.accommodationsService.getAccommodationById(
+      dto.accommodationId,
+    );
 
     if (!accommodation) {
       throw new NotFoundException(
         `Accommodation with id ${dto.accommodationId} not found`,
       );
+    }
+
+    if (accommodation.owner.id === userId) {
+      throw new BadRequestException("You can't book your own accommodation");
     }
 
     if (dto.checkOutDate <= dto.checkInDate) {
@@ -131,17 +140,18 @@ export class BookingsService {
   ) {
     const booking = await this.bookingRepository.findOne({
       where: { id: bookingId },
+      relations: ['accommodation', 'accommodation.owner'],
     });
 
     if (!booking) {
       throw new NotFoundException(`Booking with id ${bookingId} not found`);
     }
 
-    // TODO: will uncomment this after Akilbek's pr is merged and accommodation has ownner field
-    //
-    // if (booking.accommodation.ownerId !== userId) {
-    //     throw new UnauthorizedException('You are not allowed to update this booking');
-    // }
+    if (booking.accommodation.owner.id !== userId) {
+      throw new UnauthorizedException(
+        'You are not allowed to update this booking',
+      );
+    }
 
     const allowedStatusTransitions = BookingStatusTransitions[booking.status];
 

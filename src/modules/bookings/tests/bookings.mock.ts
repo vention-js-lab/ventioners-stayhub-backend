@@ -1,4 +1,3 @@
-import { UserRole } from 'src/shared/constants';
 import { BookingStatus } from '../constants/booking-status.constant';
 import {
   BookingDto,
@@ -7,6 +6,10 @@ import {
   BookingDtoWithUserAndAccommodation,
 } from '../dto/response';
 import { omit } from 'src/shared/helpers/omit-from-object.helper';
+import { mockUsers } from 'src/modules/users/test/users.mock';
+import { UserDto } from 'src/modules/users/dto/response';
+
+const mockUser = mockUsers[0] as UserDto;
 
 export const mockMyBookings: BookingDtoWithAccommodation[] = [
   {
@@ -55,15 +58,14 @@ export const mockMyBookings: BookingDtoWithAccommodation[] = [
 
 export const mockBooking: BookingDtoWithUserAndAccommodation = {
   ...mockMyBookings[0],
+  accommodation: {
+    ...mockMyBookings[0].accommodation,
+    owner: {
+      ...mockUser,
+    },
+  },
   user: {
-    id: '1',
-    email: 'example@gmail.com',
-    firstName: 'John',
-    lastName: 'Doe',
-    passwordHash: '123123123',
-    role: UserRole.USER,
-    createdAt: new Date('2021-08-01'),
-    updatedAt: new Date('2021-08-01'),
+    ...mockUser,
   },
 };
 
