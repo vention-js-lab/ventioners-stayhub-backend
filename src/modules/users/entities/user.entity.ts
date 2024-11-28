@@ -1,3 +1,4 @@
+import { Accommodation } from 'src/modules/accommodations/entities/accommodation.entity';
 import { Wishlist } from 'src/modules/accommodations/entities/wishlist.entity';
 import { UserRole } from 'src/shared/constants/user-role.constant';
 import {
@@ -44,6 +45,9 @@ export class User {
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role: string;
+
+  @OneToMany(() => Accommodation, (accommodation) => accommodation.owner)
+  accommodations: Accommodation[];
 
   @OneToMany(() => Wishlist, (like) => like.user)
   wishlist?: Wishlist[];

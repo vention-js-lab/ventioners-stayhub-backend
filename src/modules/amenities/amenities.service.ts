@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Amenity } from './entities';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class AmenitiesService {
@@ -12,5 +12,13 @@ export class AmenitiesService {
 
   async getAllAmenities(): Promise<Amenity[]> {
     return this.amenityRepository.find();
+  }
+
+  async getAmenitiesByIds(ids: string[]): Promise<Amenity[]> {
+    const amenities = await this.amenityRepository.findBy({
+      id: In(ids),
+    });
+
+    return amenities;
   }
 }
