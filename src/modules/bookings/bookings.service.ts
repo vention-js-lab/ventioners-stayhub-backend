@@ -77,12 +77,6 @@ export class BookingsService {
       dto.accommodationId,
     );
 
-    if (!accommodation) {
-      throw new NotFoundException(
-        `Accommodation with id ${dto.accommodationId} not found`,
-      );
-    }
-
     if (accommodation.owner.id === userId) {
       throw new BadRequestException("You can't book your own accommodation");
     }

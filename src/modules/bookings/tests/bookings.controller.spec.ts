@@ -5,21 +5,16 @@ import {
   BookingDto,
   BookingDtoWithAccommodation,
   BookingDtoWithAccommodationAndUserId,
-  BookingDtoWithUserAndAccommodation,
 } from '../dto/response';
 import {
   BookingsQueryParamsReqDto,
   CreateBookingReqDto,
   UpdateBookingStatusReqDto,
 } from '../dto/request';
-import {
-  mockBooking,
-  mockCreatedBooking,
-  mockMyBookings,
-  mockUpdatedBooking,
-} from './bookings.mock';
+import { mockBookings } from './bookings.mock';
 import { BookingStatus } from '../constants';
 import { mockUsers } from 'src/modules/users/test/users.mock';
+import { Booking } from '../entities/booking.entity';
 
 describe('BookingsController', () => {
   let controller: BookingsController;
@@ -36,25 +31,22 @@ describe('BookingsController', () => {
                 Promise<BookingDtoWithAccommodation[]>,
                 [BookingsQueryParamsReqDto, string]
               >()
-              .mockResolvedValue(mockMyBookings),
+              .mockResolvedValue(mockBookings),
             getBooking: jest
-              .fn<
-                Promise<BookingDtoWithUserAndAccommodation>,
-                [string, string]
-              >()
-              .mockResolvedValue(mockBooking),
+              .fn<Promise<Booking>, [string, string]>()
+              .mockResolvedValue(mockBookings[0]),
             createBooking: jest
               .fn<
                 Promise<BookingDtoWithAccommodationAndUserId>,
                 [CreateBookingReqDto, string]
               >()
-              .mockResolvedValue(mockCreatedBooking),
+              .mockResolvedValue(mockBookings[0]),
             updateStatus: jest
               .fn<
                 Promise<BookingDto>,
                 [UpdateBookingStatusReqDto, string, string]
               >()
-              .mockResolvedValue(mockUpdatedBooking),
+              .mockResolvedValue(mockBookings[0]),
           },
         },
       ],
@@ -74,7 +66,7 @@ describe('BookingsController', () => {
         mockUsers[0],
       );
 
-      expect(result).toEqual({ data: mockMyBookings });
+      expect(result).toEqual({ data: mockBookings });
     });
   });
 
@@ -82,7 +74,7 @@ describe('BookingsController', () => {
     it('returns booking', async () => {
       const result = await controller.getBooking(mockUsers[0], '1');
 
-      expect(result).toEqual({ data: mockBooking });
+      expect(result).toEqual({ data: mockBookings[0] });
     });
   });
 
@@ -100,7 +92,7 @@ describe('BookingsController', () => {
         mockUsers[0],
       );
 
-      expect(result).toEqual({ data: mockCreatedBooking });
+      expect(result).toEqual({ data: mockBookings[0] });
     });
   });
 
@@ -116,7 +108,7 @@ describe('BookingsController', () => {
         mockUsers[0],
       );
 
-      expect(result).toEqual({ data: mockUpdatedBooking });
+      expect(result).toEqual({ data: mockBookings[0] });
     });
   });
 });

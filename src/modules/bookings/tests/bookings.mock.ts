@@ -1,17 +1,10 @@
 import { BookingStatus } from '../constants';
-import {
-  BookingDto,
-  BookingDtoWithAccommodation,
-  BookingDtoWithAccommodationAndUserId,
-  BookingDtoWithUserAndAccommodation,
-} from '../dto/response';
-import { omit } from 'src/shared/helpers/omit-from-object.helper';
 import { mockUsers } from 'src/modules/users/test/users.mock';
-import { UserDto } from 'src/modules/users/dto/response';
+import { Booking } from '../entities/booking.entity';
+import { Accommodation, Image } from 'src/modules/accommodations';
+import { User } from 'src/modules/users/entities/user.entity';
 
-const mockUser = mockUsers[0] as UserDto;
-
-export const mockMyBookings: BookingDtoWithAccommodation[] = [
+export const mockBookings: Booking[] = [
   {
     id: '1',
     checkInDate: new Date('2021-09-01'),
@@ -27,13 +20,15 @@ export const mockMyBookings: BookingDtoWithAccommodation[] = [
           url: 'https://example.com/hotel-california.jpg',
           order: 1,
         },
-      ],
+      ] as Image[],
+      owner: mockUsers[1] as User,
       location: 'California, USA',
       pricePerNight: 1000,
       createdAt: new Date('2021-08-01'),
       updatedAt: new Date('2021-08-01'),
-    },
-    status: BookingStatus.CONFIRMED,
+    } as Accommodation,
+    user: mockUsers[0] as User,
+    status: BookingStatus.PENDING,
     totalPrice: 9000,
     numberOfGuests: 5,
     createdAt: new Date('2021-08-01'),
@@ -54,12 +49,14 @@ export const mockMyBookings: BookingDtoWithAccommodation[] = [
           url: 'https://example.com/hotel-california.jpg',
           order: 1,
         },
-      ],
+      ] as Image[],
+      owner: mockUsers[0] as User,
       location: 'California, USA',
       pricePerNight: 2000,
       createdAt: new Date('2021-08-01'),
       updatedAt: new Date('2021-08-01'),
-    },
+    } as Accommodation,
+    user: mockUsers[0] as User,
     status: BookingStatus.PENDING,
     totalPrice: 18000,
     numberOfGuests: 9,
@@ -67,30 +64,3 @@ export const mockMyBookings: BookingDtoWithAccommodation[] = [
     updatedAt: new Date('2021-08-01'),
   },
 ];
-
-export const mockBooking: BookingDtoWithUserAndAccommodation = {
-  ...mockMyBookings[0],
-  accommodation: {
-    ...mockMyBookings[0].accommodation,
-    owner: {
-      ...mockUser,
-    },
-  },
-  user: {
-    ...mockUser,
-  },
-};
-
-export const mockCreatedBooking: BookingDtoWithAccommodationAndUserId = {
-  ...mockBooking,
-  accommodation: {
-    id: '1',
-  },
-  user: {
-    id: '1',
-  },
-};
-
-export const mockUpdatedBooking: BookingDto = {
-  ...(omit(mockBooking, ['accommodation', 'user']) as BookingDto),
-};
