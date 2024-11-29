@@ -27,20 +27,7 @@ export class AuthController {
   ) {
     const tokens = await this.authService.register(registerDto);
 
-    res.cookie('accessToken', tokens.accessToken, {
-      httpOnly: true,
-      secure: isProd(this.configService.get('NODE_ENV')),
-      maxAge: ms(
-        this.configService.get<string>('AUTH_ACCESS_TOKEN_EXPIRES_IN'),
-      ),
-    });
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: isProd(this.configService.get('NODE_ENV')),
-      maxAge: ms(
-        this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
-      ),
-    });
+    this.setCookies(res, tokens);
   }
 
   @Post('login')
@@ -76,11 +63,21 @@ export class AuthController {
   @UseGuards(AuthTokenGuard)
   async updatePassword(
     @GetUser() user: User,
-    @Body() registerDto: UpdatePasswordDto,
+    @Body() updatePasswordDto: UpdatePasswordDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const tokens = await this.authService.updatePassword(registerDto, user);
+    const tokens = await this.authService.updatePassword(
+      updatePasswordDto,
+      user,
+    );
 
+    this.setCookies(res, tokens);
+  }
+
+  private setCookies(
+    res: Response,
+    tokens: Awaited<ReturnType<typeof this.authService.register>>,
+  ) {
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
       secure: isProd(this.configService.get('NODE_ENV')),
@@ -88,6 +85,7 @@ export class AuthController {
         this.configService.get<string>('AUTH_ACCESS_TOKEN_EXPIRES_IN'),
       ),
     });
+
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: isProd(this.configService.get('NODE_ENV')),
@@ -117,19 +115,6 @@ export class AuthController {
       jwtPayload,
     );
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: isProd(this.configService.get('NODE_ENV')),
-      maxAge: ms(
-        this.configService.get<string>('AUTH_ACCESS_TOKEN_EXPIRES_IN'),
-      ),
-    });
-    res.cookie('refreshToken', newRefreshToken, {
-      httpOnly: true,
-      secure: isProd(this.configService.get('NODE_ENV')),
-      maxAge: ms(
-        this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
-      ),
-    });
+    this.setCookies(res, { accessToken, refreshToken: newRefreshToken });
   }
 }
