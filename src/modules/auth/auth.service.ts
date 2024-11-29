@@ -69,7 +69,7 @@ export class AuthService {
       dto.oldPassword,
     );
     if (!isPasswordValid) {
-      throw new BadRequestException('Invalid email or password');
+      throw new BadRequestException('Invalid current password');
     }
 
     const hashedPassword = await Hasher.hashValue(dto.newPassword);
