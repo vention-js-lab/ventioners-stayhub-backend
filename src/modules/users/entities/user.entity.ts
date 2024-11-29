@@ -43,6 +43,14 @@ export class User {
   })
   lastName: string;
 
+  @Column({
+    name: 'profile_picture_url',
+    type: 'varchar',
+    length: 2048,
+    nullable: true,
+  })
+  profilePictureUrl?: string;
+
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role: string;
 
