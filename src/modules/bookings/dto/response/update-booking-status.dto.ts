@@ -7,7 +7,7 @@ class BoookingWithAccommodationAndOwner extends BookingDto {
   accommodation: AccommodationWithOwnerDto;
 }
 
-export class UpdateBookingStatusDto {
+export class UpdateBookingStatusResponseDto {
   @ApiProperty()
   data: BoookingWithAccommodationAndOwner;
 }

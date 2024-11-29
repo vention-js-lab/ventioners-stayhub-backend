@@ -8,7 +8,7 @@ import {
   CreateBookingDto,
   GetBookingDto,
   GetMyBookingsDto,
-  UpdateBookingStatusDto,
+  UpdateBookingStatusResponseDto,
 } from '../dto/response';
 
 export function GetMyBookingsSwaggerDecorator() {
@@ -51,7 +51,7 @@ export function UpdateBookingStatusSwaggerDecorator() {
   return applyDecorators(
     ApiOkResponse({
       description: 'Booking status updated successfully',
-      type: UpdateBookingStatusDto,
+      type: UpdateBookingStatusResponseDto,
     }),
     ApiNotFoundResponse({
       description: 'Booking not found',
