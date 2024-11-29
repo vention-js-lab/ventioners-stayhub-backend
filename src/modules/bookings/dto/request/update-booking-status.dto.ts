@@ -1,5 +1,5 @@
 import { IsEnum } from 'class-validator';
-import { BookingStatus } from '../../constants/booking-status.constant';
+import { BookingStatus } from '../../constants';
 import { ApiProperty } from '@nestjs/swagger';
 import { TransformToUpperCase } from 'src/shared/transformers';
 

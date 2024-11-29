@@ -1,4 +1,4 @@
-import { BookingStatus } from '../constants/booking-status.constant';
+import { BookingStatus } from '../constants';
 import {
   BookingDto,
   BookingDtoWithAccommodation,

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BookingStatus } from '../../constants/booking-status.constant';
+import { BookingStatus } from '../../constants';
 
 export class BookingDto {
   @ApiProperty()

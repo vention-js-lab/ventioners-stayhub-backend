@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { BookingStatus } from '../constants/booking-status.constant';
+import { BookingStatus } from '../constants';
 
 @Entity()
 export class Booking {

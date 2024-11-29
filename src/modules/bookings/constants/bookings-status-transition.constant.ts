@@ -1,4 +1,4 @@
-import { BookingStatus } from './booking-status.constant';
+import { BookingStatus } from './bookings-status.constant';
 
 export const BookingStatusTransitions: Record<BookingStatus, BookingStatus[]> =
   {

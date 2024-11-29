@@ -18,7 +18,7 @@ import {
   mockMyBookings,
   mockUpdatedBooking,
 } from './bookings.mock';
-import { BookingStatus } from '../constants/booking-status.constant';
+import { BookingStatus } from '../constants';
 import { mockUsers } from 'src/modules/users/test/users.mock';
 
 describe('BookingsController', () => {
