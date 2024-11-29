@@ -6,23 +6,25 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { TransformToInt } from 'src/shared/decorators/transform-to-int.decorator';
+import {
+  TransformToNumber,
+  TransformToUpperCase,
+} from 'src/shared/transformers';
 import {
   UsersSortBy,
   UsersSortOrder,
 } from '../../constants/users-sort-params.constant';
-import { Transform } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UserSearchParamsReqDto {
-  @TransformToInt()
+  @TransformToNumber()
   @IsOptional()
   @IsInt()
   @Min(0)
   @ApiPropertyOptional({ type: 'integer' })
   page?: number;
 
-  @TransformToInt()
+  @TransformToNumber()
   @IsOptional()
   @IsInt()
   @IsPositive()
@@ -35,12 +37,7 @@ export class UserSearchParamsReqDto {
   @ApiPropertyOptional({ enum: UsersSortBy })
   sort_by?: UsersSortBy;
 
-  @Transform(
-    ({ value }) => {
-      return value.toUpperCase();
-    },
-    { toClassOnly: true },
-  )
+  @TransformToUpperCase()
   @IsOptional()
   @IsEnum(UsersSortOrder)
   @ApiPropertyOptional({ enum: UsersSortOrder })

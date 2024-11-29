@@ -56,6 +56,8 @@ export class AccommodationsService {
       );
     }
 
+    query.leftJoinAndSelect('accommodation.images', 'images');
+
     if (searchParams.categoryId) {
       query.innerJoinAndSelect(
         'accommodation.category',
