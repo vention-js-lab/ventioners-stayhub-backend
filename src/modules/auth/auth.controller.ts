@@ -10,6 +10,8 @@ import { GetUser } from 'src/shared/decorators';
 import { isProd } from 'src/shared/helpers';
 import ms from 'ms';
 import { User } from '../users/entities/user.entity';
+import { UpdatePasswordDto } from './dto/request/update-password.dto';
+import { AuthTokenGuard } from 'src/shared/guards';
 
 @Controller('auth')
 export class AuthController {
@@ -68,6 +70,31 @@ export class AuthController {
   async logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
+  }
+
+  @Post('update-password')
+  @UseGuards(AuthTokenGuard)
+  async updatePassword(
+    @GetUser() user: User,
+    @Body() registerDto: UpdatePasswordDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const tokens = await this.authService.updatePassword(registerDto, user);
+
+    res.cookie('accessToken', tokens.accessToken, {
+      httpOnly: true,
+      secure: isProd(this.configService.get('NODE_ENV')),
+      maxAge: ms(
+        this.configService.get<string>('AUTH_ACCESS_TOKEN_EXPIRES_IN'),
+      ),
+    });
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: isProd(this.configService.get('NODE_ENV')),
+      maxAge: ms(
+        this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
+      ),
+    });
   }
 
   @Get('refresh')
