@@ -4,5 +4,5 @@ export const buildMinioFileUrl = (
   bucketName: string,
   fileName: string,
 ): string => {
-  return `https://${host}:${port}/${bucketName}/${fileName}`;
+  return `http://${host}:${port}/${bucketName}/${fileName}`;
 };

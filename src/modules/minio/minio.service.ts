@@ -86,8 +86,9 @@ export class MinioService {
   }
 
   async uploadFile(file: Express.Multer.File, bucketName = BucketName.Images) {
-    const fileName = `${randomUUID()}-${file.originalname}`;
+    const fileName = `${randomUUID()}-${file.originalname.replace(/\s+/g, '-')}`;
     await this.initializeBucket(BucketName.Images, AccessPolicy.Public);
+
     try {
       await this.minioClient.putObject(
         bucketName,
