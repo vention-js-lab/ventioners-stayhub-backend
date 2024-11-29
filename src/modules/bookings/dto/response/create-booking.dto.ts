@@ -19,7 +19,7 @@ export class BookingDtoWithAccommodationAndUserId extends BookingDto {
   accommodation: AccommodationIdDto;
 }
 
-export class CreateBookingDto {
+export class CreateBookingResponseDto {
   @ApiProperty()
   data: BookingDtoWithAccommodationAndUserId;
 }

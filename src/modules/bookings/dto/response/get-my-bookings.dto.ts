@@ -7,7 +7,7 @@ export class BookingDtoWithAccommodation extends BookingDto {
   accommodation: AccommodationDto;
 }
 
-export class GetMyBookingsDto {
+export class GetMyBookingsResponseDto {
   @ApiProperty({ isArray: true, type: BookingDtoWithAccommodation })
   data: BookingDtoWithAccommodation[];
 }

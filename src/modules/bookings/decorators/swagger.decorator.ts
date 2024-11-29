@@ -5,9 +5,9 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import {
-  CreateBookingDto,
-  GetBookingDto,
-  GetMyBookingsDto,
+  CreateBookingResponseDto,
+  GetBookingResponseDto,
+  GetMyBookingsResponseDto,
   UpdateBookingStatusResponseDto,
 } from '../dto/response';
 
@@ -15,7 +15,7 @@ export function GetMyBookingsSwaggerDecorator() {
   return applyDecorators(
     ApiOkResponse({
       description: 'My bookings retrieved successfully',
-      type: GetMyBookingsDto,
+      type: GetMyBookingsResponseDto,
     }),
   );
 }
@@ -24,7 +24,7 @@ export function GetBookingSwaggerDecorator() {
   return applyDecorators(
     ApiOkResponse({
       description: 'Booking retrieved successfully',
-      type: GetBookingDto,
+      type: GetBookingResponseDto,
     }),
     ApiNotFoundResponse({
       description: 'Booking not found',
@@ -36,7 +36,7 @@ export function CreateBookingSwaggerDecorator() {
   return applyDecorators(
     ApiOkResponse({
       description: 'Booking created successfully',
-      type: CreateBookingDto,
+      type: CreateBookingResponseDto,
     }),
     ApiNotFoundResponse({
       description: 'Accommodation not found',
