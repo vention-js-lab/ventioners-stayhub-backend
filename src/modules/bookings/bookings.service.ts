@@ -51,6 +51,10 @@ export class BookingsService {
       relations: ['accommodation', 'user', 'accommodation.owner'],
     });
 
+    if (!booking) {
+      throw new NotFoundException(`Booking with id ${bookingId} not found`);
+    }
+
     if (
       booking.accommodation.owner.id !== userId &&
       booking.user.id !== userId
@@ -58,10 +62,6 @@ export class BookingsService {
       throw new UnauthorizedException(
         'You are not allowed to view this booking',
       );
-    }
-
-    if (!booking) {
-      throw new NotFoundException(`Booking with id ${bookingId} not found`);
     }
 
     return booking;
@@ -93,21 +93,11 @@ export class BookingsService {
       throw new BadRequestException("Check in date can't be in the past");
     }
 
-    const existingBookings = await this.bookingRepository
-      .createQueryBuilder('booking')
-      .where('booking.accommodationId = :accommodationId', {
-        accommodationId: dto.accommodationId,
-      })
-      .andWhere(
-        `booking.checkInDate <= :checkInDate AND booking.checkOutDate >= :checkInDate OR 
-         booking.checkInDate <= :checkOutDate AND booking.checkOutDate >= :checkOutDate OR
-         booking.checkInDate >= :checkInDate AND booking.checkOutDate <= :checkOutDate`,
-        { checkInDate: dto.checkInDate, checkOutDate: dto.checkOutDate },
-      )
-      .andWhere('booking.status IN (:...activeStatuses)', {
-        activeStatuses: [BookingStatus.CONFIRMED, BookingStatus.CHECKED_IN],
-      })
-      .getCount();
+    const existingBookings = await this.getExistingBookings(
+      accommodation.id,
+      dto.checkInDate,
+      dto.checkOutDate,
+    );
 
     if (existingBookings > 0) {
       throw new BadRequestException(
@@ -164,6 +154,28 @@ export class BookingsService {
     booking.status = dto.status;
 
     return await this.bookingRepository.save(booking);
+  }
+
+  private async getExistingBookings(
+    accommodationId: string,
+    checkInDate: Date,
+    checkOutDate: Date,
+  ): Promise<number> {
+    return await this.bookingRepository
+      .createQueryBuilder('booking')
+      .where('booking.accommodationId = :accommodationId', {
+        accommodationId: accommodationId,
+      })
+      .andWhere(
+        `booking.checkInDate <= :checkInDate AND booking.checkOutDate >= :checkInDate OR 
+         booking.checkInDate <= :checkOutDate AND booking.checkOutDate >= :checkOutDate OR
+         booking.checkInDate >= :checkInDate AND booking.checkOutDate <= :checkOutDate`,
+        { checkInDate: checkInDate, checkOutDate: checkOutDate },
+      )
+      .andWhere('booking.status IN (:...activeStatuses)', {
+        activeStatuses: [BookingStatus.CONFIRMED, BookingStatus.CHECKED_IN],
+      })
+      .getCount();
   }
 
   private calculateNights(checkInDate: Date, checkOutDate: Date): number {

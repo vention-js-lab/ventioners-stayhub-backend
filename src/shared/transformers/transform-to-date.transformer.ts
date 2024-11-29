@@ -6,7 +6,9 @@ export function TransformToDate() {
       if (!value || typeof value !== 'string') {
         return undefined;
       }
+
       const date = new Date(value);
+
       return isNaN(date.getTime()) ? undefined : date;
     },
     { toClassOnly: true },

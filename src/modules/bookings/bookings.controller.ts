@@ -27,7 +27,7 @@ export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
   @GetMyBookingsSwaggerDecorator()
-  @Get('my')
+  @Get('')
   @UseGuards(AuthTokenGuard)
   async getMyBookings(
     @Query() queryParams: BookingsQueryParamsReqDto,

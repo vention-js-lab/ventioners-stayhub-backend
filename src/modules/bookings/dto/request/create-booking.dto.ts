@@ -1,18 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDate, IsInt, IsUUID, Min } from 'class-validator';
-import { TransformToDate } from 'src/shared/transformers';
+import { TransformToYearMonthDay } from 'src/shared/transformers/transform-to-year-month-day.transformer';
 
 export class CreateBookingReqDto {
   @IsUUID('4')
   @ApiProperty()
   accommodationId: string;
 
-  @TransformToDate()
+  @TransformToYearMonthDay()
   @IsDate()
   @ApiProperty()
   checkInDate: Date;
 
-  @TransformToDate()
+  @TransformToYearMonthDay()
   @IsDate()
   @ApiProperty()
   checkOutDate: Date;
