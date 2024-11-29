@@ -10,9 +10,11 @@ import { Booking } from './entities/booking.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BookingsQueryParamsReqDto } from './dto/request/bookings-query-params.dto';
-import { BookingStatus } from './constants/booking-status.constant';
-import { BOOKING_SERVICE_FEE } from './constants/booking-service-fee.constant';
-import { BookingStatusTransitions } from './constants/bookings-status-transition.constant';
+import {
+  BookingStatus,
+  BookingStatusTransitions,
+  BOOKING_SERVICE_FEE,
+} from './constants';
 import { AccommodationsService } from '../accommodations/accommodations.service';
 
 @Injectable()
