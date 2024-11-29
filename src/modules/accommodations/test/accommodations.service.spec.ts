@@ -151,7 +151,7 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
     });
 
     it('throws UnauthorizedException if user is not the owner', async () => {
-      await expect(
+      expect(
         service.updateAccommodation(
           'existing-id',
           updateAccommodationDto,
@@ -169,7 +169,7 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
     });
 
     it('throws UnauthorizedException if user is not the owner', async () => {
-      await expect(
+      expect(
         service.deleteAccommodation('existing-id', 'another user'),
       ).rejects.toThrow(UnauthorizedException);
     });

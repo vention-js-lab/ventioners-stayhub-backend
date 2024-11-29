@@ -82,15 +82,15 @@ describe('BookingsService', () => {
     });
 
     it("throws a NotFoundException if the booking doesn't exist", async () => {
-      await expect(service.getBooking('1', 'non-existing-id')).rejects.toThrow(
+      expect(service.getBooking('1', 'non-existing-id')).rejects.toThrow(
         NotFoundException,
       );
     });
 
     it('throws a UnauthorizedException if the user is not the author of the booking nor owner of the accommodation', async () => {
-      await expect(
-        service.getBooking('another user', 'existing-id'),
-      ).rejects.toThrow(UnauthorizedException);
+      expect(service.getBooking('another user', 'existing-id')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 
@@ -257,7 +257,7 @@ describe('BookingsService', () => {
         status: BookingStatus.ARCHIVED,
       });
 
-      await expect(
+      expect(
         service.updateStatus(
           { status: BookingStatus.PENDING },
           '2',
