@@ -6,9 +6,15 @@ import { UsersRepository } from './users.repository';
 import { DataSource } from 'typeorm';
 import { Accommodation, Wishlist } from '../accommodations';
 import { User } from './entities/user.entity';
+import { MinioModule } from '../minio/minio.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Accommodation, Wishlist, User])],
+  imports: [
+    TypeOrmModule.forFeature([Accommodation, Wishlist, User]),
+    MinioModule,
+    ConfigModule,
+  ],
   controllers: [UsersController],
   providers: [
     {
