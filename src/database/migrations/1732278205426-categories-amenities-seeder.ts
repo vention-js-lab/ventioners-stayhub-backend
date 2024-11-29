@@ -10,10 +10,6 @@ export class CategoriesAndAmenitiesSeeder1732278205426
   name = 'CategoriesAndAmenitiesSeeder1732278205426';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // i have to truncate the tables before seeding just to make sure that the tables are empty
-    // and unique constraints are not violated
-    // categories and amenities should be always the same so we can truncate them
-    // I will remove this comment after review and before merging
     await queryRunner.query('TRUNCATE TABLE accommodation_amenities CASCADE');
     await queryRunner.query('TRUNCATE TABLE amenity CASCADE');
     await queryRunner.query('TRUNCATE TABLE accommodation_category CASCADE');

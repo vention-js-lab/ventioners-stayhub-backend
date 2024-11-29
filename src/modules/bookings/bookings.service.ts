@@ -85,14 +85,6 @@ export class BookingsService {
       throw new BadRequestException("You can't book your own accommodation");
     }
 
-    if (dto.checkOutDate <= dto.checkInDate) {
-      throw new BadRequestException('Check out date should be after check in');
-    }
-
-    if (dto.checkInDate <= new Date()) {
-      throw new BadRequestException("Check in date can't be in the past");
-    }
-
     const existingBookings = await this.getExistingBookings(
       accommodation.id,
       dto.checkInDate,
@@ -156,7 +148,7 @@ export class BookingsService {
     return await this.bookingRepository.save(booking);
   }
 
-  private async getExistingBookings(
+  async getExistingBookings(
     accommodationId: string,
     checkInDate: Date,
     checkOutDate: Date,
@@ -179,11 +171,7 @@ export class BookingsService {
   }
 
   private calculateNights(checkInDate: Date, checkOutDate: Date): number {
-    const normalizedCheckInDate = this.truncateTime(checkInDate);
-    const normalizedCheckOutDate = this.truncateTime(checkOutDate);
-
-    const diffInMilliseconds =
-      normalizedCheckOutDate.getTime() - normalizedCheckInDate.getTime();
+    const diffInMilliseconds = checkInDate.getTime() - checkOutDate.getTime();
 
     const nights = diffInMilliseconds / (1000 * 60 * 60 * 24);
 
@@ -194,9 +182,5 @@ export class BookingsService {
     const basePrice = nights * pricePerNight;
 
     return basePrice + basePrice * BOOKING_SERVICE_FEE;
-  }
-
-  private truncateTime(date: Date): Date {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
 }
