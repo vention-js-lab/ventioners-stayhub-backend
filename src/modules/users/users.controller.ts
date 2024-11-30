@@ -110,9 +110,8 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('file'))
   async updateUser(
     @Body() dto: UpdateUserReqDto,
-    @UploadedFile() file: Express.Multer.File,
-    @Param('userId', new ParseUUIDV4Pipe())
-    userId: string,
+    @Param('userId', new ParseUUIDV4Pipe()) userId: string,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     const updatedUser = await this.usersService.updateUser(dto, userId, file);
 

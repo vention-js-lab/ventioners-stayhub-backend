@@ -9,6 +9,8 @@ import { User } from '../entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Accommodation } from 'src/modules/accommodations';
 import { mockAccommodations } from './accommodations.mock';
+import { MinioService } from 'src/modules/minio/minio.service';
+import { ConfigService } from '@nestjs/config';
 
 const mockUser = mockUsers[0];
 
@@ -34,6 +36,23 @@ const mockUsersRepository = {
   })),
 };
 
+const mockMinioService = {
+  uploadFile: jest.fn(),
+};
+
+const mockConfigService = {
+  get: jest
+    .fn<string | boolean, [string]>()
+    .mockImplementation((key: string) => {
+      switch (key) {
+        case 'MINIO_HOST':
+          return 'localhost';
+        case 'MINIO_PORT':
+          return '9000';
+      }
+    }),
+};
+
 const mockAccommodationsRepository = {
   createQueryBuilder: jest.fn().mockReturnValue({
     innerJoinAndSelect: jest.fn().mockReturnThis(),
@@ -57,6 +76,8 @@ describe('UsersService', () => {
           provide: getRepositoryToken(Accommodation),
           useValue: mockAccommodationsRepository,
         },
+        { provide: MinioService, useValue: mockMinioService },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
