@@ -81,7 +81,7 @@ export class UsersService {
   async getWishlist(userId: string): Promise<Accommodation[]> {
     return this.accommodationRepository
       .createQueryBuilder('accommodation')
-      .innerJoin('accommodation.likes', 'wishlist')
+      .innerJoin('accommodation.wishlists', 'wishlist')
       .leftJoinAndSelect('accommodation.images', 'images')
       .where('wishlist.user.id = :userId', { userId })
       .getMany();

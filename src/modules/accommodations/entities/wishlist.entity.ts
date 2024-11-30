@@ -18,7 +18,7 @@ export class Wishlist {
   })
   user?: User;
 
-  @ManyToOne(() => Accommodation, (accommodation) => accommodation.likes, {
+  @ManyToOne(() => Accommodation, (accommodation) => accommodation.wishlists, {
     onDelete: 'CASCADE',
   })
   accommodation?: Accommodation;

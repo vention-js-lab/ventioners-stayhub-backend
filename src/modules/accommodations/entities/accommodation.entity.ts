@@ -70,8 +70,8 @@ export class Accommodation {
   })
   owner: User;
 
-  @OneToMany(() => Wishlist, (like) => like.accommodation)
-  likes?: Wishlist[];
+  @OneToMany(() => Wishlist, (wishlist) => wishlist.accommodation)
+  wishlists?: Wishlist[];
 
   @CreateDateColumn({
     name: 'created_at',
