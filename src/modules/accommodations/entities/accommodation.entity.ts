@@ -43,6 +43,13 @@ export class Accommodation {
   location: string;
 
   @Column({
+    type: 'geography',
+    spatialFeatureType: 'Point',
+    srid: 4326,
+  })
+  locationCoordinates: { type: 'Point'; coordinates: [number, number] };
+
+  @Column({
     name: 'price_per_night',
     type: 'decimal',
   })

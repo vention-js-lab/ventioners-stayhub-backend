@@ -86,7 +86,7 @@ export class AccommodationsService {
     createAccommodationDto: CreateAccommodationDto,
     userId: string,
   ): Promise<Accommodation> {
-    const { amenities, categoryId, ...accommodationData } =
+    const { amenities, categoryId, longitude, latitude, ...accommodationData } =
       createAccommodationDto;
 
     const resolvedAmenities = amenities?.length
@@ -96,11 +96,16 @@ export class AccommodationsService {
     const resolvedCategory =
       await this.categoryService.getCategoryById(categoryId);
 
+    const transformedLocationCoordinates = {
+      type: 'Point' as const,
+      coordinates: [longitude, latitude] as [number, number],
+    };
     const newAccommodation = this.accommodationRepository.create({
       ...accommodationData,
       amenities: resolvedAmenities,
       category: resolvedCategory,
       owner: { id: userId },
+      locationCoordinates: transformedLocationCoordinates,
     });
     return await this.accommodationRepository.save(newAccommodation);
   }

@@ -9,7 +9,6 @@ import {
   MaxLength,
 } from 'class-validator';
 import { TransformToNumber } from 'src/shared/transformers';
-
 export class CreateAccommodationDto {
   @IsString()
   @IsNotEmpty()
@@ -51,4 +50,14 @@ export class CreateAccommodationDto {
     description: 'Category ID of the accommodation',
   })
   categoryId: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty({ description: 'Longitude coordinate of the accommodation' })
+  longitude: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty({ description: 'Latitude coordinate of the accommodation' })
+  latitude: number;
 }
