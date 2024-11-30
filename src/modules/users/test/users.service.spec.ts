@@ -36,7 +36,8 @@ const mockUsersRepository = {
 
 const mockAccommodationsRepository = {
   createQueryBuilder: jest.fn().mockReturnValue({
-    innerJoinAndSelect: jest.fn().mockReturnThis(),
+    innerJoin: jest.fn().mockReturnThis(),
+    leftJoinAndSelect: jest.fn().mockReturnThis(),
     where: jest.fn().mockReturnThis(),
     select: jest.fn().mockReturnThis(),
     getMany: jest.fn().mockResolvedValue(mockAccommodations),
