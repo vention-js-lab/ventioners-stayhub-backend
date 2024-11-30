@@ -37,10 +37,9 @@ export class Accommodation {
   images: Image[];
 
   @Column({
-    type: 'varchar',
-    length: 200,
+    type: 'json',
   })
-  location: string;
+  location: { latitude: number; longitude: number };
 
   @Column({
     name: 'price_per_night',

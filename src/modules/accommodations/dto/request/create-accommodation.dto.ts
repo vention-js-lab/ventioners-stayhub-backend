@@ -3,12 +3,13 @@ import {
   IsArray,
   IsNotEmpty,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   IsUUID,
   MaxLength,
 } from 'class-validator';
-import { TransformToNumber } from 'src/shared/transformers';
+import { TransformToJson, TransformToNumber } from 'src/shared/transformers';
 
 export class CreateAccommodationDto {
   @IsString()
@@ -23,11 +24,18 @@ export class CreateAccommodationDto {
   @ApiProperty({ default: 'A beautiful villa near the beach.', maxLength: 255 })
   description: string;
 
-  @IsString()
   @IsNotEmpty()
-  @MaxLength(200)
-  @ApiProperty({ default: 'Malibu, California', maxLength: 200 })
-  location: string;
+  @IsObject()
+  @TransformToJson()
+  @ApiProperty({
+    description:
+      'The position of the accommodation with latitude and longitude.',
+    example: { latitude: 34.0259, longitude: -118.7798 },
+  })
+  location: {
+    latitude: number;
+    longitude: number;
+  };
 
   @TransformToNumber()
   @IsNumber()
