@@ -56,6 +56,8 @@ describe('AccommodationsController', () => {
       categoryId: 'test-category-id',
       amenities: ['test-amenity-id'],
       pricePerNight: 100,
+      longitude: 0,
+      latitude: 0,
     };
 
     it('throws an error if no image is provided', () => {
