@@ -7,6 +7,7 @@ import { CookieOptions, Response } from 'express';
 import { LoginDto } from '../dto/request/login.dto';
 import { JwtPayload } from '../auth.types';
 import { mockUsers } from 'src/modules/users/test/users.mock';
+import { UpdatePasswordDto } from '../dto/request/update-password.dto';
 
 const mockRes = {
   cookie: jest.fn<Response, [string, string, CookieOptions]>().mockReturnThis(),
@@ -65,6 +66,7 @@ describe('AuthController', () => {
                     : mockTokens.refreshToken,
                 ),
               ),
+            updatePassword: jest.fn().mockResolvedValue(mockTokens),
           },
         },
         {
@@ -186,6 +188,46 @@ describe('AuthController', () => {
           maxAge: 604800000,
         },
       );
+    });
+  });
+
+  describe('updatePassword', () => {
+    it("updates a user's password", async () => {
+      const updatePasswordDto: UpdatePasswordDto = {
+        oldPassword: 'old-password',
+        newPassword: 'new-password',
+      };
+
+      await controller.updatePassword(mockUsers[0], updatePasswordDto, mockRes);
+
+      expect(mockRes.cookie).toHaveBeenCalledWith(
+        'accessToken',
+        mockTokens.accessToken,
+        {
+          httpOnly: true,
+          secure: true,
+          maxAge: 900000,
+        },
+      );
+
+      expect(mockRes.cookie).toHaveBeenCalledWith(
+        'refreshToken',
+        mockTokens.refreshToken,
+        {
+          httpOnly: true,
+          secure: true,
+          maxAge: 604800000,
+        },
+      );
+    });
+  });
+
+  describe('logout', () => {
+    it('clears the access and refresh tokens from the cookies', async () => {
+      await controller.logout(mockRes);
+
+      expect(mockRes.clearCookie).toHaveBeenCalledWith('accessToken');
+      expect(mockRes.clearCookie).toHaveBeenCalledWith('refreshToken');
     });
   });
 });

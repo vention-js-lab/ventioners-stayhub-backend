@@ -26,6 +26,9 @@ const mockUsersRepository = {
   createUser: jest
     .fn<Promise<User>, [CreateUserReqDto]>()
     .mockResolvedValue(mockUsers[0]),
+  updateUser: jest
+    .fn<Promise<User>, [Partial<User>, string]>()
+    .mockResolvedValue(mockUsers[0]),
 };
 
 const mockConfigService = {
@@ -128,13 +131,13 @@ describe('AuthService', () => {
     });
 
     it('throws a BadRequestException when the password is invalid', async () => {
-      Hasher.verifyHash = jest.fn().mockResolvedValue(false);
+      Hasher.verifyHash = jest.fn().mockResolvedValueOnce(false);
 
       expect(service.login(loginDto)).rejects.toThrow(BadRequestException);
     });
 
     it("logins user and returns the user's access and refresh tokens", async () => {
-      Hasher.verifyHash = jest.fn().mockResolvedValue(true);
+      Hasher.verifyHash = jest.fn().mockResolvedValueOnce(true);
 
       const result = await service.login(loginDto);
 
@@ -161,6 +164,39 @@ describe('AuthService', () => {
       const result = await service.generateToken('REFRESH', payload);
 
       expect(result).toBe('refresh-token');
+    });
+  });
+
+  describe('updatePassword', () => {
+    it("throws a BadRequestException when the user's current password is invalid", async () => {
+      Hasher.verifyHash = jest.fn().mockResolvedValueOnce(false);
+
+      expect(
+        service.updatePassword(
+          {
+            oldPassword: 'invalid-password',
+            newPassword: 'new-password',
+          },
+          mockUsers[0],
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it("updates the user's password and returns the user's access and refresh tokens", async () => {
+      Hasher.verifyHash = jest.fn().mockResolvedValueOnce(true);
+
+      const result = await service.updatePassword(
+        {
+          oldPassword: 'password',
+          newPassword: 'new-password',
+        },
+        mockUsers[0],
+      );
+
+      expect(result).toEqual({
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token',
+      });
     });
   });
 });
