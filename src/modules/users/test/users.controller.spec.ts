@@ -8,11 +8,10 @@ import { UpdateUserReqDto } from '../dto/request/update-user.dto';
 import { mockUsers } from './users.mock';
 import { AccommodationDto } from 'src/modules/accommodations/dto';
 import { mockAccommodations } from './accommodations.mock';
+import { omit } from 'src/shared/helpers/omit-from-object.helper';
 
 describe('UsersController', () => {
   let controller: UsersController;
-  // eslint-disable-next-line
-  let service: UsersService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -54,7 +53,6 @@ describe('UsersController', () => {
     }).compile();
 
     controller = module.get(UsersController);
-    service = module.get(UsersService);
   });
 
   it('should be defined', () => {
@@ -120,6 +118,21 @@ describe('UsersController', () => {
 
       expect(controller.getWishlist(user)).resolves.toEqual({
         data: mockAccommodations,
+      });
+    });
+  });
+
+  describe('getCurrentUser', () => {
+    it("returns the current user's information", () => {
+      const user = omit(mockUsers[0], ['accommodations', 'role']) as User;
+
+      expect(controller.getCurrentUser(user)).resolves.toEqual({
+        user: {
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          id: user.id,
+        },
       });
     });
   });

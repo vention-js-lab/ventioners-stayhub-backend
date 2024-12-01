@@ -13,7 +13,6 @@ import {
   CreateAccommodationDto,
 } from './dto/request';
 import { PaginatedResult } from './interfaces';
-import { User } from '../users/entities/user.entity';
 import { MinioService } from '../minio/minio.service';
 import { BucketName } from '../minio/minio.constants';
 import { ConfigService } from '@nestjs/config';
@@ -29,8 +28,6 @@ export class AccommodationsService {
     private readonly accommodationRepository: Repository<Accommodation>,
     @InjectRepository(Wishlist)
     private readonly wishlistRepository: Repository<Wishlist>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     @InjectRepository(Image)
     private readonly imageRepository: Repository<Image>,
     private readonly minioService: MinioService,
@@ -171,7 +168,7 @@ export class AccommodationsService {
 
   async toggleWishlistAccommodation(
     payload: WishlistAccommodationDto,
-  ): Promise<boolean> {
+  ): Promise<void> {
     const { userId, accommodationId } = payload;
 
     const isInWishlist = await this.wishlistRepository.findOne({
@@ -180,25 +177,24 @@ export class AccommodationsService {
 
     if (isInWishlist) {
       await this.wishlistRepository.remove(isInWishlist);
-      return false;
-    } else {
-      const accommodation = await this.accommodationRepository.findOne({
-        where: { id: accommodationId },
-      });
 
-      if (!accommodation) {
-        throw new NotFoundException('Accommodation not found');
-      }
-
-      const user = await this.userRepository.findOne({ where: { id: userId } });
-
-      const userWishlist = new Wishlist();
-      userWishlist.user = user;
-      userWishlist.accommodation = accommodation;
-
-      await this.wishlistRepository.save(userWishlist);
-      return true;
+      return;
     }
+
+    const accommodation = await this.accommodationRepository.findOne({
+      where: { id: accommodationId },
+    });
+
+    if (!accommodation) {
+      throw new NotFoundException('Accommodation not found');
+    }
+
+    const userWishlist = this.wishlistRepository.create({
+      user: { id: userId },
+      accommodation,
+    });
+
+    await this.wishlistRepository.save(userWishlist);
   }
 
   async addImagesToAccommodation(

@@ -6,8 +6,6 @@ import { AmenityDto } from '../dto/response';
 
 describe('AmenitiesController', () => {
   let controller: AmenitiesController;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let service: AmenitiesService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,7 +23,6 @@ describe('AmenitiesController', () => {
     }).compile();
 
     controller = module.get<AmenitiesController>(AmenitiesController);
-    service = module.get<AmenitiesService>(AmenitiesService);
   });
 
   it('should be defined', () => {

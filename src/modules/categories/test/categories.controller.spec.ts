@@ -6,8 +6,6 @@ import { mockCategories } from './categories.mock';
 
 describe('CategoriesController', () => {
   let controller: CategoriesController;
-  // eslint-disable-next-line
-  let service: CategoriesService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,7 +23,6 @@ describe('CategoriesController', () => {
     }).compile();
 
     controller = module.get<CategoriesController>(CategoriesController);
-    service = module.get<CategoriesService>(CategoriesService);
   });
 
   it('should be defined', () => {
