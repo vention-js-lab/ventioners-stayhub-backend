@@ -50,5 +50,9 @@ export const mockAccommodations: Accommodation[] = [
         updatedAt: new Date(),
       },
     ] as Amenity[],
+    locationCoordinates: {
+      type: 'Point',
+      coordinates: [69.27480697631836, 41.29102833630755],
+    },
   },
 ];
