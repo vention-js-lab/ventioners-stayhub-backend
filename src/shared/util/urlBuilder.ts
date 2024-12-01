@@ -4,5 +4,6 @@ export const buildMinioFileUrl = (
   bucketName: string,
   fileName: string,
 ): string => {
-  return `https://${host}:${port}/${bucketName}/${fileName}`;
+  // TODO: add support for https
+  return `http://${host}:${port}/${bucketName}/${fileName}`;
 };
