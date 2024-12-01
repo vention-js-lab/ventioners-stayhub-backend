@@ -8,7 +8,9 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ParseUUIDV4Pipe } from 'src/shared/pipes';
@@ -30,6 +32,7 @@ import { AuthTokenGuard } from 'src/shared/guards';
 import { GetUser } from 'src/shared/decorators';
 import { User } from './entities/user.entity';
 import { omit } from 'src/shared/helpers/omit-from-object.helper';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Users')
 @Controller('users')
@@ -104,11 +107,13 @@ export class UsersController {
 
   @Put(':userId')
   @UpdateUserSwaggerDecorator()
+  @UseInterceptors(FileInterceptor('file'))
   async updateUser(
     @Body() dto: UpdateUserReqDto,
     @Param('userId', new ParseUUIDV4Pipe()) userId: string,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
-    const updatedUser = await this.usersService.updateUser(dto, userId);
+    const updatedUser = await this.usersService.updateUser(dto, userId, file);
 
     return {
       data: updatedUser,

@@ -14,6 +14,10 @@ import { Hasher } from 'src/shared/libs';
 import { Accommodation } from '../accommodations';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { MinioService } from '../minio/minio.service';
+import { BucketName } from '../minio/minio.constants';
+import { buildMinioFileUrl } from 'src/shared/util/urlBuilder';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
@@ -21,6 +25,8 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
     @InjectRepository(Accommodation)
     private readonly accommodationRepository: Repository<Accommodation>,
+    private readonly minioService: MinioService,
+    private readonly configService: ConfigService,
   ) {}
 
   async getUsers(
@@ -60,8 +66,27 @@ export class UsersService {
     return newUser;
   }
 
-  async updateUser(dto: UpdateUserReqDto, userId: string): Promise<User> {
-    const updatedUser = await this.usersRepository.updateUser(dto, userId);
+  async updateUser(
+    dto: UpdateUserReqDto,
+    userId: string,
+    file?: Express.Multer.File,
+  ): Promise<User> {
+    const profilePictureName = await this.minioService.uploadFile(
+      file,
+      BucketName.Images,
+    );
+
+    const profilePictureUrl = buildMinioFileUrl(
+      this.configService.get('MINIO_HOST'),
+      this.configService.get('MINIO_PORT'),
+      BucketName.Images,
+      profilePictureName,
+    );
+
+    const updatedUser = await this.usersRepository.updateUser(
+      { ...dto, profilePictureUrl },
+      userId,
+    );
 
     if (!updatedUser) {
       throw new NotFoundException(`User with id ${userId} not found`);
