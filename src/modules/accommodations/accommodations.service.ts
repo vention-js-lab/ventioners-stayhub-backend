@@ -126,10 +126,16 @@ export class AccommodationsService {
     UpdateAccommodationDto: UpdateAccommodationDto,
     userId: string,
   ): Promise<Accommodation> {
-    const { amenities, categoryId, ...updateAccommodationData } =
-      UpdateAccommodationDto;
+    const {
+      amenities,
+      categoryId,
+      longitude,
+      latitude,
+      ...updateAccommodationData
+    } = UpdateAccommodationDto;
 
     const accommodation = await this.getAccommodationById(id);
+
     if (accommodation.owner.id !== userId) {
       throw new UnauthorizedException('Access denied.');
     }
@@ -138,16 +144,23 @@ export class AccommodationsService {
       const resolvedAmenities = amenities?.length
         ? await this.amenitiesService.getAmenitiesByIds(amenities)
         : [];
-
       accommodation.amenities = resolvedAmenities;
     }
 
     if (categoryId) {
       const resolvedCategory =
         await this.categoryService.getCategoryById(categoryId);
-
       accommodation.category = resolvedCategory;
     }
+
+    if (longitude && latitude) {
+      const transformedLocationCoordinates = {
+        type: 'Point' as const,
+        coordinates: [longitude, latitude] as [number, number],
+      };
+      accommodation.locationCoordinates = transformedLocationCoordinates;
+    }
+
     Object.assign(accommodation, updateAccommodationData);
 
     return await this.accommodationRepository.save(accommodation);
