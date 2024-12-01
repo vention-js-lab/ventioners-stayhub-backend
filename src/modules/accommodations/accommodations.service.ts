@@ -100,6 +100,7 @@ export class AccommodationsService {
       type: 'Point' as const,
       coordinates: [longitude, latitude] as [number, number],
     };
+
     const newAccommodation = this.accommodationRepository.create({
       ...accommodationData,
       amenities: resolvedAmenities,

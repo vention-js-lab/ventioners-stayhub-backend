@@ -65,7 +65,6 @@ export class AccommodationsController {
     if (!files || files?.length === 0) {
       throw new BadRequestException('At least one image is required');
     }
-    console.log(createAccommodationDto);
     const newAccommodation =
       await this.accommodationsService.createAccommodation(
         createAccommodationDto,
