@@ -72,7 +72,7 @@ describe('UsersController', () => {
   describe('getUser', () => {
     it("returns a user's information", () => {
       expect(controller.getUser('1')).resolves.toEqual({
-        data: mockUsers[0],
+        data: omit<User>(mockUsers[0], ['passwordHash']),
       });
     });
   });
@@ -87,7 +87,7 @@ describe('UsersController', () => {
       };
 
       expect(controller.createUser(createUserDto)).resolves.toEqual({
-        data: mockUsers[0],
+        data: omit<User>(mockUsers[0], ['passwordHash']),
       });
     });
   });
@@ -101,7 +101,7 @@ describe('UsersController', () => {
       };
 
       expect(controller.updateUser(updateUserDto, '1')).resolves.toEqual({
-        data: mockUsers[0],
+        data: omit<User>(mockUsers[0], ['passwordHash']),
       });
     });
   });
@@ -124,15 +124,10 @@ describe('UsersController', () => {
 
   describe('getCurrentUser', () => {
     it("returns the current user's information", () => {
-      const user = omit(mockUsers[0], ['accommodations', 'role']) as User;
+      const user = mockUsers[0];
 
       expect(controller.getCurrentUser(user)).resolves.toEqual({
-        user: {
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          id: user.id,
-        },
+        data: omit<User>(user, ['passwordHash']),
       });
     });
   });
