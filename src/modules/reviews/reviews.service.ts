@@ -24,6 +24,7 @@ export class ReviewsService {
 
     return await this.reviewRepository.find({
       where: { accommodation: { id: accommodationId } },
+      relations: ['user'],
     });
   }
 }

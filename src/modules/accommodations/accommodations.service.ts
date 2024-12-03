@@ -102,17 +102,38 @@ export class AccommodationsService {
     return await this.accommodationRepository.save(newAccommodation);
   }
 
-  async getAccommodationById(id: string): Promise<Accommodation> {
+  async getAccommodationById(
+    id: string,
+  ): Promise<Accommodation & { overallRating: number }> {
     const accommodation = await this.accommodationRepository.findOne({
       where: { id },
-      relations: ['amenities', 'category', 'owner', 'images', 'reviews'],
+      relations: [
+        'amenities',
+        'category',
+        'owner',
+        'images',
+        'reviews',
+        'reviews.user',
+      ],
     });
 
     if (!accommodation) {
       throw new NotFoundException(`Accommodation with ID ${id} not found`);
     }
 
-    return accommodation;
+    const overallRating =
+      accommodation.reviews.length > 0
+        ? Math.round(
+            (accommodation.reviews.reduce(
+              (acc, review) => acc + Number(review.rating),
+              0,
+            ) /
+              accommodation.reviews.length) *
+              100,
+          ) / 100
+        : 0;
+
+    return { ...accommodation, overallRating };
   }
 
   async updateAccommodation(
