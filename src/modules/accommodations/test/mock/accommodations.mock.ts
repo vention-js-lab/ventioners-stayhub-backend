@@ -50,5 +50,6 @@ export const mockAccommodations: Accommodation[] = [
         updatedAt: new Date(),
       },
     ] as Amenity[],
+    reviews: [],
   },
 ];
