@@ -105,7 +105,7 @@ export class AccommodationsService {
   async getAccommodationById(id: string): Promise<Accommodation> {
     const accommodation = await this.accommodationRepository.findOne({
       where: { id },
-      relations: ['amenities', 'category', 'owner', 'images'],
+      relations: ['amenities', 'category', 'owner', 'images', 'reviews'],
     });
 
     if (!accommodation) {
