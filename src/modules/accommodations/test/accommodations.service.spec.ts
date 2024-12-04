@@ -120,7 +120,7 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
     it("returns an accommodation's details", async () => {
       const result = await service.getAccommodationById('existing-id');
 
-      expect(result).toEqual(mockAccommodations[0]);
+      expect(result).toEqual({ ...mockAccommodations[0], overallRating: 0 });
     });
 
     it('throws NotFoundException if accommodation is not found', async () => {
