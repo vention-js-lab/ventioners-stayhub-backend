@@ -1,0 +1,39 @@
+services:
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=${WATCHTOWER_CLEANUP}
+      - WATCHTOWER_POLL_INTERVAL=${WATCHTOWER_POLL_INTERVAL}
+    restart: always
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_TAG}:latest
+    ports:
+      - '${APP_PORT}:${APP_PORT}'
+    env_file:
+      - .env
+    depends_on:
+      - cache
+    restart: always
+  cache:
+    image: redis
+    ports:
+      - '${REDIS_PORT}:6379'
+    command: redis-server --loglevel warning --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - cache:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', '${REDIS_PASSWORD}', 'ping']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
+
+volumes:
+  cache:
+    driver: local
