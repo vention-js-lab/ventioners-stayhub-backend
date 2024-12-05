@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import { BookingsService } from '../bookings/bookings.service';
@@ -7,11 +7,16 @@ import { AccommodationsService } from '../accommodations/accommodations.service'
 import { Accommodation } from '@modules';
 import { Booking } from '../bookings/entities/booking.entity';
 import { CreateCheckoutDto } from './dto';
+import { generateAfterPaymentUrl } from '../../shared/helpers/generate-after-payment-url';
+import { convertToCent } from '../../shared/helpers/convert-to-cent';
+import { SessionMetadata } from './types';
 
 @Injectable()
 export class StripeService {
+  private logger = new Logger(StripeService.name, { timestamp: true });
   private stripe: Stripe;
-  private readonly baseUrl = this.configService.get('ALLOWED_ORIGINS');
+  private readonly clientURL: string;
+  private readonly webhookSecret: string;
 
   constructor(
     private readonly configService: ConfigService,
@@ -19,6 +24,8 @@ export class StripeService {
     private readonly accommodationsService: AccommodationsService,
   ) {
     const apiKey = this.configService.get('STRIPE_SECRET_KEY');
+    this.clientURL = this.configService.get('CLIENT_URL');
+    this.webhookSecret = this.configService.get('STRIPE_WEBHOOK_SECRET');
     this.stripe = new Stripe(apiKey);
   }
 
@@ -38,6 +45,11 @@ export class StripeService {
     const accommodationImage = accommodation.images
       .filter((image) => image.order === 1)
       .map((image) => image.url);
+
+    const sessionMetadata: SessionMetadata = {
+      bookingId: booking.id,
+      userId: booking.user.id,
+    };
     const session = await this.stripe.checkout.sessions.create({
       line_items: [
         {
@@ -48,35 +60,50 @@ export class StripeService {
               description: accommodation.description,
               images: accommodationImage,
             },
-            unit_amount: booking.totalPrice * 100,
+            unit_amount: convertToCent(booking.totalPrice),
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      metadata: {
-        bookingId: booking.id,
-        userId: booking.user.id,
-      },
+      metadata: sessionMetadata,
       // For now we redirect to the same page with query params
-      success_url: `${this.baseUrl}/property/${accommodation.id}?success=true&bookingId=${booking.id}`,
-      cancel_url: `${this.baseUrl}/property/${accommodation.id}?success=false&bookingId=${booking.id}`,
+      success_url: generateAfterPaymentUrl({
+        accommodationId: accommodation.id,
+        bookingId: booking.id,
+        clientURL: this.clientURL,
+        success: true,
+      }),
+      cancel_url: generateAfterPaymentUrl({
+        accommodationId: accommodation.id,
+        bookingId: booking.id,
+        clientURL: this.clientURL,
+        success: false,
+      }),
     });
 
     return { checkoutSessionUrl: session.url };
   }
 
   async handleWebhook(body: Buffer, signature: string) {
+    if (
+      !this.stripe.webhooks.signature.verifyHeader(
+        JSON.stringify(body),
+        signature,
+        this.webhookSecret,
+      )
+    ) {
+      throw new BadRequestException('Invalid webhook signature');
+    }
+
     const event = this.constructEvent(body, signature);
     if (!event) return { received: false };
 
     switch (event.type) {
       case 'payment_intent.succeeded':
-        const paymentIntentSuccess = event.data.object;
-        return await this.handlePaymentIntent(paymentIntentSuccess, 'success');
+        return await this.handlePaymentIntent(event.data.object, 'success');
       case 'payment_intent.payment_failed':
-        const paymentIntentFailed = event.data.object;
-        return await this.handlePaymentIntent(paymentIntentFailed, 'failed');
+        return await this.handlePaymentIntent(event.data.object, 'failed');
       default:
         throw new BadRequestException(`Unhandled event type ${event.type}`);
     }
@@ -93,7 +120,15 @@ export class StripeService {
     const booking = await this.bookingsService.getBooking(userId, bookingId);
 
     if (!booking) {
-      throw new BadRequestException(`Booking with id ${bookingId} not found`);
+      throw new BadRequestException(
+        `Booking with id ${bookingId} does not exist`,
+      );
+    }
+
+    if (booking.user.id !== userId) {
+      throw new BadRequestException(
+        `Booking with id ${bookingId} does not belong to user with id ${userId}`,
+      );
     }
 
     if (booking.status != 'PENDING') {
@@ -127,7 +162,7 @@ export class StripeService {
         endpointSecret,
       );
     } catch (error) {
-      console.log(error);
+      this.logger.error(error);
       return false;
     }
   }
