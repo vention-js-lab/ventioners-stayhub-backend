@@ -8,6 +8,7 @@ import { AccommodationCategory } from 'src/modules/categories/entities';
 import { User } from 'src/modules/users/entities/user.entity';
 import { Booking } from 'src/modules/bookings/entities/booking.entity';
 import { Review } from 'src/modules/reviews/entities';
+import { isProd } from 'src/shared/helpers';
 
 @Module({
   imports: [
@@ -31,7 +32,14 @@ import { Review } from 'src/modules/reviews/entities';
           Review,
         ],
         migrations: [`./migrations/**/*{.ts,.js}`],
-        ssl: configService.get('NODE_ENV') === 'production',
+        ssl: isProd(configService.get('NODE_ENV')),
+        ...(isProd(configService.get('NODE_ENV')) && {
+          extra: {
+            ssl: {
+              rejectUnauthorized: false,
+            },
+          },
+        }),
       }),
       inject: [ConfigService],
     }),
