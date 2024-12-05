@@ -7,6 +7,7 @@ import {
   RawBodyRequest,
   Body,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { StripeService } from './stripe.service';
 import { Request } from 'express';
@@ -30,6 +31,9 @@ export class StripeController {
     @Req() req: RawBodyRequest<Request>,
     @Headers('stripe-signature') signature: string,
   ) {
+    if (!signature) {
+      throw new BadRequestException('Missing signature');
+    }
     return await this.stripeService.handleWebhook(req.rawBody, signature);
   }
 }
