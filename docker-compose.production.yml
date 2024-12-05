@@ -1,17 +1,5 @@
 services:
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - WATCHTOWER_CLEANUP=${WATCHTOWER_CLEANUP}
-      - WATCHTOWER_POLL_INTERVAL=${WATCHTOWER_POLL_INTERVAL}
-    restart: always
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: ${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_TAG}:latest
     ports:
       - '${APP_PORT}:${APP_PORT}'
