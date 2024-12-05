@@ -31,7 +31,10 @@ export class StripeService {
     return await this.createCheckoutSession(accommodation, booking);
   }
 
-  async createCheckoutSession(accommodation: Accommodation, booking: Booking) {
+  private async createCheckoutSession(
+    accommodation: Accommodation,
+    booking: Booking,
+  ) {
     const accommodationImage = accommodation.images
       .filter((image) => image.order === 1)
       .map((image) => image.url);
