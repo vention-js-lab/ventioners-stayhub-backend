@@ -72,7 +72,7 @@ export class UsersController {
       'createdAt',
     ]);
 
-    return { user: publicUser };
+    return { data: publicUser };
   }
 
   @Get(':userId')
