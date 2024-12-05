@@ -5,12 +5,13 @@ import { ConfigModule } from '@nestjs/config';
 import { validateEnv } from './shared/configs';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { OAuthModule } from './modules';
+import { OAuthModule } from '@modules';
 import { AccommodationsModule } from './modules/accommodations/accommodations.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { AmenitiesModule } from './modules/amenities/amenities.module';
 import { MinioModule } from './modules/minio/minio.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
+import { StripeModule } from './modules/stripe/stripe.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { BookingsModule } from './modules/bookings/bookings.module';
     AmenitiesModule,
     MinioModule,
     BookingsModule,
+    StripeModule,
   ],
 })
 export class AppModule {}
