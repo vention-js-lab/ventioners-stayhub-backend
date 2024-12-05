@@ -1,1 +1,0 @@
-export const STRIPE_SECRET_KEY = 'STRIPE_SECRET_KEY';
