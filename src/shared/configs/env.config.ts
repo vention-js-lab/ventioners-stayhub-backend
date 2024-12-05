@@ -6,6 +6,7 @@ const envConfigSchema = z.object({
     .string()
     .transform((s) => s.split(',').map((origin) => origin.trim().toLowerCase()))
     .pipe(z.array(z.string())),
+  CLIENT_URL: z.string(),
 
   NODE_ENV: z.enum(['development', 'production', 'test']),
 
