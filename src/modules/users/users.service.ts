@@ -18,6 +18,7 @@ import { MinioService } from '../minio/minio.service';
 import { BucketName } from '../minio/minio.constants';
 import { ConfigService } from '@nestjs/config';
 import { generatePublicFileUrl } from '../../shared/helpers';
+import { isProd } from 'src/shared/helpers';
 
 @Injectable()
 export class UsersService {
@@ -81,6 +82,8 @@ export class UsersService {
         this.configService.get('MINIO_PORT'),
         BucketName.Images,
         profilePictureName,
+        isProd(this.configService.get('NODE_ENV')),
+        this.configService.get('MINIO_REGION'),
       );
 
       const updatedUser = await this.usersRepository.updateUser(

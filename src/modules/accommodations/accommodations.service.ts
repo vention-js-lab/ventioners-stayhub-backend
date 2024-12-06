@@ -22,6 +22,7 @@ import {
   extractFileNameFromUrl,
   generatePublicFileUrl,
 } from '../../shared/helpers';
+import { isProd } from 'src/shared/helpers';
 
 @Injectable()
 export class AccommodationsService {
@@ -242,6 +243,8 @@ export class AccommodationsService {
         this.configService.get('MINIO_PORT'),
         BucketName.Images,
         fileName,
+        isProd(this.configService.get('NODE_ENV')),
+        this.configService.get('MINIO_REGION'),
       );
       const image = this.imageRepository.create({
         url,
