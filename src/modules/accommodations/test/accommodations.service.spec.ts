@@ -110,6 +110,7 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
           pricePerNight: 200,
           longitude: 0,
           latitude: 0,
+          numberOfGuests: 4,
         },
         'existing-id',
       );

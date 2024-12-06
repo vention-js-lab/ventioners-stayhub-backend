@@ -34,6 +34,12 @@ export class CreateAccommodationDto {
   @ApiProperty({ default: 200.0, description: 'Price per night' })
   pricePerNight: number;
 
+  @TransformToNumber()
+  @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty({ default: 1, description: 'Number of guests' })
+  numberOfGuests: number;
+
   @IsArray()
   @IsOptional()
   @ApiPropertyOptional({

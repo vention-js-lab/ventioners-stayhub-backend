@@ -22,6 +22,9 @@ export class AccommodationResponseDto {
   @ApiProperty({ example: 200 })
   pricePerNight: number;
 
+  @ApiProperty({ example: 4 })
+  numberOfGuests: number;
+
   @ApiProperty({ type: [AmenityDto] })
   amenities: AmenityDto[];
 
