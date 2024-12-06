@@ -14,6 +14,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { OAuthModule } from './modules/oAuth';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { StripeModule } from './modules/stripe/stripe.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { StripeModule } from './modules/stripe/stripe.module';
     PaymentsModule,
     ReviewsModule,
     StripeModule,
+    PaymentsModule,
   ],
 })
 export class AppModule { }
