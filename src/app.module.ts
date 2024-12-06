@@ -15,6 +15,7 @@ import { OAuthModule } from './modules/oAuth';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { StripeModule } from './modules/stripe/stripe.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { OAuthModule } from './modules/oAuth';
 
 @Module({
   imports: [
