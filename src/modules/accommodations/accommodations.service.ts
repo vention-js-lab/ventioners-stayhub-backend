@@ -22,7 +22,7 @@ import {
   extractFileNameFromUrl,
   generatePublicFileUrl,
 } from '../../shared/helpers';
-import { createLocationCoordinates } from 'src/shared/helpers/createCordinates';
+import { createLocationCoordinates } from 'src/shared/helpers/create-cordinates';
 import { isProd } from 'src/shared/helpers';
 
 @Injectable()
