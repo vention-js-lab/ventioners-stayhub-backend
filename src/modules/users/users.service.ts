@@ -6,9 +6,9 @@ import {
 import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
 import {
+  UserSearchParamsReqDto,
   CreateUserReqDto,
   UpdateUserReqDto,
-  UserSearchParamsReqDto,
 } from './dto/request';
 import { Hasher } from 'src/shared/libs';
 import { Accommodation } from '../accommodations';
@@ -27,7 +27,7 @@ export class UsersService {
     private readonly accommodationRepository: Repository<Accommodation>,
     private readonly minioService: MinioService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   async getUsers(
     searchParams: UserSearchParamsReqDto,
@@ -58,10 +58,12 @@ export class UsersService {
     }
 
     const password = await Hasher.hashValue(dto.password);
-    return await this.usersRepository.createUser({
+    const newUser = await this.usersRepository.createUser({
       ...dto,
       password,
     });
+
+    return newUser;
   }
 
   async updateUser(
@@ -84,18 +86,18 @@ export class UsersService {
         isProd(this.configService.get('NODE_ENV')),
         this.configService.get('MINIO_REGION'),
       );
-
-      const updatedUser = await this.usersRepository.updateUser(
-        { ...dto, profilePictureUrl },
-        userId,
-      );
-
-      if (!updatedUser) {
-        throw new NotFoundException(`User with id ${userId} not found`);
-      }
-
-      return updatedUser;
     }
+
+    const updatedUser = await this.usersRepository.updateUser(
+      { ...dto, profilePictureUrl },
+      userId,
+    );
+
+    if (!updatedUser) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    return updatedUser;
   }
 
   async deleteUser(userId: string): Promise<void> {
