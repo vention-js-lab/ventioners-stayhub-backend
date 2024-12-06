@@ -8,7 +8,7 @@ import {
   IsUUID,
   MaxLength,
 } from 'class-validator';
-import { TransformToFloat, TransformToNumber } from 'src/shared/transformers';
+import { TransformToFloat, TransformToInt } from 'src/shared/transformers';
 
 export class CreateAccommodationDto {
   @IsString()
@@ -29,13 +29,13 @@ export class CreateAccommodationDto {
   @ApiProperty({ default: 'Malibu, California', maxLength: 200 })
   location: string;
 
-  @TransformToDouble()
+  @TransformToFloat()
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({ default: 200.0, description: 'Price per night' })
   pricePerNight: number;
 
-  @TransformToNumber()
+  @TransformToInt()
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({ default: 1, description: 'Number of guests' })
