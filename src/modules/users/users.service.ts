@@ -27,7 +27,7 @@ export class UsersService {
     private readonly accommodationRepository: Repository<Accommodation>,
     private readonly minioService: MinioService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   async getUsers(
     searchParams: UserSearchParamsReqDto,
@@ -84,7 +84,6 @@ export class UsersService {
         isProd(this.configService.get('NODE_ENV')),
         this.configService.get('MINIO_REGION'),
       );
-    
 
       const updatedUser = await this.usersRepository.updateUser(
         { ...dto, profilePictureUrl },
