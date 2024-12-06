@@ -13,7 +13,6 @@ import { Booking } from 'src/modules/bookings/entities/booking.entity';
 import { Payment } from '../modules/payments/entities/payment.entity';
 import { Review } from 'src/modules/reviews/entities';
 import { isProd } from 'src/shared/helpers';
-import { Payment } from '../modules/payments/entities/payment.entity';
 
 @Module({
   imports: [
