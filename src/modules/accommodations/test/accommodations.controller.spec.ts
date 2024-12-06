@@ -56,6 +56,7 @@ describe('AccommodationsController', () => {
       categoryId: 'test-category-id',
       amenities: ['test-amenity-id'],
       pricePerNight: 100,
+      numberOfGuests: 4,
     };
 
     it('throws an error if no image is provided', () => {

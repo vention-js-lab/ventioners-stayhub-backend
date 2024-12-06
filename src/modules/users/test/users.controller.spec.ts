@@ -127,7 +127,7 @@ describe('UsersController', () => {
       const user = omit(mockUsers[0], ['accommodations', 'role']) as User;
 
       expect(controller.getCurrentUser(user)).resolves.toEqual({
-        user: {
+        data: {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,

@@ -24,6 +24,7 @@ export const mockAccommodations: Accommodation[] = [
     updatedAt: new Date(),
     location: 'Moon',
     pricePerNight: 200,
+    numberOfGuests: 4,
     owner: {
       id: '3',
       email: 'clyde@gmail.com',

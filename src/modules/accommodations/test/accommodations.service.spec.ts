@@ -108,6 +108,7 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
           categoryId: 'existing-id',
           amenities: ['existing-id'],
           pricePerNight: 200,
+          numberOfGuests: 4,
         },
         'existing-id',
       );
