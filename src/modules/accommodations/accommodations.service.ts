@@ -7,10 +7,10 @@ import { Accommodation, Image, Wishlist } from './entities';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
-  WishlistAccommodationDto,
+  CreateAccommodationDto,
   SearchAccommodationQueryParamsDto,
   UpdateAccommodationDto,
-  CreateAccommodationDto,
+  WishlistAccommodationDto,
 } from './dto/request';
 import { PaginatedResult } from './interfaces';
 import { MinioService } from '../minio/minio.service';
@@ -18,8 +18,10 @@ import { BucketName } from '../minio/minio.constants';
 import { ConfigService } from '@nestjs/config';
 import { CategoriesService } from '../categories/categories.service';
 import { AmenitiesService } from '../amenities/amenities.service';
-import { buildMinioFileUrl } from 'src/shared/util/urlBuilder';
-import { extractFileNameFromUrl } from 'src/shared/util/exractFileName';
+import {
+  extractFileNameFromUrl,
+  generatePublicFileUrl,
+} from '../../shared/helpers';
 
 @Injectable()
 export class AccommodationsService {
@@ -129,18 +131,14 @@ export class AccommodationsService {
     }
 
     if (amenities) {
-      const resolvedAmenities = amenities?.length
+      accommodation.amenities = amenities?.length
         ? await this.amenitiesService.getAmenitiesByIds(amenities)
         : [];
-
-      accommodation.amenities = resolvedAmenities;
     }
 
     if (categoryId) {
-      const resolvedCategory =
+      accommodation.category =
         await this.categoryService.getCategoryById(categoryId);
-
-      accommodation.category = resolvedCategory;
     }
     Object.assign(accommodation, updateAccommodationData);
 
@@ -218,7 +216,7 @@ export class AccommodationsService {
     for (const [index, file] of files.entries()) {
       const fileName = await this.minioService.uploadFile(file);
 
-      const url = buildMinioFileUrl(
+      const url = generatePublicFileUrl(
         this.configService.get('MINIO_HOST'),
         this.configService.get('MINIO_PORT'),
         BucketName.Images,
