@@ -6,9 +6,9 @@ import {
 import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
 import {
-  UserSearchParamsReqDto,
   CreateUserReqDto,
   UpdateUserReqDto,
+  UserSearchParamsReqDto,
 } from './dto/request';
 import { Hasher } from 'src/shared/libs';
 import { Accommodation } from '../accommodations';
@@ -17,8 +17,7 @@ import { Repository } from 'typeorm';
 import { MinioService } from '../minio/minio.service';
 import { BucketName } from '../minio/minio.constants';
 import { ConfigService } from '@nestjs/config';
-import { generatePublicFileUrl } from '../../shared/helpers';
-import { isProd } from 'src/shared/helpers';
+import { generatePublicFileUrl, isProd } from 'src/shared/helpers';
 
 @Injectable()
 export class UsersService {
@@ -85,18 +84,18 @@ export class UsersService {
         isProd(this.configService.get('NODE_ENV')),
         this.configService.get('MINIO_REGION'),
       );
-
-      const updatedUser = await this.usersRepository.updateUser(
-        { ...dto, profilePictureUrl },
-        userId,
-      );
-
-      if (!updatedUser) {
-        throw new NotFoundException(`User with id ${userId} not found`);
-      }
-
-      return updatedUser;
     }
+
+    const updatedUser = await this.usersRepository.updateUser(
+      { ...dto, profilePictureUrl },
+      userId,
+    );
+
+    if (!updatedUser) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    return updatedUser;
   }
 
   async deleteUser(userId: string): Promise<void> {
