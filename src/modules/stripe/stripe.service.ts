@@ -10,14 +10,14 @@ import { ConfigService } from '@nestjs/config';
 import { BookingsService } from '../bookings/bookings.service';
 import { BookingStatus } from '../bookings/constants';
 import { AccommodationsService } from '../accommodations/accommodations.service';
-import { Accommodation } from '@modules';
 import { Booking } from '../bookings/entities/booking.entity';
-import { generateAfterPaymentUrl } from '../../shared/helpers/generate-after-payment-url';
-import { convertToCent } from '../../shared/helpers/convert-to-cent';
+import { generateAfterPaymentUrl } from '../../shared/helpers';
+import { convertToCent } from '../../shared/helpers';
 import { SessionMetadata } from './types';
 import { CreateStripeCheckoutDto } from '../payments/dto';
 import { PaymentsService } from '../payments/payments.service';
 import { PaymentStatus } from '../payments/constants';
+import { Accommodation } from '../accommodations';
 
 @Injectable()
 export class StripeService {

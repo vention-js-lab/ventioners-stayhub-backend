@@ -16,8 +16,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MinioService } from '../minio/minio.service';
 import { BucketName } from '../minio/minio.constants';
-import { buildMinioFileUrl } from 'src/shared/util/urlBuilder';
 import { ConfigService } from '@nestjs/config';
+import { generatePublicFileUrl } from '../../shared/helpers';
 
 @Injectable()
 export class UsersService {
@@ -58,12 +58,10 @@ export class UsersService {
     }
 
     const password = await Hasher.hashValue(dto.password);
-    const newUser = await this.usersRepository.createUser({
+    return await this.usersRepository.createUser({
       ...dto,
       password,
     });
-
-    return newUser;
   }
 
   async updateUser(
@@ -76,7 +74,7 @@ export class UsersService {
       BucketName.Images,
     );
 
-    const profilePictureUrl = buildMinioFileUrl(
+    const profilePictureUrl = generatePublicFileUrl(
       this.configService.get('MINIO_HOST'),
       this.configService.get('MINIO_PORT'),
       BucketName.Images,
