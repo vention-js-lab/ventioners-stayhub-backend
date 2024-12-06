@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import { BookingsService } from '../bookings/bookings.service';
@@ -6,10 +12,12 @@ import { BookingStatus } from '../bookings/constants';
 import { AccommodationsService } from '../accommodations/accommodations.service';
 import { Accommodation } from '@modules';
 import { Booking } from '../bookings/entities/booking.entity';
-import { CreateCheckoutDto } from './dto';
 import { generateAfterPaymentUrl } from '../../shared/helpers/generate-after-payment-url';
 import { convertToCent } from '../../shared/helpers/convert-to-cent';
 import { SessionMetadata } from './types';
+import { CreateStripeCheckoutDto } from '../payments/dto';
+import { PaymentsService } from '../payments/payments.service';
+import { PaymentStatus } from '../payments/constants';
 
 @Injectable()
 export class StripeService {
@@ -22,6 +30,8 @@ export class StripeService {
     private readonly configService: ConfigService,
     private readonly bookingsService: BookingsService,
     private readonly accommodationsService: AccommodationsService,
+    @Inject(forwardRef(() => PaymentsService))
+    private readonly paymentsService: PaymentsService,
   ) {
     const apiKey = this.configService.get('STRIPE_SECRET_KEY');
     this.clientURL = this.configService.get('CLIENT_URL');
@@ -29,7 +39,7 @@ export class StripeService {
     this.stripe = new Stripe(apiKey);
   }
 
-  async checkout(dto: CreateCheckoutDto) {
+  async checkout(dto: CreateStripeCheckoutDto) {
     const accommodation = await this.accommodationsService.getAccommodationById(
       dto.accommodationId,
     );
@@ -101,9 +111,15 @@ export class StripeService {
 
     switch (event.type) {
       case 'payment_intent.succeeded':
-        return await this.handlePaymentIntent(event.data.object, 'success');
+        return await this.handlePaymentIntent(
+          event.data.object,
+          PaymentStatus.CONFIRMED,
+        );
       case 'payment_intent.payment_failed':
-        return await this.handlePaymentIntent(event.data.object, 'failed');
+        return await this.handlePaymentIntent(
+          event.data.object,
+          PaymentStatus.FAILED,
+        );
       default:
         throw new BadRequestException(`Unhandled event type ${event.type}`);
     }
@@ -111,7 +127,7 @@ export class StripeService {
 
   async handlePaymentIntent(
     paymentIntent: Stripe.PaymentIntent,
-    paymentStatus: 'success' | 'failed',
+    paymentStatus: PaymentStatus,
   ) {
     const metadata = paymentIntent.metadata;
     const bookingId = metadata.bookingId;
@@ -119,30 +135,26 @@ export class StripeService {
 
     const booking = await this.bookingsService.getBooking(userId, bookingId);
 
-    if (!booking) {
-      throw new BadRequestException(
-        `Booking with id ${bookingId} does not exist`,
-      );
-    }
-
-    if (booking.user.id !== userId) {
-      throw new BadRequestException(
-        `Booking with id ${bookingId} does not belong to user with id ${userId}`,
-      );
-    }
-
     if (booking.status != 'PENDING') {
       throw new BadRequestException(
         `Booking with id ${bookingId} is not in pending state`,
       );
     }
 
+    const bookingStatus =
+      paymentStatus === 'CONFIRMED'
+        ? BookingStatus.CONFIRMED
+        : BookingStatus.CANCELLED;
+
+    await this.paymentsService.createPayment({
+      amount: convertToCent(booking.totalPrice),
+      booking,
+      status: paymentStatus,
+    });
+
     await this.bookingsService.updateStatus(
       {
-        status:
-          paymentStatus === 'success'
-            ? BookingStatus.CONFIRMED
-            : BookingStatus.CANCELLED,
+        status: bookingStatus,
       },
       userId,
       bookingId,
