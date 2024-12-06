@@ -20,6 +20,7 @@ import { CategoriesService } from '../categories/categories.service';
 import { AmenitiesService } from '../amenities/amenities.service';
 import { buildMinioFileUrl } from 'src/shared/util/urlBuilder';
 import { extractFileNameFromUrl } from 'src/shared/util/exractFileName';
+import { createLocationCoordinates } from 'src/shared/util/createCordinates';
 import { isProd } from 'src/shared/helpers';
 
 @Injectable()
@@ -84,7 +85,7 @@ export class AccommodationsService {
     createAccommodationDto: CreateAccommodationDto,
     userId: string,
   ): Promise<Accommodation> {
-    const { amenities, categoryId, ...accommodationData } =
+    const { amenities, categoryId, longitude, latitude, ...accommodationData } =
       createAccommodationDto;
 
     const resolvedAmenities = amenities?.length
@@ -94,11 +95,17 @@ export class AccommodationsService {
     const resolvedCategory =
       await this.categoryService.getCategoryById(categoryId);
 
+    const transformedLocationCoordinates = createLocationCoordinates(
+      longitude,
+      latitude,
+    );
+
     const newAccommodation = this.accommodationRepository.create({
       ...accommodationData,
       amenities: resolvedAmenities,
       category: resolvedCategory,
       owner: { id: userId },
+      locationCoordinates: transformedLocationCoordinates,
     });
     return await this.accommodationRepository.save(newAccommodation);
   }
@@ -142,10 +149,16 @@ export class AccommodationsService {
     UpdateAccommodationDto: UpdateAccommodationDto,
     userId: string,
   ): Promise<Accommodation> {
-    const { amenities, categoryId, ...updateAccommodationData } =
-      UpdateAccommodationDto;
+    const {
+      amenities,
+      categoryId,
+      longitude,
+      latitude,
+      ...updateAccommodationData
+    } = UpdateAccommodationDto;
 
     const accommodation = await this.getAccommodationById(id);
+
     if (accommodation.owner.id !== userId) {
       throw new UnauthorizedException('Access denied.');
     }
@@ -154,16 +167,23 @@ export class AccommodationsService {
       const resolvedAmenities = amenities?.length
         ? await this.amenitiesService.getAmenitiesByIds(amenities)
         : [];
-
       accommodation.amenities = resolvedAmenities;
     }
 
     if (categoryId) {
       const resolvedCategory =
         await this.categoryService.getCategoryById(categoryId);
-
       accommodation.category = resolvedCategory;
     }
+
+    if (longitude && latitude) {
+      const transformedLocationCoordinates = createLocationCoordinates(
+        longitude,
+        latitude,
+      );
+      accommodation.locationCoordinates = transformedLocationCoordinates;
+    }
+
     Object.assign(accommodation, updateAccommodationData);
 
     return await this.accommodationRepository.save(accommodation);
