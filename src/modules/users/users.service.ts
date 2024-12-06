@@ -75,24 +75,25 @@ export class UsersService {
         file,
         BucketName.Images,
       );
-      
-    const profilePictureUrl = generatePublicFileUrl(
-      this.configService.get('MINIO_HOST'),
-      this.configService.get('MINIO_PORT'),
-      BucketName.Images,
-      profilePictureName,
-    );
 
-    const updatedUser = await this.usersRepository.updateUser(
-      { ...dto, profilePictureUrl },
-      userId,
-    );
+      profilePictureUrl = generatePublicFileUrl(
+        this.configService.get('MINIO_HOST'),
+        this.configService.get('MINIO_PORT'),
+        BucketName.Images,
+        profilePictureName,
+      );
 
-    if (!updatedUser) {
-      throw new NotFoundException(`User with id ${userId} not found`);
+      const updatedUser = await this.usersRepository.updateUser(
+        { ...dto, profilePictureUrl },
+        userId,
+      );
+
+      if (!updatedUser) {
+        throw new NotFoundException(`User with id ${userId} not found`);
+      }
+
+      return updatedUser;
     }
-
-    return updatedUser;
   }
 
   async deleteUser(userId: string): Promise<void> {
