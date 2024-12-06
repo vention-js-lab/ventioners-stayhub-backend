@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsUUID } from 'class-validator';
 
-export class CreateCheckoutDto {
+export class CreateStripeCheckoutDto {
   @IsUUID()
   @IsNotEmpty()
   accommodationId: string;

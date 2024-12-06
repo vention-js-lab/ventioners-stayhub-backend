@@ -12,6 +12,7 @@ import { AmenitiesModule } from './modules/amenities/amenities.module';
 import { MinioModule } from './modules/minio/minio.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { StripeModule } from './modules/stripe/stripe.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { StripeModule } from './modules/stripe/stripe.module';
     MinioModule,
     BookingsModule,
     StripeModule,
+    PaymentsModule,
   ],
 })
 export class AppModule {}
