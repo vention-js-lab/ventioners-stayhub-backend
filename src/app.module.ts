@@ -10,12 +10,10 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { AmenitiesModule } from './modules/amenities/amenities.module';
 import { MinioModule } from './modules/minio/minio.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
-import { PaymentsModule } from './modules/payments/payments.module';
 import { OAuthModule } from './modules/oAuth';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { StripeModule } from './modules/stripe/stripe.module';
 import { PaymentsModule } from './modules/payments/payments.module';
-import { OAuthModule } from './modules/oAuth';
 
 @Module({
   imports: [
@@ -41,4 +39,4 @@ import { OAuthModule } from './modules/oAuth';
     PaymentsModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}
