@@ -1,5 +1,5 @@
 export const enum BucketName {
-  Images = 'images',
+  Images = 'stayhub-images',
 }
 
 export const enum AccessPolicy {

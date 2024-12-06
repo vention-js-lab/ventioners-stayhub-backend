@@ -21,6 +21,7 @@ import { AmenitiesService } from '../amenities/amenities.service';
 import { buildMinioFileUrl } from 'src/shared/util/urlBuilder';
 import { extractFileNameFromUrl } from 'src/shared/util/exractFileName';
 import { createLocationCoordinates } from 'src/shared/util/createCordinates';
+import { isProd } from 'src/shared/helpers';
 
 @Injectable()
 export class AccommodationsService {
@@ -264,6 +265,8 @@ export class AccommodationsService {
         this.configService.get('MINIO_PORT'),
         BucketName.Images,
         fileName,
+        isProd(this.configService.get('NODE_ENV')),
+        this.configService.get('MINIO_REGION'),
       );
       const image = this.imageRepository.create({
         url,
