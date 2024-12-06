@@ -9,6 +9,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { TransformToFloat, TransformToNumber } from 'src/shared/transformers';
+
 export class CreateAccommodationDto {
   @IsString()
   @IsNotEmpty()
@@ -28,7 +29,7 @@ export class CreateAccommodationDto {
   @ApiProperty({ default: 'Malibu, California', maxLength: 200 })
   location: string;
 
-  @TransformToNumber()
+  @TransformToDouble()
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({ default: 200.0, description: 'Price per night' })
