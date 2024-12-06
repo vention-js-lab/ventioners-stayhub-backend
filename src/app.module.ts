@@ -10,10 +10,10 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { AmenitiesModule } from './modules/amenities/amenities.module';
 import { MinioModule } from './modules/minio/minio.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
-import { StripeModule } from './modules/stripe/stripe.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { OAuthModule } from './modules/oAuth';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { StripeModule } from './modules/stripe/stripe.module';
 
 @Module({
   imports: [
@@ -35,6 +35,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     StripeModule,
     PaymentsModule,
     ReviewsModule,
+    StripeModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
