@@ -8,7 +8,7 @@ import {
   IsUUID,
   MaxLength,
 } from 'class-validator';
-import { TransformToDouble, TransformToNumber } from 'src/shared/transformers';
+import { TransformToDouble, TransformToInt } from 'src/shared/transformers';
 
 export class CreateAccommodationDto {
   @IsString()
@@ -35,7 +35,7 @@ export class CreateAccommodationDto {
   @ApiProperty({ default: 200.0, description: 'Price per night' })
   pricePerNight: number;
 
-  @TransformToNumber()
+  @TransformToInt()
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({ default: 1, description: 'Number of guests' })
