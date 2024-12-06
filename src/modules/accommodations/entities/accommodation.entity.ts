@@ -14,6 +14,7 @@ import { AccommodationCategory } from 'src/modules/categories/entities';
 import { Wishlist } from './wishlist.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 import { Image } from './image.entity';
+import { Review } from 'src/modules/reviews/entities/review.entity';
 @Entity()
 export class Accommodation {
   @PrimaryGeneratedColumn('uuid')
@@ -79,6 +80,9 @@ export class Accommodation {
 
   @OneToMany(() => Wishlist, (wishlist) => wishlist.accommodation)
   wishlists?: Wishlist[];
+
+  @OneToMany(() => Review, (review) => review.accommodation)
+  reviews?: Review[];
 
   @CreateDateColumn({
     name: 'created_at',
