@@ -1,4 +1,3 @@
-// src/types/point-geometry.type.ts
 export type PointGeometry = {
   type: 'Point';
   coordinates: [number, number];
