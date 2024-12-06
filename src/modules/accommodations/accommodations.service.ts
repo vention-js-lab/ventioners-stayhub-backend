@@ -20,6 +20,7 @@ import { CategoriesService } from '../categories/categories.service';
 import { AmenitiesService } from '../amenities/amenities.service';
 import { buildMinioFileUrl } from 'src/shared/util/urlBuilder';
 import { extractFileNameFromUrl } from 'src/shared/util/exractFileName';
+import { createLocationCoordinates } from 'src/shared/util/createCordinates';
 
 @Injectable()
 export class AccommodationsService {
@@ -93,10 +94,10 @@ export class AccommodationsService {
     const resolvedCategory =
       await this.categoryService.getCategoryById(categoryId);
 
-    const transformedLocationCoordinates = {
-      type: 'Point' as const,
-      coordinates: [longitude, latitude] as [number, number],
-    };
+    const transformedLocationCoordinates = createLocationCoordinates(
+      longitude,
+      latitude,
+    );
 
     const newAccommodation = this.accommodationRepository.create({
       ...accommodationData,
@@ -154,10 +155,10 @@ export class AccommodationsService {
     }
 
     if (longitude && latitude) {
-      const transformedLocationCoordinates = {
-        type: 'Point' as const,
-        coordinates: [longitude, latitude] as [number, number],
-      };
+      const transformedLocationCoordinates = createLocationCoordinates(
+        longitude,
+        latitude,
+      );
       accommodation.locationCoordinates = transformedLocationCoordinates;
     }
 

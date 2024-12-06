@@ -14,6 +14,7 @@ import { AccommodationCategory } from 'src/modules/categories/entities';
 import { Wishlist } from './wishlist.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 import { Image } from './image.entity';
+import { PointGeometry } from 'src/shared/util/createCordinates';
 @Entity()
 export class Accommodation {
   @PrimaryGeneratedColumn('uuid')
@@ -47,7 +48,7 @@ export class Accommodation {
     spatialFeatureType: 'Point',
     srid: 4326,
   })
-  locationCoordinates: { type: 'Point'; coordinates: [number, number] };
+  locationCoordinates: PointGeometry;
 
   @Column({
     name: 'price_per_night',
