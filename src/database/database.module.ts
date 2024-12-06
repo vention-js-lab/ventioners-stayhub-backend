@@ -13,6 +13,7 @@ import { Booking } from 'src/modules/bookings/entities/booking.entity';
 import { Payment } from '../modules/payments/entities/payment.entity';
 import { Review } from 'src/modules/reviews/entities';
 import { isProd } from 'src/shared/helpers';
+import { Payment } from '../modules/payments/entities/payment.entity';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { isProd } from 'src/shared/helpers';
           Booking,
           Payment,
           Review,
+          Payment,
         ],
         migrations: [`./migrations/**/*{.ts,.js}`],
         ssl: isProd(configService.get('NODE_ENV')),
