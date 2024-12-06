@@ -9,8 +9,6 @@ import { swaggerConfig } from './shared/configs/swagger.config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.setGlobalPrefix('api');
-
   const configService = app.get(ConfigService<EnvConfig>);
 
   app.useGlobalPipes(ValidationConfig);
@@ -28,7 +26,7 @@ async function bootstrap() {
   const documentFactory = () =>
     SwaggerModule.createDocument(app, swaggerConfig);
 
-  SwaggerModule.setup('api/docs', app, documentFactory);
+  SwaggerModule.setup('docs', app, documentFactory);
 
   await app.listen(port);
 }
