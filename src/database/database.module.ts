@@ -11,6 +11,7 @@ import { AccommodationCategory } from 'src/modules/categories/entities';
 import { User } from 'src/modules/users/entities/user.entity';
 import { Booking } from 'src/modules/bookings/entities/booking.entity';
 import { Payment } from '../modules/payments/entities/payment.entity';
+import { Review } from 'src/modules/reviews/entities';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { Payment } from '../modules/payments/entities/payment.entity';
           Image,
           Booking,
           Payment,
+          Review,
         ],
         migrations: [`./migrations/**/*{.ts,.js}`],
         ssl: configService.get('NODE_ENV') === 'production',

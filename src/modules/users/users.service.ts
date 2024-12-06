@@ -69,11 +69,13 @@ export class UsersService {
     userId: string,
     file?: Express.Multer.File,
   ): Promise<User> {
-    const profilePictureName = await this.minioService.uploadFile(
-      file,
-      BucketName.Images,
-    );
-
+    let profilePictureUrl: string | null;
+    if (file) {
+      const profilePictureName = await this.minioService.uploadFile(
+        file,
+        BucketName.Images,
+      );
+      
     const profilePictureUrl = generatePublicFileUrl(
       this.configService.get('MINIO_HOST'),
       this.configService.get('MINIO_PORT'),
