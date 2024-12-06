@@ -84,18 +84,19 @@ export class UsersService {
         isProd(this.configService.get('NODE_ENV')),
         this.configService.get('MINIO_REGION'),
       );
+    
+
+      const updatedUser = await this.usersRepository.updateUser(
+        { ...dto, profilePictureUrl },
+        userId,
+      );
+
+      if (!updatedUser) {
+        throw new NotFoundException(`User with id ${userId} not found`);
+      }
+
+      return updatedUser;
     }
-
-    const updatedUser = await this.usersRepository.updateUser(
-      { ...dto, profilePictureUrl },
-      userId,
-    );
-
-    if (!updatedUser) {
-      throw new NotFoundException(`User with id ${userId} not found`);
-    }
-
-    return updatedUser;
   }
 
   async deleteUser(userId: string): Promise<void> {
