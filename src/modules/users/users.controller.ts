@@ -66,23 +66,19 @@ export class UsersController {
   @Get('me')
   @UseGuards(AuthTokenGuard)
   async getCurrentUser(@GetUser() user: User) {
-    const publicUser = omit<User>(user, [
-      'passwordHash',
-      'updatedAt',
-      'createdAt',
-    ]);
+    const publicUser = omit<User>(user, ['passwordHash']);
 
-    return { user: publicUser };
+    return { data: publicUser };
   }
 
   @Get(':userId')
   @GetUserSwaggerDecorator()
   async getUser(@Param('userId', new ParseUUIDV4Pipe()) userId: string) {
-    const user = await this.usersService.getUser(userId);
+    const user = omit<User>(await this.usersService.getUser(userId), [
+      'passwordHash',
+    ]);
 
-    return {
-      data: user,
-    };
+    return { data: user };
   }
 
   @Post('')
@@ -91,11 +87,11 @@ export class UsersController {
     @Body()
     dto: CreateUserReqDto,
   ) {
-    const newUser = await this.usersService.createUser(dto);
+    const newUser = omit<User>(await this.usersService.createUser(dto), [
+      'passwordHash',
+    ]);
 
-    return {
-      data: newUser,
-    };
+    return { data: newUser };
   }
 
   @Delete(':userId')
@@ -113,10 +109,11 @@ export class UsersController {
     @Param('userId', new ParseUUIDV4Pipe()) userId: string,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    const updatedUser = await this.usersService.updateUser(dto, userId, file);
+    const updatedUser = omit<User>(
+      await this.usersService.updateUser(dto, userId, file),
+      ['passwordHash'],
+    );
 
-    return {
-      data: updatedUser,
-    };
+    return { data: updatedUser };
   }
 }

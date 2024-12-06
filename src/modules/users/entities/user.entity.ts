@@ -1,5 +1,6 @@
 import { Accommodation } from 'src/modules/accommodations/entities/accommodation.entity';
 import { Wishlist } from 'src/modules/accommodations/entities/wishlist.entity';
+import { Review } from 'src/modules/reviews/entities/review.entity';
 import { UserRole } from 'src/shared/constants/user-role.constant';
 import {
   Column,
@@ -59,6 +60,9 @@ export class User {
 
   @OneToMany(() => Wishlist, (like) => like.user)
   wishlist?: Wishlist[];
+
+  @OneToMany(() => Review, (review) => review.user)
+  reviews?: Review[];
 
   @CreateDateColumn({
     name: 'created_at',

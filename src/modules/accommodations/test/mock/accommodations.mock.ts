@@ -54,5 +54,7 @@ export const mockAccommodations: Accommodation[] = [
       type: 'Point',
       coordinates: [69.27480697631836, 41.29102833630755],
     },
+
+    reviews: [],
   },
 ];

@@ -11,6 +11,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { AmenitiesModule } from './modules/amenities/amenities.module';
 import { MinioModule } from './modules/minio/minio.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { BookingsModule } from './modules/bookings/bookings.module';
     AmenitiesModule,
     MinioModule,
     BookingsModule,
+    ReviewsModule,
   ],
 })
 export class AppModule {}

@@ -7,6 +7,7 @@ import { Amenity } from 'src/modules/amenities/entities';
 import { AccommodationCategory } from 'src/modules/categories/entities';
 import { User } from 'src/modules/users/entities/user.entity';
 import { Booking } from 'src/modules/bookings/entities/booking.entity';
+import { Review } from 'src/modules/reviews/entities';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { Booking } from 'src/modules/bookings/entities/booking.entity';
           Wishlist,
           Image,
           Booking,
+          Review,
         ],
         migrations: [`./migrations/**/*{.ts,.js}`],
         ssl: configService.get('NODE_ENV') === 'production',
