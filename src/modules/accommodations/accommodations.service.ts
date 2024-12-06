@@ -22,6 +22,7 @@ import {
   extractFileNameFromUrl,
   generatePublicFileUrl,
 } from '../../shared/helpers';
+import { createLocationCoordinates } from 'src/shared/helpers/createCordinates';
 import { isProd } from 'src/shared/helpers';
 
 @Injectable()
@@ -86,7 +87,7 @@ export class AccommodationsService {
     createAccommodationDto: CreateAccommodationDto,
     userId: string,
   ): Promise<Accommodation> {
-    const { amenities, categoryId, ...accommodationData } =
+    const { amenities, categoryId, longitude, latitude, ...accommodationData } =
       createAccommodationDto;
 
     const resolvedAmenities = amenities?.length
@@ -96,11 +97,17 @@ export class AccommodationsService {
     const resolvedCategory =
       await this.categoryService.getCategoryById(categoryId);
 
+    const transformedLocationCoordinates = createLocationCoordinates(
+      longitude,
+      latitude,
+    );
+
     const newAccommodation = this.accommodationRepository.create({
       ...accommodationData,
       amenities: resolvedAmenities,
       category: resolvedCategory,
       owner: { id: userId },
+      locationCoordinates: transformedLocationCoordinates,
     });
     return await this.accommodationRepository.save(newAccommodation);
   }
@@ -144,10 +151,16 @@ export class AccommodationsService {
     UpdateAccommodationDto: UpdateAccommodationDto,
     userId: string,
   ): Promise<Accommodation> {
-    const { amenities, categoryId, ...updateAccommodationData } =
-      UpdateAccommodationDto;
+    const {
+      amenities,
+      categoryId,
+      longitude,
+      latitude,
+      ...updateAccommodationData
+    } = UpdateAccommodationDto;
 
     const accommodation = await this.getAccommodationById(id);
+
     if (accommodation.owner.id !== userId) {
       throw new UnauthorizedException('Access denied.');
     }
@@ -162,6 +175,15 @@ export class AccommodationsService {
       accommodation.category =
         await this.categoryService.getCategoryById(categoryId);
     }
+
+    if (longitude && latitude) {
+      const transformedLocationCoordinates = createLocationCoordinates(
+        longitude,
+        latitude,
+      );
+      accommodation.locationCoordinates = transformedLocationCoordinates;
+    }
+
     Object.assign(accommodation, updateAccommodationData);
 
     return await this.accommodationRepository.save(accommodation);
