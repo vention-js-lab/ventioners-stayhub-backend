@@ -12,12 +12,15 @@ import ms from 'ms';
 import { User } from '../users/entities/user.entity';
 import { UpdatePasswordDto } from './dto/request/update-password.dto';
 import { AuthTokenGuard } from 'src/shared/guards';
+import { Cookies } from 'src/shared/decorators/cookies.decorator';
+import { RedisService } from 'src/redis/redis.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
+    private readonly redisService: RedisService,
   ) {}
 
   @Post('register')
@@ -37,24 +40,18 @@ export class AuthController {
   ) {
     const tokens = await this.authService.login(loginDto);
 
-    res.cookie('accessToken', tokens.accessToken, {
-      httpOnly: true,
-      secure: isProd(this.configService.get('NODE_ENV')),
-      maxAge: ms(
-        this.configService.get<string>('AUTH_ACCESS_TOKEN_EXPIRES_IN'),
-      ),
-    });
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: isProd(this.configService.get('NODE_ENV')),
-      maxAge: ms(
-        this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN'),
-      ),
-    });
+    this.setCookies(res, tokens);
   }
 
   @Get('logout')
-  async logout(@Res({ passthrough: true }) res: Response) {
+  async logout(
+    @Res({ passthrough: true }) res: Response,
+    @Cookies('refreshToken') oldRefreshToken: string,
+  ) {
+    if (oldRefreshToken) {
+      await this.redisService.blacklistRefreshToken(oldRefreshToken);
+    }
+
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
   }
@@ -65,11 +62,16 @@ export class AuthController {
     @GetUser() user: User,
     @Body() updatePasswordDto: UpdatePasswordDto,
     @Res({ passthrough: true }) res: Response,
+    @Cookies('refreshToken') oldRefreshToken: string,
   ) {
     const tokens = await this.authService.updatePassword(
       updatePasswordDto,
       user,
     );
+
+    if (oldRefreshToken) {
+      await this.redisService.blacklistRefreshToken(oldRefreshToken);
+    }
 
     this.setCookies(res, tokens);
   }
@@ -99,6 +101,7 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   async refresh(
     @GetUser() user: User,
+    @Cookies('refreshToken') oldRefreshToken: string,
     @Res({ passthrough: true }) res: Response,
   ) {
     const jwtPayload: JwtPayload = {
@@ -114,6 +117,8 @@ export class AuthController {
       'REFRESH',
       jwtPayload,
     );
+
+    await this.redisService.blacklistRefreshToken(oldRefreshToken);
 
     this.setCookies(res, { accessToken, refreshToken: newRefreshToken });
   }

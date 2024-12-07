@@ -8,6 +8,7 @@ import { LoginDto } from '../dto/request/login.dto';
 import { JwtPayload } from '../auth.types';
 import { mockUsers } from 'src/modules/users/test/users.mock';
 import { UpdatePasswordDto } from '../dto/request/update-password.dto';
+import { RedisService } from 'src/redis/redis.service';
 
 const mockRes = {
   cookie: jest.fn<Response, [string, string, CookieOptions]>().mockReturnThis(),
@@ -32,6 +33,10 @@ const mockConfigService = {
           return 'production';
       }
     }),
+};
+
+const mockRedisService = {
+  blacklistRefreshToken: jest.fn(),
 };
 
 describe('AuthController', () => {
@@ -72,6 +77,10 @@ describe('AuthController', () => {
         {
           provide: ConfigService,
           useValue: mockConfigService,
+        },
+        {
+          provide: RedisService,
+          useValue: mockRedisService,
         },
       ],
     }).compile();
@@ -150,7 +159,7 @@ describe('AuthController', () => {
 
   describe('logout', () => {
     it('clears the access and refresh tokens from the cookies', async () => {
-      await controller.logout(mockRes);
+      await controller.logout(mockRes, 'refresh-token');
 
       expect(mockRes.clearCookie).toHaveBeenCalledWith('accessToken');
       expect(mockRes.clearCookie).toHaveBeenCalledWith('refreshToken');
@@ -164,7 +173,7 @@ describe('AuthController', () => {
         userEmail: mockUsers[0].email,
       };
 
-      await controller.refresh(mockUsers[0], mockRes);
+      await controller.refresh(mockUsers[0], 'refresh-token', mockRes);
 
       expect(service.generateToken).toHaveBeenCalledWith('ACCESS', jwtPayload);
       expect(service.generateToken).toHaveBeenCalledWith('REFRESH', jwtPayload);
@@ -198,7 +207,12 @@ describe('AuthController', () => {
         newPassword: 'new-password',
       };
 
-      await controller.updatePassword(mockUsers[0], updatePasswordDto, mockRes);
+      await controller.updatePassword(
+        mockUsers[0],
+        updatePasswordDto,
+        mockRes,
+        'refresh-token',
+      );
 
       expect(mockRes.cookie).toHaveBeenCalledWith(
         'accessToken',
@@ -224,7 +238,7 @@ describe('AuthController', () => {
 
   describe('logout', () => {
     it('clears the access and refresh tokens from the cookies', async () => {
-      await controller.logout(mockRes);
+      await controller.logout(mockRes, 'refresh-token');
 
       expect(mockRes.clearCookie).toHaveBeenCalledWith('accessToken');
       expect(mockRes.clearCookie).toHaveBeenCalledWith('refreshToken');
