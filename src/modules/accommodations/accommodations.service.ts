@@ -19,11 +19,11 @@ import { ConfigService } from '@nestjs/config';
 import { CategoriesService } from '../categories/categories.service';
 import { AmenitiesService } from '../amenities/amenities.service';
 import {
+  createLocationCoordinates,
   extractFileNameFromUrl,
   generatePublicFileUrl,
+  isProd,
 } from '../../shared/helpers';
-import { createLocationCoordinates } from 'src/shared/helpers/create-cordinates';
-import { isProd } from 'src/shared/helpers';
 
 @Injectable()
 export class AccommodationsService {
@@ -175,13 +175,11 @@ export class AccommodationsService {
       accommodation.category =
         await this.categoryService.getCategoryById(categoryId);
     }
-
     if (longitude && latitude) {
-      const transformedLocationCoordinates = createLocationCoordinates(
+      accommodation.locationCoordinates = createLocationCoordinates(
         longitude,
         latitude,
       );
-      accommodation.locationCoordinates = transformedLocationCoordinates;
     }
 
     Object.assign(accommodation, updateAccommodationData);
