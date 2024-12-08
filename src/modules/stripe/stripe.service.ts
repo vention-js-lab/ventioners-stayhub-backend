@@ -77,7 +77,6 @@ export class StripeService {
       ],
       mode: 'payment',
       metadata: sessionMetadata,
-      // For now we redirect to the same page with query params
       success_url: generateAfterPaymentUrl({
         accommodationId: accommodation.id,
         bookingId: booking.id,

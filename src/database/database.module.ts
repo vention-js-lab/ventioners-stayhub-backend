@@ -35,7 +35,6 @@ import { isProd } from 'src/shared/helpers';
           Booking,
           Payment,
           Review,
-          Payment,
         ],
         migrations: [`./migrations/**/*{.ts,.js}`],
         ssl: isProd(configService.get('NODE_ENV')),

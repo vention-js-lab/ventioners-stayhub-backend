@@ -35,7 +35,6 @@ import { PaymentsModule } from './modules/payments/payments.module';
     StripeModule,
     PaymentsModule,
     ReviewsModule,
-    StripeModule,
     PaymentsModule,
   ],
 })
