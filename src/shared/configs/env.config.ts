@@ -6,6 +6,7 @@ const envConfigSchema = z.object({
     .string()
     .transform((s) => s.split(',').map((origin) => origin.trim().toLowerCase()))
     .pipe(z.array(z.string())),
+  CLIENT_URL: z.string(),
 
   NODE_ENV: z.enum(['development', 'production', 'test']),
 
@@ -36,6 +37,9 @@ const envConfigSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string(),
   GOOGLE_CLIENT_CALLBACK_URL: z.string(),
   GOOGLE_CLIENT_REDIRECT_URL: z.string(),
+
+  STRIPE_SECRET_KEY: z.string(),
+  STRIPE_WEBHOOK_SECRET: z.string(),
 });
 
 export type EnvConfig = z.infer<typeof envConfigSchema>;
