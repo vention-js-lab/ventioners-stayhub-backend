@@ -5,6 +5,7 @@ import { OAuthService } from '../oAuth.service';
 import { GoogleUserCreateDto } from '../dtos';
 import { ConfigService } from '@nestjs/config';
 import { OAuthResponse } from '../oAuth.types';
+import { RedisService } from 'src/redis/redis.service';
 
 const mockRes = {
   cookie: jest.fn<Response, [string, string, CookieOptions]>().mockReturnThis(),
@@ -33,6 +34,10 @@ const mockConfigSerivice = {
     }),
 };
 
+const mockRedisService = {
+  blacklistRefreshToken: jest.fn(),
+};
+
 describe('OAuthController', () => {
   let controller: OAuthController;
 
@@ -55,6 +60,7 @@ describe('OAuthController', () => {
           provide: ConfigService,
           useValue: mockConfigSerivice,
         },
+        { provide: RedisService, useValue: mockRedisService },
       ],
     }).compile();
 
@@ -82,7 +88,11 @@ describe('OAuthController', () => {
         lastName: 'Doe',
       };
 
-      await controller.googleAuthRedirect(oAuthResponse, mockRes);
+      await controller.googleAuthRedirect(
+        oAuthResponse,
+        mockRes,
+        'refresh-token',
+      );
 
       expect(mockRes.cookie).toHaveBeenCalledWith(
         'accessToken',
