@@ -16,6 +16,7 @@ import { User } from 'src/modules/users/entities/user.entity';
 import { Image } from './image.entity';
 import { PointGeometry } from 'src/shared/util/createCordinates';
 import { Review } from 'src/modules/reviews/entities/review.entity';
+
 @Entity()
 export class Accommodation {
   @PrimaryGeneratedColumn('uuid')
@@ -56,6 +57,13 @@ export class Accommodation {
     type: 'decimal',
   })
   pricePerNight: number;
+
+  @Column({
+    name: 'number_of_guests',
+    type: 'smallint',
+    default: 1,
+  })
+  numberOfGuests: number;
 
   @ManyToMany(() => Amenity)
   @JoinTable({
