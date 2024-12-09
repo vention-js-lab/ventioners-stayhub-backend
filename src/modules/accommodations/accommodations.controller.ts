@@ -65,16 +65,23 @@ export class AccommodationsController {
     if (!files || files?.length === 0) {
       throw new BadRequestException('At least one image is required');
     }
+
+    if (files.length > 10) {
+      throw new BadRequestException(`Maximum 10 images allowed`);
+    }
+
     const newAccommodation =
       await this.accommodationsService.createAccommodation(
         createAccommodationDto,
         payload.id,
       );
+
     await this.accommodationsService.addImagesToAccommodation(
       newAccommodation.id,
       files,
       payload.id,
     );
+
     return { data: newAccommodation };
   }
 

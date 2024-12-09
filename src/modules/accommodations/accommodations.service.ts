@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -22,6 +23,8 @@ import { buildMinioFileUrl } from 'src/shared/util/urlBuilder';
 import { extractFileNameFromUrl } from 'src/shared/util/exractFileName';
 import { createLocationCoordinates } from 'src/shared/util/createCordinates';
 import { isProd } from 'src/shared/helpers';
+import sharp from 'sharp';
+import { encode } from 'blurhash';
 
 @Injectable()
 export class AccommodationsService {
@@ -258,21 +261,66 @@ export class AccommodationsService {
     const uploadedImages = [];
 
     for (const [index, file] of files.entries()) {
-      const fileName = await this.minioService.uploadFile(file);
+      if (!['image/jpeg', 'image/png'].includes(file.mimetype)) {
+        throw new BadRequestException(
+          'Invalid file type. Only image files are allowed.',
+        );
+      }
 
-      const url = buildMinioFileUrl(
-        this.configService.get('MINIO_HOST'),
-        this.configService.get('MINIO_PORT'),
-        BucketName.Images,
-        fileName,
-        isProd(this.configService.get('NODE_ENV')),
-        this.configService.get('MINIO_REGION'),
+      const sharpInstance = sharp(file.buffer);
+
+      const [fullSizeBuffer, thumbnailBuffer, { data, info }] =
+        await Promise.all([
+          sharpInstance
+            .clone()
+            .resize({ width: 1280, height: 720 })
+            .jpeg({ quality: 80 })
+            .toBuffer(),
+          sharpInstance
+            .clone()
+            .resize({ height: 240, width: 427 })
+            .jpeg({ quality: 80 })
+            .toBuffer(),
+          sharpInstance
+            .clone()
+            .resize({ height: 240, width: 427 })
+            .ensureAlpha()
+            .raw()
+            .toBuffer({ resolveWithObject: true }),
+        ]);
+
+      const blurhash = encode(
+        new Uint8ClampedArray(data),
+        info.width,
+        info.height,
+        4,
+        4,
       );
+
+      const [fullSizeFileName, thumbnailFileName] = await Promise.all([
+        this.minioService.uploadFile({
+          ...file,
+          buffer: fullSizeBuffer,
+          size: fullSizeBuffer.length,
+        }),
+        this.minioService.uploadFile({
+          ...file,
+          buffer: thumbnailBuffer,
+          size: thumbnailBuffer.length,
+        }),
+      ]);
+
+      const fullSizeUrl = this.buildImageUrl(fullSizeFileName);
+      const thumbnailUrl = this.buildImageUrl(thumbnailFileName);
+
       const image = this.imageRepository.create({
-        url,
+        url: fullSizeUrl,
         order: index,
         accommodation,
+        thumbnailUrl,
+        blurhash,
       });
+
       uploadedImages.push(image);
     }
 
@@ -302,5 +350,16 @@ export class AccommodationsService {
     const fileName = extractFileNameFromUrl(image.url);
     await this.minioService.deleteFile(fileName);
     await this.imageRepository.remove(image);
+  }
+
+  private buildImageUrl(fileName: string): string {
+    return buildMinioFileUrl(
+      this.configService.get('MINIO_HOST'),
+      this.configService.get('MINIO_PORT'),
+      BucketName.Images,
+      fileName,
+      isProd(this.configService.get('NODE_ENV')),
+      this.configService.get('MINIO_REGION'),
+    );
   }
 }
