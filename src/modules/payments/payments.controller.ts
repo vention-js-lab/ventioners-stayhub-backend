@@ -10,6 +10,8 @@ export class PaymentsController {
   @Post('stripe-checkout')
   @UseGuards(AuthTokenGuard)
   async checkout(@Body() createCheckoutDto: CreateStripeCheckoutDto) {
-    return await this.paymentsService.createStripeCheckout(createCheckoutDto);
+    const checkoutSessionUrl =
+      await this.paymentsService.createStripeCheckout(createCheckoutDto);
+    return { data: checkoutSessionUrl };
   }
 }
