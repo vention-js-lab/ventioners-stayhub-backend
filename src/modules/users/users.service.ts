@@ -85,7 +85,7 @@ export class UsersService {
         BucketName.Images,
         profilePictureName,
         isProd(this.configService.get('NODE_ENV')),
-        this.configService.get('MINIO_REGION'),
+        this.configService.get('CDN_URL'),
       );
     }
 

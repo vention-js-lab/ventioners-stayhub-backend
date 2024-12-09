@@ -261,7 +261,16 @@ export class AccommodationsService {
     const uploadedImages = [];
 
     for (const [index, file] of files.entries()) {
-      if (!['image/jpeg', 'image/png'].includes(file.mimetype)) {
+      if (
+        ![
+          'image/jpeg',
+          'image/jpg',
+          'image/png',
+          'image/gif',
+          'image/webp',
+          'image/tiff',
+        ].includes(file.mimetype)
+      ) {
         throw new BadRequestException(
           'Invalid file type. Only image files are allowed.',
         );
@@ -279,7 +288,7 @@ export class AccommodationsService {
           sharpInstance
             .clone()
             .resize({ height: 240, width: 427 })
-            .jpeg({ quality: 80 })
+            .jpeg({ quality: 90 })
             .toBuffer(),
           sharpInstance
             .clone()
@@ -359,7 +368,7 @@ export class AccommodationsService {
       BucketName.Images,
       fileName,
       isProd(this.configService.get('NODE_ENV')),
-      this.configService.get('MINIO_REGION'),
+      this.configService.get('CDN_URL'),
     );
   }
 }
