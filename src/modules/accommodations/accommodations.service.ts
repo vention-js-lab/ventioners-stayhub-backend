@@ -85,7 +85,7 @@ export class AccommodationsService {
     createAccommodationDto: CreateAccommodationDto,
     userId: string,
   ): Promise<Accommodation> {
-    const { amenities, categoryId, longitude, latitude, ...accommodationData } =
+    const { amenities, categoryId, locationCoordinates, ...accommodationData } =
       createAccommodationDto;
 
     const resolvedAmenities = amenities?.length
@@ -96,8 +96,8 @@ export class AccommodationsService {
       await this.categoryService.getCategoryById(categoryId);
 
     const transformedLocationCoordinates = createLocationCoordinates(
-      longitude,
-      latitude,
+      locationCoordinates.coordinates[1],
+      locationCoordinates.coordinates[0],
     );
 
     const newAccommodation = this.accommodationRepository.create({
@@ -152,8 +152,7 @@ export class AccommodationsService {
     const {
       amenities,
       categoryId,
-      longitude,
-      latitude,
+      locationCoordinates,
       ...updateAccommodationData
     } = UpdateAccommodationDto;
 
@@ -176,10 +175,10 @@ export class AccommodationsService {
       accommodation.category = resolvedCategory;
     }
 
-    if (longitude && latitude) {
+    if (locationCoordinates) {
       const transformedLocationCoordinates = createLocationCoordinates(
-        longitude,
-        latitude,
+        locationCoordinates.coordinates[1],
+        locationCoordinates.coordinates[0],
       );
       accommodation.locationCoordinates = transformedLocationCoordinates;
     }
