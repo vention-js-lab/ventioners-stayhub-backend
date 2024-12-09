@@ -3,6 +3,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
 import Stripe from 'stripe';
@@ -90,8 +91,13 @@ export class StripeService {
         success: false,
       }),
     });
+    if (!session.url) {
+      throw new InternalServerErrorException(
+        'Failed to create checkout session',
+      );
+    }
 
-    return { checkoutSessionUrl: session.url };
+    return session.url;
   }
 
   async handleWebhook(body: Buffer, signature: string) {
