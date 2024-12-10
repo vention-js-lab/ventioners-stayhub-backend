@@ -14,8 +14,8 @@ import { AccommodationCategory } from 'src/modules/categories/entities';
 import { Wishlist } from './wishlist.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 import { Image } from './image.entity';
-import { PointGeometry } from 'src/shared/util/createCordinates';
 import { Review } from 'src/modules/reviews/entities/review.entity';
+import { PointGeometry } from 'src/shared/helpers';
 
 @Entity()
 export class Accommodation {

@@ -4,11 +4,11 @@ export type PointGeometry = {
 };
 
 export function createLocationCoordinates(
-  longitude: number,
   latitude: number,
+  longitude: number,
 ): PointGeometry {
   return {
     type: 'Point' as const,
-    coordinates: [longitude, latitude] as [number, number],
+    coordinates: [latitude, longitude] as [number, number],
   };
 }
