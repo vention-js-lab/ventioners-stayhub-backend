@@ -20,6 +20,7 @@ import { mockAccommodations } from './mock/accommodations.mock';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UpdateAccommodationDto } from '../dto/request';
 import { mockImages } from './mock/images.mock';
+import { readFileSync } from 'fs';
 
 describe('AccommodationsService - toggleLikeAccommodation', () => {
   let service: AccommodationsService;
@@ -60,6 +61,21 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
     }).compile();
 
     service = module.get<AccommodationsService>(AccommodationsService);
+
+    jest.mock('blurhash', () => ({
+      encode: jest.fn().mockReturnValue('test-hash'),
+    }));
+
+    jest.mock('sharp', () => {
+      return jest.fn(() => ({
+        clone: jest.fn().mockReturnThis(),
+        resize: jest.fn().mockReturnThis(),
+        jpeg: jest.fn().mockReturnThis(),
+        ensureAlpha: jest.fn().mockReturnThis(),
+        raw: jest.fn().mockReturnThis(),
+        toBuffer: jest.fn().mockResolvedValue(Buffer.from('test image data')),
+      }));
+    });
   });
 
   describe('toggleWishlistAccommodation', () => {
@@ -185,17 +201,29 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
   });
 
   describe('addImagesToAccommodation', () => {
+    const mockBuffer = readFileSync(
+      'src/modules/accommodations/test/mock/example.jpg',
+    );
+
+    const mockFiles = [
+      {
+        buffer: mockBuffer,
+        mimetype: 'image/png',
+        originalname: 'test.png',
+        size: mockBuffer.length,
+      },
+      {
+        buffer: mockBuffer,
+        mimetype: 'image/png',
+        originalname: 'test.png',
+        size: mockBuffer.length,
+      },
+    ] as any;
+
     it('adds an image to an accommodation', async () => {
       const result = await service.addImagesToAccommodation(
         'existing-id',
-        [
-          {
-            image1: 'test.jpg',
-          },
-          {
-            image2: 'test2.jpg',
-          },
-        ] as any,
+        mockFiles,
         '3',
       );
 
@@ -204,11 +232,7 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
 
     it('throws NotFoundException if accommodation is not found', async () => {
       expect(
-        service.addImagesToAccommodation(
-          'non-existing-id',
-          'test.jpg' as any,
-          '3',
-        ),
+        service.addImagesToAccommodation('non-existing-id', mockFiles, '3'),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -216,7 +240,7 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
       expect(
         service.addImagesToAccommodation(
           'existing-id',
-          'test.jpg' as any,
+          mockFiles,
           'another user',
         ),
       ).rejects.toThrow(UnauthorizedException);

@@ -4,10 +4,10 @@ export const buildMinioFileUrl = (
   bucketName: string,
   fileName: string,
   isProd?: boolean,
-  region?: string,
+  cdnUrl?: string,
 ): string => {
   if (isProd) {
-    return `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
+    return `${cdnUrl}/${fileName}`;
   }
 
   return `http://${host}:${port}/${bucketName}/${fileName}`;
