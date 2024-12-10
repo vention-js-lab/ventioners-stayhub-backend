@@ -288,7 +288,7 @@ export class AccommodationsService {
           sharpInstance
             .clone()
             .resize({ height: 240, width: 427 })
-            .jpeg({ quality: 90 })
+            .jpeg({ quality: 95 })
             .toBuffer(),
           sharpInstance
             .clone()
