@@ -9,6 +9,12 @@ export class Image {
   @Column()
   url: string;
 
+  @Column({ nullable: true })
+  thumbnailUrl?: string;
+
+  @Column({ nullable: true })
+  blurhash?: string;
+
   @Column({ default: 0 })
   order: number;
 
