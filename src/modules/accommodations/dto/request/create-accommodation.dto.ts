@@ -3,6 +3,7 @@ import {
   IsArray,
   IsNotEmpty,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   IsUUID,
@@ -58,15 +59,14 @@ export class CreateAccommodationDto {
   })
   categoryId: string;
 
-  @TransformToFloat()
-  @IsNumber()
+  @IsObject()
   @IsNotEmpty()
-  @ApiProperty({ description: 'Longitude coordinate of the accommodation' })
-  longitude: number;
-
-  @TransformToFloat()
-  @IsNumber()
-  @IsNotEmpty()
-  @ApiProperty({ description: 'Latitude coordinate of the accommodation' })
-  latitude: number;
+  @ApiProperty({
+    description: 'Location coordinates of the accommodation',
+    example: { type: 'Point', coordinates: [69.2348, 41.3268] },
+  })
+  locationCoordinates: {
+    type: string;
+    coordinates: [number, number];
+  };
 }

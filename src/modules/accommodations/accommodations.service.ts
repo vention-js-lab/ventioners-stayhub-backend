@@ -20,8 +20,7 @@ import { CategoriesService } from '../categories/categories.service';
 import { AmenitiesService } from '../amenities/amenities.service';
 import { buildMinioFileUrl } from 'src/shared/util/urlBuilder';
 import { extractFileNameFromUrl } from 'src/shared/util/exractFileName';
-import { createLocationCoordinates } from 'src/shared/util/createCordinates';
-import { isProd } from 'src/shared/helpers';
+import { createLocationCoordinates, isProd } from 'src/shared/helpers';
 
 @Injectable()
 export class AccommodationsService {
@@ -85,7 +84,7 @@ export class AccommodationsService {
     createAccommodationDto: CreateAccommodationDto,
     userId: string,
   ): Promise<Accommodation> {
-    const { amenities, categoryId, longitude, latitude, ...accommodationData } =
+    const { amenities, categoryId, locationCoordinates, ...accommodationData } =
       createAccommodationDto;
 
     const resolvedAmenities = amenities?.length
@@ -96,8 +95,8 @@ export class AccommodationsService {
       await this.categoryService.getCategoryById(categoryId);
 
     const transformedLocationCoordinates = createLocationCoordinates(
-      longitude,
-      latitude,
+      locationCoordinates.coordinates[0],
+      locationCoordinates.coordinates[1],
     );
 
     const newAccommodation = this.accommodationRepository.create({
@@ -152,8 +151,7 @@ export class AccommodationsService {
     const {
       amenities,
       categoryId,
-      longitude,
-      latitude,
+      locationCoordinates,
       ...updateAccommodationData
     } = UpdateAccommodationDto;
 
@@ -176,10 +174,10 @@ export class AccommodationsService {
       accommodation.category = resolvedCategory;
     }
 
-    if (longitude && latitude) {
+    if (locationCoordinates) {
       const transformedLocationCoordinates = createLocationCoordinates(
-        longitude,
-        latitude,
+        locationCoordinates.coordinates[0],
+        locationCoordinates.coordinates[1],
       );
       accommodation.locationCoordinates = transformedLocationCoordinates;
     }
