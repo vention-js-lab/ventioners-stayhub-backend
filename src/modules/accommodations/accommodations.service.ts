@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -261,21 +260,6 @@ export class AccommodationsService {
     const uploadedImages = [];
 
     for (const [index, file] of files.entries()) {
-      if (
-        ![
-          'image/jpeg',
-          'image/jpg',
-          'image/png',
-          'image/gif',
-          'image/webp',
-          'image/tiff',
-        ].includes(file.mimetype)
-      ) {
-        throw new BadRequestException(
-          'Invalid file type. Only image files are allowed.',
-        );
-      }
-
       const sharpInstance = sharp(file.buffer);
 
       const [fullSizeBuffer, thumbnailBuffer, { data, info }] =

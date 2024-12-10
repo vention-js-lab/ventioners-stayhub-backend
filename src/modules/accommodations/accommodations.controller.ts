@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -31,6 +30,7 @@ import { AuthTokenGuard } from 'src/shared/guards';
 import { User } from '../users/entities/user.entity';
 import { ParseUUIDV4Pipe } from 'src/shared/pipes';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { AccommodationImagesValidationPipe } from './pipes/accommodation-images-validation.pipe';
 
 @Controller('accommodations')
 export class AccommodationsController {
@@ -60,16 +60,9 @@ export class AccommodationsController {
   async createAccommodation(
     @Body() createAccommodationDto: CreateAccommodationDto,
     @GetUser() payload: User,
-    @UploadedFiles() files: Express.Multer.File[],
+    @UploadedFiles(new AccommodationImagesValidationPipe())
+    files: Express.Multer.File[],
   ) {
-    if (!files || files.length < 5) {
-      throw new BadRequestException(`Minimum 5 images required`);
-    }
-
-    if (files.length > 15) {
-      throw new BadRequestException(`Maximum 15 images allowed`);
-    }
-
     const newAccommodation =
       await this.accommodationsService.createAccommodation(
         createAccommodationDto,
@@ -137,7 +130,8 @@ export class AccommodationsController {
   @UseGuards(AuthTokenGuard)
   async addImages(
     @Param('id', new ParseUUIDV4Pipe()) accommodationId: string,
-    @UploadedFiles() files: Express.Multer.File[],
+    @UploadedFiles(new AccommodationImagesValidationPipe())
+    files: Express.Multer.File[],
     @GetUser() payload: User,
   ) {
     const uploadedImage =

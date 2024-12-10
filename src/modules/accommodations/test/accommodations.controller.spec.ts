@@ -8,7 +8,6 @@ import {
 } from '../dto/request';
 import { mockAccommodations } from './mock/accommodations.mock';
 import { mockUsers } from 'src/modules/users/test/users.mock';
-import { BadRequestException } from '@nestjs/common';
 import { mockImages } from './mock/images.mock';
 import { mockAccommodationsService } from './mock/controller-dependencies.mock';
 
@@ -59,16 +58,6 @@ describe('AccommodationsController', () => {
       longitude: 0,
       latitude: 0,
     };
-
-    it('throws an error if no image is provided', () => {
-      expect(
-        controller.createAccommodation(
-          createAccommodationDto,
-          mockUsers[0],
-          [],
-        ),
-      ).rejects.toThrow(BadRequestException);
-    });
 
     it("creates a new accommodation and returns it's data", async () => {
       const result = await controller.createAccommodation(

@@ -17,11 +17,7 @@ import {
   mockConfigService,
 } from './mock/service-dependencies.mock';
 import { mockAccommodations } from './mock/accommodations.mock';
-import {
-  BadRequestException,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UpdateAccommodationDto } from '../dto/request';
 import { mockImages } from './mock/images.mock';
 import { readFileSync } from 'fs';
@@ -247,21 +243,6 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
           'another user',
         ),
       ).rejects.toThrow(UnauthorizedException);
-    });
-
-    it('throws BadRequestException if image type is invalid', async () => {
-      const invalidFiles = [
-        {
-          buffer: mockBuffer,
-          mimetype: 'text/plain',
-          originalname: 'test.txt',
-          size: mockBuffer.length,
-        },
-      ] as any;
-
-      expect(
-        service.addImagesToAccommodation('existing-id', invalidFiles, '3'),
-      ).rejects.toThrow(BadRequestException);
     });
   });
 
