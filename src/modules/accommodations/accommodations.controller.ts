@@ -62,12 +62,12 @@ export class AccommodationsController {
     @GetUser() payload: User,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    if (!files || files?.length === 0) {
-      throw new BadRequestException('At least one image is required');
+    if (!files || files.length < 5) {
+      throw new BadRequestException(`Minimum 5 images required`);
     }
 
-    if (files.length > 10) {
-      throw new BadRequestException(`Maximum 10 images allowed`);
+    if (files.length > 15) {
+      throw new BadRequestException(`Maximum 15 images allowed`);
     }
 
     const newAccommodation =
