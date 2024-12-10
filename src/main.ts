@@ -5,6 +5,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { EnvConfig, ValidationConfig } from './shared/configs';
 import cookieParser from 'cookie-parser';
 import { swaggerConfig } from './shared/configs/swagger.config';
+import bodyParser from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(ValidationConfig);
   app.use(cookieParser());
+  app.use('/stripe/webhook', bodyParser.raw({ type: '*/*' }));
 
   app.enableCors({
     origin: configService.get('ALLOWED_ORIGINS'),
