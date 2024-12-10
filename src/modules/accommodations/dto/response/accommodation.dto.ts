@@ -27,6 +27,9 @@ export class AccommodationDto {
   @ApiProperty()
   pricePerNight: number;
 
+  @ApiProperty()
+  numberOfGuests: number;
+
   @ApiProperty({ type: 'array' })
   images: ImageDto[];
 

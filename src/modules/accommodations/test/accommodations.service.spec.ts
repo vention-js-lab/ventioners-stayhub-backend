@@ -112,6 +112,7 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
             type: 'Poitn',
             coordinates: [0, 0],
           },
+          numberOfGuests: 4,
         },
         'existing-id',
       );

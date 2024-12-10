@@ -60,6 +60,7 @@ describe('AccommodationsController', () => {
         type: 'Point',
         coordinates: [0, 0],
       },
+      numberOfGuests: 4,
     };
 
     it('throws an error if no image is provided', () => {
