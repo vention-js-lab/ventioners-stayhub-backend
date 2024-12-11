@@ -9,6 +9,7 @@ const envConfigSchema = z
         s.split(',').map((origin) => origin.trim().toLowerCase()),
       )
       .pipe(z.array(z.string())),
+    CLIENT_URL: z.string(),
 
     NODE_ENV: z.enum(['development', 'production', 'test']),
 
@@ -38,6 +39,9 @@ const envConfigSchema = z
     GOOGLE_CLIENT_SECRET: z.string(),
     GOOGLE_CLIENT_CALLBACK_URL: z.string(),
     GOOGLE_CLIENT_REDIRECT_URL: z.string(),
+
+    STRIPE_SECRET_KEY: z.string(),
+    STRIPE_WEBHOOK_SECRET: z.string(),
 
     CDN_URL: z.string().optional(),
   })

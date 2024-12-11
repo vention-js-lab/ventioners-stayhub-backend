@@ -9,5 +9,6 @@ import { AccommodationsModule } from '../accommodations/accommodations.module';
   imports: [AccommodationsModule, TypeOrmModule.forFeature([Booking])],
   controllers: [BookingsController],
   providers: [BookingsService],
+  exports: [BookingsService],
 })
 export class BookingsModule {}
