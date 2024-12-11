@@ -40,6 +40,13 @@ const envConfigSchema = z
     GOOGLE_CLIENT_REDIRECT_URL: z.string(),
 
     CDN_URL: z.string().optional(),
+
+    BREVO_SMTP_KEY: z.string(),
+    SMTP_PORT: z.coerce.number().int().positive(),
+    BREVO_SMTP_SERVER: z.string(),
+    BREVO_LOGIN: z.string(),
+
+    MAIL_FROM: z.string(),
   })
   .refine((env) => {
     if (env.NODE_ENV === 'production' && !env.CDN_URL) {

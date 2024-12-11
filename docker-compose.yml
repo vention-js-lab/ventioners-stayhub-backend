@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres
+    image: postgis/postgis
     container_name: postgres_database
     ports:
       - '${DB_PORT}:5432'
