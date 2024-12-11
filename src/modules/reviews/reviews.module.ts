@@ -5,9 +5,10 @@ import { ReviewsController } from './reviews.controller';
 import { ReviewsService } from './reviews.service';
 import { Accommodation } from '../accommodations';
 import { User } from '../users/entities/user.entity';
+import { Booking } from '../bookings/entities/booking.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Review, Accommodation, User])],
+  imports: [TypeOrmModule.forFeature([Review, Accommodation, User, Booking])],
   controllers: [ReviewsController],
   providers: [ReviewsService],
 })

@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Review } from './entities';
 import { Repository } from 'typeorm';
 import { Accommodation } from '../accommodations';
 import { CreateReviewDto } from './dto/request/creare-review.dto';
 import { User } from '../users/entities/user.entity';
+import { Booking } from '../bookings/entities/booking.entity';
 
 @Injectable()
 export class ReviewsService {
@@ -15,6 +20,8 @@ export class ReviewsService {
     private readonly accommodationRepository: Repository<Accommodation>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Booking)
+    private readonly bookingRepository: Repository<Booking>,
   ) {}
 
   async getReviewsByAccommodationId(accommodationId: string) {
@@ -50,6 +57,19 @@ export class ReviewsService {
     });
     if (!user) {
       throw new NotFoundException('User not found with this id');
+    }
+
+    const userHasBooking = await this.bookingRepository
+      .createQueryBuilder('booking')
+      .where('booking.userId = :userId', { userId })
+      .getCount();
+
+    if (userHasBooking === 0) {
+      throw new ForbiddenException('You must have a booking to leave a review');
+    }
+
+    if (userHasBooking === 0) {
+      throw new ForbiddenException('You must have a booking to leave a review');
     }
 
     const newReview = this.reviewRepository.create({
