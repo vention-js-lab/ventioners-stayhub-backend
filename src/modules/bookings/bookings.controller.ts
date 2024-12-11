@@ -14,7 +14,7 @@ import { CreateBookingReqDto, UpdateBookingStatusReqDto } from './dto/request';
 import { AuthTokenGuard } from 'src/shared/guards';
 import { GetUser } from 'src/shared/decorators';
 import { User } from '../users/entities/user.entity';
-import { BookingsQueryParamsReqDto } from './dto/request/bookings-query-params.dto';
+import { BookingsQueryParamsReqDto } from './dto/request';
 import {
   GetMyBookingsSwaggerDecorator,
   GetBookingSwaggerDecorator,

@@ -5,10 +5,12 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { BookingStatus } from '../constants';
+import { Payment } from '../../payments/entities/payment.entity';
 
 @Entity()
 export class Booking {
@@ -24,6 +26,9 @@ export class Booking {
     onDelete: 'CASCADE',
   })
   accommodation: Accommodation;
+
+  @OneToMany(() => Payment, (payment) => payment.booking)
+  payments: Payment[];
 
   @Column({
     name: 'check_in_date',
