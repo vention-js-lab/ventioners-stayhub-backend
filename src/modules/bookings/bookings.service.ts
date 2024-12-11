@@ -128,12 +128,6 @@ export class BookingsService {
       throw new NotFoundException(`Booking with id ${bookingId} not found`);
     }
 
-    if (booking.accommodation.owner.id !== userId) {
-      throw new UnauthorizedException(
-        'You are not allowed to update this booking',
-      );
-    }
-
     const allowedStatusTransitions = BookingStatusTransitions[booking.status];
 
     if (!allowedStatusTransitions.includes(dto.status)) {
