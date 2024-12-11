@@ -78,8 +78,8 @@ export class StripeService {
       ],
       mode: 'payment',
       metadata: sessionMetadata,
-      success_url: this.generatePaymentUrl(accommodation.id, booking.id, true),
-      cancel_url: this.generatePaymentUrl(accommodation.id, booking.id, false),
+      success_url: this.generatePaymentUrl(true),
+      cancel_url: this.generatePaymentUrl(false),
     });
     if (!session.url) {
       throw new InternalServerErrorException(
@@ -200,14 +200,8 @@ export class StripeService {
     }
   }
 
-  private generatePaymentUrl(
-    accommodationId: string,
-    bookingId: string,
-    success: boolean,
-  ) {
+  private generatePaymentUrl(success: boolean) {
     return generateAfterPaymentUrl({
-      accommodationId,
-      bookingId,
       clientURL: this.clientURL,
       success,
     });

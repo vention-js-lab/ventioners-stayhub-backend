@@ -1,15 +1,11 @@
 interface GenerateAfterPaymentUrlParams {
-  accommodationId: string;
-  bookingId: string;
-  success: boolean;
   clientURL: string;
+  success: boolean;
 }
 
 export const generateAfterPaymentUrl = ({
-  accommodationId,
-  bookingId,
-  success,
   clientURL,
+  success,
 }: GenerateAfterPaymentUrlParams) => {
-  return `${clientURL}/property/${accommodationId}?success=${success}&bookingId=${bookingId}`;
+  return `${clientURL}/payment?success=${success}`;
 };
