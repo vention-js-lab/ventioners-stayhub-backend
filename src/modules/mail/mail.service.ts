@@ -1,14 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createTransport } from 'nodemailer';
 import { BookingsService } from '../bookings/bookings.service';
+import dayjs from 'dayjs';
+import { MailSendingException } from 'src/shared';
 
 @Injectable()
 export class MailerService {
   private readonly transport: ReturnType<typeof createTransport>;
   constructor(
     private readonly configService: ConfigService,
-    private readonly bookingService: BookingsService,
+    @Inject(BookingsService) private readonly bookingService: BookingsService,
   ) {
     this.transport = createTransport({
       host: this.configService.get('BREVO_SMTP_SERVER'),
@@ -19,16 +21,10 @@ export class MailerService {
         pass: this.configService.get('BREVO_SMTP_KEY'),
       },
     });
-    this.bookingService = bookingService;
   }
 
   private formatBookingDate(date: Date): string {
-    return date.toLocaleDateString('uz-UZ', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+    return dayjs(date).locale('uz').format('dddd, MMMM D, YYYY');
   }
 
   public async sendEmail(subject: string, text: string, recipient: string) {
@@ -40,12 +36,20 @@ export class MailerService {
         text: text,
       });
     } catch (error) {
-      throw new NotFoundException('Error sending email');
+      throw new MailSendingException('Error sending email');
     }
   }
 
-  async sendStatusMail(id: string) {
+  private async getBookingDetails(id: string) {
     const booking = await this.bookingService.getBookingById(id);
+    if (!booking) {
+      throw new NotFoundException('Booking not found');
+    }
+    return booking;
+  }
+
+  async sendStatusMail(id: string) {
+    const booking = await this.getBookingDetails(id);
     const {
       user,
       accommodation,
@@ -82,10 +86,10 @@ export class MailerService {
   }
 
   async sendInvoiceMail(id: string) {
-    const booking = await this.bookingService.getBookingById(id);
+    const booking = await this.getBookingDetails(id);
     const { user, accommodation, totalPrice } = booking;
 
-    const issueDate = new Date().toLocaleDateString('en-US');
+    const issueDate = dayjs().format('MMMM D, YYYY');
     const bookingId = booking.id;
 
     const htmlContent = `
@@ -110,7 +114,7 @@ export class MailerService {
   }
 
   async sendReviewMail(id: string) {
-    const booking = await this.bookingService.getBookingById(id);
+    const booking = await this.getBookingDetails(id);
     const { user, accommodation } = booking;
 
     const subject = `Review Your Stay at ${accommodation.name}`;
