@@ -1,19 +1,14 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
 import { createTransport } from 'nodemailer';
-import { Repository } from 'typeorm';
-import { Booking } from '../bookings/entities/booking.entity';
+import { BookingsService } from '../bookings/bookings.service';
 
 @Injectable()
 export class MailerService {
   private readonly transport: ReturnType<typeof createTransport>;
-  private readonly logger = new Logger(MailerService.name);
-
   constructor(
     private readonly configService: ConfigService,
-    @InjectRepository(Booking)
-    private readonly bookingRepository: Repository<Booking>,
+    private readonly bookingService: BookingsService,
   ) {
     this.transport = createTransport({
       host: this.configService.get('BREVO_SMTP_SERVER'),
@@ -24,10 +19,11 @@ export class MailerService {
         pass: this.configService.get('BREVO_SMTP_KEY'),
       },
     });
+    this.bookingService = bookingService;
   }
 
   private formatBookingDate(date: Date): string {
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('uz-UZ', {
       weekday: 'short',
       year: 'numeric',
       month: 'short',
@@ -44,26 +40,12 @@ export class MailerService {
         text: text,
       });
     } catch (error) {
-      this.logger.error(`Error sending email: ${error.message}`, error.stack);
       throw new NotFoundException('Error sending email');
     }
   }
 
-  private async getBooking(id: string): Promise<Booking> {
-    const booking = await this.bookingRepository.findOne({
-      where: { id },
-      relations: ['accommodation', 'user'],
-    });
-
-    if (!booking) {
-      throw new NotFoundException('Booking not found');
-    }
-
-    return booking;
-  }
-
   async sendStatusMail(id: string) {
-    const booking = await this.getBooking(id);
+    const booking = await this.bookingService.getBookingById(id);
     const {
       user,
       accommodation,
@@ -100,7 +82,7 @@ export class MailerService {
   }
 
   async sendInvoiceMail(id: string) {
-    const booking = await this.getBooking(id);
+    const booking = await this.bookingService.getBookingById(id);
     const { user, accommodation, totalPrice } = booking;
 
     const issueDate = new Date().toLocaleDateString('en-US');
@@ -128,13 +110,11 @@ export class MailerService {
   }
 
   async sendReviewMail(id: string) {
-    const booking = await this.getBooking(id);
+    const booking = await this.bookingService.getBookingById(id);
     const { user, accommodation } = booking;
 
     const subject = `Review Your Stay at ${accommodation.name}`;
-
-    // make it environment variable
-    const reviewPageUrl = `https://stayhub.live/property/${id}`;
+    const reviewPageUrl = `${this.configService.get('WEB_REVIEW_URL')}/property/${id}`;
 
     const htmlContent = `
     <p style="margin: 0">Hello ${user.firstName},</p>
