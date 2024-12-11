@@ -7,12 +7,15 @@ import { GetUser } from 'src/shared/decorators';
 import { OAuthResponse } from './oAuth.types';
 import ms from 'ms';
 import { isProd } from 'src/shared/helpers';
+import { RedisService } from 'src/redis/redis.service';
+import { Cookies } from 'src/shared/decorators/cookies.decorator';
 
 @Controller('auth')
 export class OAuthController {
   constructor(
     private readonly oAuthService: OAuthService,
-    private configService: ConfigService,
+    private readonly configService: ConfigService,
+    private readonly redisService: RedisService,
   ) {}
 
   @Get('google/login')
@@ -24,8 +27,13 @@ export class OAuthController {
   async googleAuthRedirect(
     @GetUser() user: OAuthResponse,
     @Res() res: Response,
+    @Cookies('refreshToken') oldRefreshToken: string,
   ) {
     const tokens = await this.oAuthService.googleLogin(user);
+
+    if (oldRefreshToken) {
+      await this.redisService.blacklistRefreshToken(oldRefreshToken);
+    }
 
     this.setCookies(res, tokens);
 

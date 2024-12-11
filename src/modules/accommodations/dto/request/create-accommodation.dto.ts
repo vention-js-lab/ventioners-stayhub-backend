@@ -3,12 +3,14 @@ import {
   IsArray,
   IsNotEmpty,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   IsUUID,
   MaxLength,
 } from 'class-validator';
-import { TransformToFloat, TransformToNumber } from 'src/shared/transformers';
+import { TransformToFloat, TransformToInt } from 'src/shared/transformers';
+
 export class CreateAccommodationDto {
   @IsString()
   @IsNotEmpty()
@@ -28,11 +30,17 @@ export class CreateAccommodationDto {
   @ApiProperty({ default: 'Malibu, California', maxLength: 200 })
   location: string;
 
-  @TransformToNumber()
+  @TransformToFloat()
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({ default: 200.0, description: 'Price per night' })
   pricePerNight: number;
+
+  @TransformToInt()
+  @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty({ default: 1, description: 'Number of guests' })
+  numberOfGuests: number;
 
   @IsArray()
   @IsOptional()
@@ -51,15 +59,14 @@ export class CreateAccommodationDto {
   })
   categoryId: string;
 
-  @TransformToFloat()
-  @IsNumber()
+  @IsObject()
   @IsNotEmpty()
-  @ApiProperty({ description: 'Longitude coordinate of the accommodation' })
-  longitude: number;
-
-  @TransformToFloat()
-  @IsNumber()
-  @IsNotEmpty()
-  @ApiProperty({ description: 'Latitude coordinate of the accommodation' })
-  latitude: number;
+  @ApiProperty({
+    description: 'Location coordinates of the accommodation',
+    example: { type: 'Point', coordinates: [69.2348, 41.3268] },
+  })
+  locationCoordinates: {
+    type: string;
+    coordinates: [number, number];
+  };
 }

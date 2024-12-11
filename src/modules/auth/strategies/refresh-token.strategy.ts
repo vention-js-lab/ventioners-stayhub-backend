@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from '../auth.types';
 import { AuthConfig } from 'src/shared/configs';
 import { UsersRepository } from 'src/modules/users/users.repository';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -19,6 +20,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
   constructor(
     private readonly configService: ConfigService,
     private readonly usersRepository: UsersRepository,
+    private readonly redisService: RedisService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -35,6 +37,14 @@ export class RefreshTokenStrategy extends PassportStrategy(
     if (!refreshToken || !payload) {
       req.res.clearCookie('refreshToken');
       return done(new UnauthorizedException('Invalid refresh token'), false);
+    }
+
+    const isBlacklisted =
+      await this.redisService.isTokenBlacklisted(refreshToken);
+
+    if (isBlacklisted) {
+      req.res.clearCookie('refreshToken');
+      return done(new UnauthorizedException('Token has been revoked'), false);
     }
 
     const user = await this.usersRepository.findOne({

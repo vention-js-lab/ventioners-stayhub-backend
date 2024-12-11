@@ -1,12 +1,32 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { RedisCache } from 'cache-manager-redis-yet';
+import ms from 'ms';
 import { RedisClientType } from 'redis';
 import { parseJSON } from 'src/shared/helpers';
 
 @Injectable()
 export class RedisService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: RedisCache) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private readonly cacheManager: RedisCache,
+    @Inject(ConfigService) private readonly configService: ConfigService,
+  ) {}
+
+  async blacklistRefreshToken(token: string): Promise<void> {
+    await this.set(
+      token,
+      'blacklisted',
+      ms(this.configService.get<string>('AUTH_REFRESH_TOKEN_EXPIRES_IN')) *
+        1000,
+    );
+  }
+
+  async isTokenBlacklisted(token: string): Promise<boolean> {
+    const value = await this.get(token);
+
+    return value === 'blacklisted';
+  }
 
   get redis(): RedisClientType {
     return this.cacheManager.store.client;

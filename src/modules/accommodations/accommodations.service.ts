@@ -20,10 +20,12 @@ import { CategoriesService } from '../categories/categories.service';
 import { AmenitiesService } from '../amenities/amenities.service';
 import {
   createLocationCoordinates,
+  isProd,
   extractFileNameFromUrl,
   generatePublicFileUrl,
-  isProd,
-} from '../../shared/helpers';
+} from 'src/shared/helpers';
+import sharp from 'sharp';
+import { encode } from 'blurhash';
 
 @Injectable()
 export class AccommodationsService {
@@ -87,7 +89,7 @@ export class AccommodationsService {
     createAccommodationDto: CreateAccommodationDto,
     userId: string,
   ): Promise<Accommodation> {
-    const { amenities, categoryId, longitude, latitude, ...accommodationData } =
+    const { amenities, categoryId, locationCoordinates, ...accommodationData } =
       createAccommodationDto;
 
     const resolvedAmenities = amenities?.length
@@ -98,8 +100,8 @@ export class AccommodationsService {
       await this.categoryService.getCategoryById(categoryId);
 
     const transformedLocationCoordinates = createLocationCoordinates(
-      longitude,
-      latitude,
+      locationCoordinates.coordinates[0],
+      locationCoordinates.coordinates[1],
     );
 
     const newAccommodation = this.accommodationRepository.create({
@@ -154,8 +156,7 @@ export class AccommodationsService {
     const {
       amenities,
       categoryId,
-      longitude,
-      latitude,
+      locationCoordinates,
       ...updateAccommodationData
     } = UpdateAccommodationDto;
 
@@ -175,11 +176,14 @@ export class AccommodationsService {
       accommodation.category =
         await this.categoryService.getCategoryById(categoryId);
     }
-    if (longitude && latitude) {
-      accommodation.locationCoordinates = createLocationCoordinates(
-        longitude,
-        latitude,
+
+    if (locationCoordinates) {
+      const transformedLocationCoordinates = createLocationCoordinates(
+        locationCoordinates.coordinates[0],
+        locationCoordinates.coordinates[1],
       );
+
+      accommodation.locationCoordinates = transformedLocationCoordinates;
     }
 
     Object.assign(accommodation, updateAccommodationData);
@@ -256,21 +260,60 @@ export class AccommodationsService {
     const uploadedImages = [];
 
     for (const [index, file] of files.entries()) {
-      const fileName = await this.minioService.uploadFile(file);
+      const sharpInstance = sharp(file.buffer);
 
-      const url = generatePublicFileUrl(
-        this.configService.get('MINIO_HOST'),
-        this.configService.get('MINIO_PORT'),
-        BucketName.Images,
-        fileName,
-        isProd(this.configService.get('NODE_ENV')),
-        this.configService.get('MINIO_REGION'),
+      const [fullSizeBuffer, thumbnailBuffer, { data, info }] =
+        await Promise.all([
+          sharpInstance
+            .clone()
+            .resize({ width: 1280, height: 720 })
+            .jpeg({ quality: 80 })
+            .toBuffer(),
+          sharpInstance
+            .clone()
+            .resize({ height: 240, width: 427 })
+            .jpeg({ quality: 95 })
+            .toBuffer(),
+          sharpInstance
+            .clone()
+            .resize({ height: 240, width: 427 })
+            .ensureAlpha()
+            .raw()
+            .toBuffer({ resolveWithObject: true }),
+        ]);
+
+      const blurhash = encode(
+        new Uint8ClampedArray(data),
+        info.width,
+        info.height,
+        4,
+        4,
       );
+
+      const [fullSizeFileName, thumbnailFileName] = await Promise.all([
+        this.minioService.uploadFile({
+          ...file,
+          buffer: fullSizeBuffer,
+          size: fullSizeBuffer.length,
+        }),
+        this.minioService.uploadFile({
+          ...file,
+          buffer: thumbnailBuffer,
+          size: thumbnailBuffer.length,
+        }),
+      ]);
+
+      const fullSizeUrl = this.buildImageUrl(fullSizeFileName);
+      const thumbnailUrl = this.buildImageUrl(thumbnailFileName);
+
       const image = this.imageRepository.create({
-        url,
+        url: fullSizeUrl,
         order: index,
         accommodation,
+        thumbnailUrl,
+        blurhash,
       });
+
       uploadedImages.push(image);
     }
 
@@ -300,5 +343,16 @@ export class AccommodationsService {
     const fileName = extractFileNameFromUrl(image.url);
     await this.minioService.deleteFile(fileName);
     await this.imageRepository.remove(image);
+  }
+
+  private buildImageUrl(fileName: string): string {
+    return generatePublicFileUrl(
+      this.configService.get('MINIO_HOST'),
+      this.configService.get('MINIO_PORT'),
+      BucketName.Images,
+      fileName,
+      isProd(this.configService.get('NODE_ENV')),
+      this.configService.get('CDN_URL'),
+    );
   }
 }
