@@ -68,10 +68,6 @@ export class ReviewsService {
       throw new ForbiddenException('You must have a booking to leave a review');
     }
 
-    if (userHasBooking === 0) {
-      throw new ForbiddenException('You must have a booking to leave a review');
-    }
-
     const newReview = this.reviewRepository.create({
       ...createReviewDto,
       accommodation,
