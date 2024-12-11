@@ -2,13 +2,11 @@ import {
   Controller,
   HttpCode,
   Post,
-  Req,
   Headers,
-  RawBodyRequest,
   BadRequestException,
+  Body,
 } from '@nestjs/common';
 import { StripeService } from './stripe.service';
-import { Request } from 'express';
 
 @Controller('stripe')
 export class StripeController {
@@ -17,12 +15,13 @@ export class StripeController {
   @Post('webhook')
   @HttpCode(200)
   async handleWebhook(
-    @Req() req: RawBodyRequest<Request>,
+    @Body() rawBody: Buffer,
     @Headers('stripe-signature') signature: string,
   ) {
-    if (!signature) {
-      throw new BadRequestException('Missing signature');
+    if (!signature || !rawBody) {
+      throw new BadRequestException('Missing signature or raw body');
     }
-    return await this.stripeService.handleWebhook(req.rawBody, signature);
+
+    return await this.stripeService.handleWebhook(rawBody, signature);
   }
 }
