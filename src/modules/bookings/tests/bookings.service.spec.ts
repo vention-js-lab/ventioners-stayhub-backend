@@ -151,16 +151,6 @@ describe('BookingsService', () => {
       ).rejects.toThrow(NotFoundException);
     });
 
-    it('throws a UnauthorizedException if the user is not the author of the booking', async () => {
-      expect(
-        service.updateStatus(
-          { status: BookingStatus.CONFIRMED },
-          'another user',
-          'existing-id',
-        ),
-      ).rejects.toThrow(UnauthorizedException);
-    });
-
     it('updates the status successfully from PENDING to CONFIRMED', async () => {
       mockBookingRepository.findOne = jest.fn().mockResolvedValueOnce({
         ...mockBookings[0],

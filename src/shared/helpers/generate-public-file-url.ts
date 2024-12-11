@@ -1,4 +1,4 @@
-export const buildMinioFileUrl = (
+export const generatePublicFileUrl = (
   host: string,
   port: string,
   bucketName: string,

@@ -1,12 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { Accommodation, Image } from 'src/modules/accommodations/entities';
-import { Wishlist } from '@modules';
+import {
+  Accommodation,
+  Image,
+  Wishlist,
+} from 'src/modules/accommodations/entities';
 import { Amenity } from 'src/modules/amenities/entities';
 import { AccommodationCategory } from 'src/modules/categories/entities';
 import { User } from 'src/modules/users/entities/user.entity';
 import { Booking } from 'src/modules/bookings/entities/booking.entity';
+import { Payment } from '../modules/payments/entities/payment.entity';
 import { Review } from 'src/modules/reviews/entities';
 import { isProd } from 'src/shared/helpers';
 
@@ -29,6 +33,7 @@ import { isProd } from 'src/shared/helpers';
           Wishlist,
           Image,
           Booking,
+          Payment,
           Review,
         ],
         migrations: [`./migrations/**/*{.ts,.js}`],

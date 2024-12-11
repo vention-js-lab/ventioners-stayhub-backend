@@ -5,15 +5,18 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateBookingReqDto, UpdateBookingStatusReqDto } from './dto/request';
+import {
+  BookingsQueryParamsReqDto,
+  CreateBookingReqDto,
+  UpdateBookingStatusReqDto,
+} from './dto/request';
 import { Booking } from './entities/booking.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BookingsQueryParamsReqDto } from './dto/request/bookings-query-params.dto';
 import {
+  BOOKING_SERVICE_FEE,
   BookingStatus,
   BookingStatusTransitions,
-  BOOKING_SERVICE_FEE,
 } from './constants';
 import { AccommodationsService } from '../accommodations/accommodations.service';
 
@@ -125,12 +128,6 @@ export class BookingsService {
       throw new NotFoundException(`Booking with id ${bookingId} not found`);
     }
 
-    if (booking.accommodation.owner.id !== userId) {
-      throw new UnauthorizedException(
-        'You are not allowed to update this booking',
-      );
-    }
-
     const allowedStatusTransitions = BookingStatusTransitions[booking.status];
 
     if (!allowedStatusTransitions.includes(dto.status)) {
@@ -142,6 +139,18 @@ export class BookingsService {
     booking.status = dto.status;
 
     return await this.bookingRepository.save(booking);
+  }
+
+  async getBookingById(bookingId: string): Promise<Booking> {
+    const booking = await this.bookingRepository.findOne({
+      where: { id: bookingId },
+      relations: ['user'],
+    });
+    if (!booking) {
+      throw new NotFoundException(`Booking with id ${bookingId} not found`);
+    }
+
+    return booking;
   }
 
   async getExistingBookings(
