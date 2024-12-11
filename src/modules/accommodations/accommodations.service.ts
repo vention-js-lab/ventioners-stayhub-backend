@@ -267,6 +267,7 @@ export class AccommodationsService {
         file,
         BucketName.Images,
         metadata,
+        true,
       );
 
       const image = this.imageRepository.create({
