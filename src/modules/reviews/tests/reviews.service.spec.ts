@@ -4,12 +4,14 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Review } from '../entities';
 import { Accommodation } from 'src/modules/accommodations';
 import { NotFoundException } from '@nestjs/common';
+import { User } from 'src/modules/users/entities/user.entity';
 
 describe('ReviewsService', () => {
   let service: ReviewsService;
 
   const mockReviewRepository = { find: jest.fn() };
   const mockAccommodationRepository = { find: jest.fn() };
+  const mockUserRepository = { findOne: jest.fn() };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,6 +21,10 @@ describe('ReviewsService', () => {
         {
           provide: getRepositoryToken(Accommodation),
           useValue: mockAccommodationRepository,
+        },
+        {
+          provide: getRepositoryToken(User),
+          useValue: mockUserRepository, // Provide the mock UserRepository
         },
       ],
     }).compile();
