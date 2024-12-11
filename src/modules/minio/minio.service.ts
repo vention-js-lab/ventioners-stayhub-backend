@@ -85,7 +85,11 @@ export class MinioService {
     }
   }
 
-  async uploadFile(file: Express.Multer.File, bucketName = BucketName.Images) {
+  async uploadFile(
+    file: Express.Multer.File,
+    bucketName = BucketName.Images,
+    metadata?: Minio.ItemBucketMetadata,
+  ) {
     const fileName = `${randomUUID()}-${file.originalname.replace(/\s+/g, '-')}`;
     await this.initializeBucket(BucketName.Images, AccessPolicy.Public);
 
@@ -95,6 +99,7 @@ export class MinioService {
         fileName,
         file.buffer,
         file.size,
+        metadata,
       );
 
       return fileName;
