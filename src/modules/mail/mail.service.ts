@@ -35,7 +35,7 @@ export class MailerService {
     });
   }
 
-  private async sendEmail(subject: string, text: string, recipient: string) {
+  public async sendEmail(subject: string, text: string, recipient: string) {
     try {
       await this.transport.sendMail({
         from: this.configService.get<string>('MAIL_FROM'),
@@ -133,7 +133,8 @@ export class MailerService {
 
     const subject = `Review Your Stay at ${accommodation.name}`;
 
-    const reviewPageUrl = `https://stayhub.live/booking/${id}`;
+    // make it environment variable
+    const reviewPageUrl = `https://stayhub.live/property/${id}`;
 
     const htmlContent = `
     <p style="margin: 0">Hello ${user.firstName},</p>
