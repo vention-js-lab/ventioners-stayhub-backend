@@ -78,18 +78,8 @@ export class StripeService {
       ],
       mode: 'payment',
       metadata: sessionMetadata,
-      success_url: generateAfterPaymentUrl({
-        accommodationId: accommodation.id,
-        bookingId: booking.id,
-        clientURL: this.clientURL,
-        success: true,
-      }),
-      cancel_url: generateAfterPaymentUrl({
-        accommodationId: accommodation.id,
-        bookingId: booking.id,
-        clientURL: this.clientURL,
-        success: false,
-      }),
+      success_url: this.generatePaymentUrl(accommodation.id, booking.id, true),
+      cancel_url: this.generatePaymentUrl(accommodation.id, booking.id, false),
     });
     if (!session.url) {
       throw new InternalServerErrorException(
@@ -100,87 +90,126 @@ export class StripeService {
     return session.url;
   }
 
-  async handleWebhook(body: Buffer, signature: string) {
-    if (
-      !this.stripe.webhooks.signature.verifyHeader(
-        JSON.stringify(body),
-        signature,
-        this.webhookSecret,
-      )
-    ) {
-      throw new BadRequestException('Invalid webhook signature');
-    }
-
-    const event = this.constructEvent(body, signature);
-    if (!event) return { received: false };
-
-    switch (event.type) {
-      case 'payment_intent.succeeded':
-        return await this.handlePaymentIntent(
-          event.data.object,
-          PaymentStatus.CONFIRMED,
-        );
-      case 'payment_intent.payment_failed':
-        return await this.handlePaymentIntent(
-          event.data.object,
-          PaymentStatus.FAILED,
-        );
-      default:
-        throw new BadRequestException(`Unhandled event type ${event.type}`);
+  async handleWebhook(rawBody: string | Buffer, signature: string) {
+    try {
+      const event = this.verifyEvent(rawBody, signature);
+      return await this.processStripeEvent(event);
+    } catch (error) {
+      this.logger.error(
+        `Webhook handling error: ${error.message}`,
+        error.stack,
+      );
+      throw new BadRequestException('Webhook processing failed');
     }
   }
 
-  async handlePaymentIntent(
-    paymentIntent: Stripe.PaymentIntent,
+  private async processStripeEvent(event: Stripe.Event) {
+    switch (event.type) {
+      case 'checkout.session.completed':
+        return this.handleCompletedSession(event);
+
+      case 'checkout.session.expired':
+        return this.handleExpiredSession(event);
+
+      case 'checkout.session.async_payment_failed':
+        return this.handleSessionOutcome(event, PaymentStatus.FAILED);
+
+      default:
+        this.logger.warn(`Unhandled Stripe event type: ${event.type}`);
+        return { received: false };
+    }
+  }
+
+  private async handleCompletedSession(event: Stripe.Event) {
+    return this.handleSessionOutcome(event, PaymentStatus.APPROVED);
+  }
+
+  private async handleExpiredSession(event: Stripe.Event) {
+    return this.handleSessionOutcome(event, PaymentStatus.FAILED);
+  }
+
+  private async handleSessionOutcome(
+    event: Stripe.Event,
     paymentStatus: PaymentStatus,
   ) {
-    const metadata = paymentIntent.metadata;
-    const bookingId = metadata.bookingId;
-    const userId = metadata.userId;
+    const session = await this.getSession(
+      (event.data.object as Stripe.Checkout.Session).id,
+    );
+
+    if (!session) {
+      throw new BadRequestException('Invalid session');
+    }
+
+    return this.handlePaymentIntent(session, paymentStatus);
+  }
+
+  async handlePaymentIntent(
+    session: Stripe.Checkout.Session,
+    paymentStatus: PaymentStatus,
+  ) {
+    const { bookingId, userId } = session.metadata;
 
     const booking = await this.bookingsService.getBooking(userId, bookingId);
 
-    if (booking.status != 'PENDING') {
+    if (booking.status !== BookingStatus.PENDING) {
       throw new BadRequestException(
         `Booking with id ${bookingId} is not in pending state`,
       );
     }
 
     const bookingStatus =
-      paymentStatus === 'CONFIRMED'
+      paymentStatus === PaymentStatus.APPROVED
         ? BookingStatus.CONFIRMED
         : BookingStatus.CANCELLED;
 
-    await this.paymentsService.createPayment({
-      amount: convertToCent(booking.totalPrice),
-      booking,
-      status: paymentStatus,
-    });
-
-    await this.bookingsService.updateStatus(
-      {
-        status: bookingStatus,
-      },
-      userId,
-      bookingId,
-    );
+    await Promise.all([
+      this.paymentsService.createPayment({
+        amount: convertToCent(booking.totalPrice),
+        booking,
+        status: paymentStatus,
+      }),
+      this.bookingsService.updateStatus(
+        { status: bookingStatus },
+        userId,
+        bookingId,
+      ),
+    ]);
 
     return { received: true };
   }
 
-  private constructEvent(body: Buffer, signature: string) {
-    const endpointSecret = this.configService.get<string>(
-      'STRIPE_WEBHOOK_SECRET',
-    );
+  private verifyEvent(body: string | Buffer, signature: string) {
     try {
       return this.stripe.webhooks.constructEvent(
         body,
         signature,
-        endpointSecret,
+        this.webhookSecret,
       );
     } catch (error) {
       this.logger.error(error);
+      throw new BadRequestException('Webhook signature verification failed');
+    }
+  }
+
+  private async getSession(sessionId: string) {
+    try {
+      return await this.stripe.checkout.sessions.retrieve(sessionId);
+    } catch (error) {
+      this.logger.error('Failed to get session: ', error);
       return false;
     }
+  }
+
+  private generatePaymentUrl(
+    accommodationId: string,
+    bookingId: string,
+    success: boolean,
+  ) {
+    return generateAfterPaymentUrl({
+      accommodationId,
+      bookingId,
+      clientURL: this.clientURL,
+      success,
+    });
   }
 }
