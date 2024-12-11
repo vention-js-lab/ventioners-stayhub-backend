@@ -24,7 +24,7 @@ describe('ReviewsService', () => {
         },
         {
           provide: getRepositoryToken(User),
-          useValue: mockUserRepository, // Provide the mock UserRepository
+          useValue: mockUserRepository,
         },
       ],
     }).compile();

@@ -5,6 +5,7 @@ import { ParseUUIDV4Pipe } from 'src/shared/pipes';
 import { GetUser } from 'src/shared/decorators';
 import { AuthTokenGuard } from 'src/shared/guards';
 import { User } from '../users/entities/user.entity';
+import { CreateReviewSwaggerDecorator } from './decorator/swagger.decorator';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -20,6 +21,7 @@ export class ReviewsController {
   }
 
   @Post(':accommodationId')
+  @CreateReviewSwaggerDecorator()
   @UseGuards(AuthTokenGuard)
   async createReview(
     @Param('accommodationId', new ParseUUIDV4Pipe()) accommodationId: string,
