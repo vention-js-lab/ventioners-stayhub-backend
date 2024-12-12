@@ -10,6 +10,7 @@ import { Accommodation } from '../accommodations';
 import { CreateReviewDto } from './dto/request/creare-review.dto';
 import { Booking } from '../bookings/entities/booking.entity';
 import { UsersService } from '../users/users.service';
+import { AccommodationsService } from '../accommodations/accommodations.service';
 
 @Injectable()
 export class ReviewsService {
@@ -21,6 +22,7 @@ export class ReviewsService {
     @InjectRepository(Booking)
     private readonly bookingRepository: Repository<Booking>,
     private readonly userService: UsersService,
+    private readonly accommodatioService: AccommodationsService,
   ) {}
 
   async getReviewsByAccommodationId(accommodationId: string) {
@@ -39,18 +41,11 @@ export class ReviewsService {
   }
 
   async createReview(createReviewDto: CreateReviewDto, userId: string) {
-    const accommodation = await this.accommodationRepository.findOne({
-      where: { id: createReviewDto.accommodationId },
-    });
-
-    if (!accommodation) {
-      throw new NotFoundException('Accommodation not found with this id');
-    }
+    const accommodation = await this.accommodatioService.getAccommodationById(
+      createReviewDto.accommodationId,
+    );
 
     const user = await this.userService.getUser(userId);
-    if (!user) {
-      throw new NotFoundException('User not found with this id');
-    }
 
     const userHasBooking = await this.bookingRepository
       .createQueryBuilder('booking')

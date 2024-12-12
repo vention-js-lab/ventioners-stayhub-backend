@@ -7,11 +7,13 @@ import { Accommodation } from '../accommodations';
 import { User } from '../users/entities/user.entity';
 import { Booking } from '../bookings/entities/booking.entity';
 import { UsersModule } from '../users/users.module';
+import { AccommodationsModule } from '../accommodations/accommodations.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Review, Accommodation, User, Booking]),
     UsersModule,
+    AccommodationsModule,
   ],
   controllers: [ReviewsController],
   providers: [ReviewsService],
