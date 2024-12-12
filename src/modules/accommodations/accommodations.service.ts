@@ -246,11 +246,6 @@ export class AccommodationsService {
   ) {
     const accommodation = await this.getAccommodationById(accommodationId);
 
-    if (!accommodation) {
-      throw new NotFoundException(
-        `Accommodation with ${accommodationId} not found`,
-      );
-    }
     if (accommodation.owner.id !== userId) {
       throw new UnauthorizedException('Access denied.');
     }
@@ -270,10 +265,10 @@ export class AccommodationsService {
       );
 
       const image = this.imageRepository.create({
-        url: this.buildImageUrl(fileName), // i will store full image temporarily then update it inside lambda with resized image
+        url: this.buildImageUrl(fileName),
         order: index,
         accommodation,
-        thumbnailUrl: this.buildImageUrl(fileName), // i will store full image temporarily then update it inside lambda with resized image
+        thumbnailUrl: this.buildImageUrl(fileName),
         blurhash: null,
       });
 
