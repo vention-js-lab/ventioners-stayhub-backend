@@ -11,6 +11,7 @@ import { CreateReviewDto } from './dto/request/creare-review.dto';
 import { Booking } from '../bookings/entities/booking.entity';
 import { UsersService } from '../users/users.service';
 import { AccommodationsService } from '../accommodations/accommodations.service';
+import { BookingsService } from '../bookings/bookings.service';
 
 @Injectable()
 export class ReviewsService {
@@ -23,6 +24,7 @@ export class ReviewsService {
     private readonly bookingRepository: Repository<Booking>,
     private readonly userService: UsersService,
     private readonly accommodatioService: AccommodationsService,
+    private readonly bookingService: BookingsService,
   ) {}
 
   async getReviewsByAccommodationId(accommodationId: string) {
@@ -47,12 +49,10 @@ export class ReviewsService {
 
     const user = await this.userService.getUser(userId);
 
-    const userHasBooking = await this.bookingRepository
-      .createQueryBuilder('booking')
-      .where('booking.userId = :userId', { userId })
-      .getCount();
+    const userBookings = await this.bookingService.getMyBookings({}, userId);
+    const userHasBooking = userBookings.length > 0;
 
-    if (userHasBooking === 0) {
+    if (!userHasBooking) {
       throw new ForbiddenException('You must have a booking to leave a review');
     }
 
