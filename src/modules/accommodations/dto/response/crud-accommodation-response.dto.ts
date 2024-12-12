@@ -19,6 +19,17 @@ export class AccommodationResponseDto {
   @ApiProperty({ example: 'Karakalpakistan' })
   location: string;
 
+  @ApiProperty({
+    example: {
+      type: 'Point',
+      coordinates: [69.282671213, 41.311371881],
+    },
+  })
+  locationCoordinates: {
+    type: string;
+    coordinates: number[];
+  };
+
   @ApiProperty({ example: 200 })
   pricePerNight: number;
 
