@@ -8,8 +8,8 @@ import { Review } from './entities';
 import { Repository } from 'typeorm';
 import { Accommodation } from '../accommodations';
 import { CreateReviewDto } from './dto/request/creare-review.dto';
-import { User } from '../users/entities/user.entity';
 import { Booking } from '../bookings/entities/booking.entity';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class ReviewsService {
@@ -18,10 +18,9 @@ export class ReviewsService {
     private readonly reviewRepository: Repository<Review>,
     @InjectRepository(Accommodation)
     private readonly accommodationRepository: Repository<Accommodation>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     @InjectRepository(Booking)
     private readonly bookingRepository: Repository<Booking>,
+    private readonly userService: UsersService,
   ) {}
 
   async getReviewsByAccommodationId(accommodationId: string) {
@@ -48,9 +47,7 @@ export class ReviewsService {
       throw new NotFoundException('Accommodation not found with this id');
     }
 
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-    });
+    const user = await this.userService.getUser(userId);
     if (!user) {
       throw new NotFoundException('User not found with this id');
     }
