@@ -15,11 +15,21 @@ export class SearchAccommodationQueryParamsDto {
   @IsOptional()
   @ApiPropertyOptional({
     type: String,
-    description:
-      'Search query to find accommodations by name, description, or location',
+    description: 'Search query to filter accommodations by location',
     default: '',
   })
-  search?: string;
+  location?: string;
+
+  @TransformToInt()
+  @IsInt()
+  @IsOptional()
+  @Min(1)
+  @ApiPropertyOptional({
+    type: Number,
+    description: 'Search query to filter accommodations by the guests count',
+    default: '',
+  })
+  numberOfGuests?: number;
 
   @IsUUID()
   @IsOptional()
