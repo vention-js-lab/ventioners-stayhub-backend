@@ -1,9 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createTransport } from 'nodemailer';
 import { BookingsService } from '../bookings/bookings.service';
 import dayjs from 'dayjs';
-import { MailSendingException } from 'src/shared';
+import { MailSendingException } from 'src/shared/exceptions';
 
 @Injectable()
 export class MailerService {
@@ -40,16 +40,8 @@ export class MailerService {
     }
   }
 
-  private async getBookingDetails(id: string) {
-    const booking = await this.bookingService.getBookingById(id);
-    if (!booking) {
-      throw new NotFoundException('Booking not found');
-    }
-    return booking;
-  }
-
   async sendStatusMail(id: string) {
-    const booking = await this.getBookingDetails(id);
+    const booking = await this.bookingService.getBookingById(id);
     const {
       user,
       accommodation,
@@ -86,7 +78,7 @@ export class MailerService {
   }
 
   async sendInvoiceMail(id: string) {
-    const booking = await this.getBookingDetails(id);
+    const booking = await this.bookingService.getBookingById(id);
     const { user, accommodation, totalPrice } = booking;
 
     const issueDate = dayjs().format('MMMM D, YYYY');
@@ -114,7 +106,7 @@ export class MailerService {
   }
 
   async sendReviewMail(id: string) {
-    const booking = await this.getBookingDetails(id);
+    const booking = await this.bookingService.getBookingById(id);
     const { user, accommodation } = booking;
 
     const subject = `Review Your Stay at ${accommodation.name}`;
