@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -12,7 +13,7 @@ import {
 } from './dto/request';
 import { Booking } from './entities/booking.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThanOrEqual, Repository } from 'typeorm';
 import {
   BOOKING_SERVICE_FEE,
   BookingStatus,
@@ -28,6 +29,64 @@ export class BookingsService {
     @Inject(AccommodationsService)
     private readonly accommodationsService: AccommodationsService,
   ) {}
+
+  private readonly logger = new Logger(BookingsService.name);
+
+  async updateBookingStatusToCheckedOut() {
+    const truncatedToday = this.truncateDateToYearMonthDay(new Date());
+
+    this.logger.log(
+      `Starting updateBookingStatusToCheckedOut for date: ${truncatedToday.toISOString()}`,
+    );
+
+    const result = await this.bookingRepository.update(
+      {
+        status: BookingStatus.CHECKED_IN,
+        checkOutDate: LessThanOrEqual(truncatedToday),
+      },
+      { status: BookingStatus.CHECKED_OUT },
+    );
+
+    if (result.affected === 0) {
+      this.logger.warn(
+        `updateBookingStatusToCheckedOut: No bookings found to update for date: ${truncatedToday.toISOString()}`,
+      );
+
+      return;
+    }
+
+    this.logger.log(
+      `updateBookingStatusToCheckedOut: Successfully updated ${result.affected} bookings for date: ${truncatedToday.toISOString()}`,
+    );
+  }
+
+  async updateBookingStatusToCheckedIn() {
+    const truncatedToday = this.truncateDateToYearMonthDay(new Date());
+
+    this.logger.log(
+      `Starting updateBookingStatusToCheckedIn for date: ${truncatedToday.toISOString()}`,
+    );
+
+    const result = await this.bookingRepository.update(
+      {
+        status: BookingStatus.CONFIRMED,
+        checkInDate: LessThanOrEqual(truncatedToday),
+      },
+      { status: BookingStatus.CHECKED_IN },
+    );
+
+    if (result.affected === 0) {
+      this.logger.warn(
+        `updateBookingStatusToCheckedIn: No bookings found to update for date: ${truncatedToday.toISOString()}`,
+      );
+
+      return;
+    }
+
+    this.logger.log(
+      `updateBookingStatusToCheckedIn: Successfully updated ${result.affected} bookings for date: ${truncatedToday.toISOString()}`,
+    );
+  }
 
   async getMyBookings(
     queryParamsDto: BookingsQueryParamsReqDto,
@@ -187,5 +246,9 @@ export class BookingsService {
     const basePrice = nights * pricePerNight;
 
     return basePrice + basePrice * BOOKING_SERVICE_FEE;
+  }
+
+  private truncateDateToYearMonthDay(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
 }

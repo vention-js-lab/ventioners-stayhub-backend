@@ -43,6 +43,7 @@ const mockBookingRepository: Partial<Repository<Booking>> = {
     ),
   save: jest.fn().mockResolvedValue(mockBookings[0]),
   create: jest.fn().mockReturnValue(mockBookings[0]),
+  update: jest.fn().mockResolvedValue({ affected: 1 }),
 };
 
 describe('BookingsService', () => {
@@ -64,6 +65,22 @@ describe('BookingsService', () => {
     }).compile();
 
     service = module.get<BookingsService>(BookingsService);
+  });
+
+  describe('updateBookingStatusToCheckedOut', () => {
+    it('updates the status of bookings to CHECKED_OUT', async () => {
+      const result = await service.updateBookingStatusToCheckedOut();
+
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe('updateBookingStatusToCheckedIn', () => {
+    it('updates the status of bookings to CHECKED_IN', async () => {
+      const result = await service.updateBookingStatusToCheckedIn();
+
+      expect(result).toBeUndefined();
+    });
   });
 
   describe('getMyBookings', () => {

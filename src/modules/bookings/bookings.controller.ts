@@ -21,10 +21,21 @@ import {
   CreateBookingSwaggerDecorator,
   UpdateBookingStatusSwaggerDecorator,
 } from './decorators/swagger.decorator';
+import { Cron } from '@nestjs/schedule';
 
 @Controller('bookings')
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
+
+  @Cron('0 0 12 * * *', { timeZone: 'Asia/Tashkent' })
+  updateBookingStatusToCheckedOut() {
+    this.bookingsService.updateBookingStatusToCheckedOut();
+  }
+
+  @Cron('0 0 14 * * *', { timeZone: 'Asia/Tashkent' })
+  updateBookingStatusToCheckedIn() {
+    this.bookingsService.updateBookingStatusToCheckedIn();
+  }
 
   @GetMyBookingsSwaggerDecorator()
   @Get('')
