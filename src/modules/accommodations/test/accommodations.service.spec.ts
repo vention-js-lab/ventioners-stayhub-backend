@@ -223,7 +223,6 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
     ] as any;
 
     it('adds an image to an accommodation', async () => {
-      jest.setTimeout(7000);
       const result = await service.addImagesToAccommodation(
         'existing-id',
         mockFiles,
@@ -234,14 +233,12 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
     });
 
     it('throws NotFoundException if accommodation is not found', async () => {
-      jest.setTimeout(7000);
       expect(
         service.addImagesToAccommodation('non-existing-id', mockFiles, '3'),
       ).rejects.toThrow(NotFoundException);
     });
 
     it('throws UnauthorizedException if user is not the owner', async () => {
-      jest.setTimeout(7000);
       expect(
         service.addImagesToAccommodation(
           'existing-id',
