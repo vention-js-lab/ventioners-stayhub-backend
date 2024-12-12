@@ -4,7 +4,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Review } from '../entities';
 import { Accommodation } from 'src/modules/accommodations';
 import { NotFoundException } from '@nestjs/common';
-import { User } from 'src/modules/users/entities/user.entity';
 import { Booking } from 'src/modules/bookings/entities/booking.entity';
 
 describe('ReviewsService', () => {
@@ -12,7 +11,6 @@ describe('ReviewsService', () => {
 
   const mockReviewRepository = { find: jest.fn() };
   const mockAccommodationRepository = { find: jest.fn() };
-  const mockUserRepository = { findOne: jest.fn() };
   const mockBookingRepository = { find: jest.fn() };
 
   beforeEach(async () => {
@@ -23,10 +21,6 @@ describe('ReviewsService', () => {
         {
           provide: getRepositoryToken(Accommodation),
           useValue: mockAccommodationRepository,
-        },
-        {
-          provide: getRepositoryToken(User),
-          useValue: mockUserRepository,
         },
         {
           provide: getRepositoryToken(Booking),
