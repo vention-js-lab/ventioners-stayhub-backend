@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - 'main'
+      - 'feature/76-image-processing'
 
 jobs:
   ci:

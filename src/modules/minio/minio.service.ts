@@ -89,9 +89,9 @@ export class MinioService {
     file: Express.Multer.File,
     bucketName = BucketName.Images,
     metadata?: Minio.ItemBucketMetadata,
-    uncompressed?: boolean,
   ) {
-    const fileName = `${uncompressed ? 'uncompressed-' : ''}${randomUUID()}-${file.originalname.replace(/\s+/g, '-')}`;
+    const folder = 'raw';
+    const fileName = `${folder}/${randomUUID()}-${file.originalname.replace(/\s+/g, '-')}`;
 
     await this.initializeBucket(BucketName.Images, AccessPolicy.Public);
 
