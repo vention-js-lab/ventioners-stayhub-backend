@@ -145,6 +145,19 @@ export class AccommodationsService {
     return { ...accommodation, overallRating };
   }
 
+  async getAccommodationsByUser(userId: string): Promise<Accommodation[]> {
+    const accommodations = await this.accommodationRepository.find({
+      where: { owner: { id: userId } },
+      relations: ['category', 'amenities', 'images'],
+    });
+
+    if (!accommodations.length) {
+      throw new NotFoundException('No accommodations found for this user');
+    }
+
+    return accommodations;
+  }
+
   async updateAccommodation(
     id: string,
     UpdateAccommodationDto: UpdateAccommodationDto,
