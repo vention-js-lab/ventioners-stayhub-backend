@@ -78,6 +78,14 @@ export class AccommodationsController {
     return { data: newAccommodation };
   }
 
+  @Get('my')
+  @UseGuards(AuthTokenGuard)
+  async getMyAccommodations(@GetUser() payload: User) {
+    const accommodations =
+      await this.accommodationsService.getAccommodationsByUser(payload.id);
+    return { data: accommodations };
+  }
+
   @Get(':id')
   @GetByIdSwaggerDecorator()
   async getAccommodationById(@Param('id', new ParseUUIDV4Pipe()) id: string) {
