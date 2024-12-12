@@ -8,7 +8,6 @@ import { Review } from './entities';
 import { Repository } from 'typeorm';
 import { Accommodation } from '../accommodations';
 import { CreateReviewDto } from './dto/request/creare-review.dto';
-import { Booking } from '../bookings/entities/booking.entity';
 import { UsersService } from '../users/users.service';
 import { AccommodationsService } from '../accommodations/accommodations.service';
 import { BookingsService } from '../bookings/bookings.service';
@@ -20,8 +19,6 @@ export class ReviewsService {
     private readonly reviewRepository: Repository<Review>,
     @InjectRepository(Accommodation)
     private readonly accommodationRepository: Repository<Accommodation>,
-    @InjectRepository(Booking)
-    private readonly bookingRepository: Repository<Booking>,
     private readonly userService: UsersService,
     private readonly accommodatioService: AccommodationsService,
     private readonly bookingService: BookingsService,

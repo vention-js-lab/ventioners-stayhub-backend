@@ -4,16 +4,16 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Review } from '../entities';
 import { Accommodation } from 'src/modules/accommodations';
 import { NotFoundException } from '@nestjs/common';
-import { Booking } from 'src/modules/bookings/entities/booking.entity';
 import { UsersService } from 'src/modules/users/users.service';
 import { AccommodationsService } from 'src/modules/accommodations/accommodations.service';
+import { BookingsService } from 'src/modules/bookings/bookings.service';
 
 describe('ReviewsService', () => {
   let service: ReviewsService;
 
   const mockReviewRepository = { find: jest.fn() };
   const mockAccommodationRepository = { find: jest.fn() };
-  const mockBookingRepository = { find: jest.fn() };
+  const mockBookingService = { getMyBookings: jest.fn() };
   const mockUsersService = { findUserById: jest.fn() };
   const mockAccommodationService = { findAccommodationById: jest.fn() };
 
@@ -27,8 +27,8 @@ describe('ReviewsService', () => {
           useValue: mockAccommodationRepository,
         },
         {
-          provide: getRepositoryToken(Booking),
-          useValue: mockBookingRepository,
+          provide: BookingsService,
+          useValue: mockBookingService,
         },
         { provide: UsersService, useValue: mockUsersService },
         { provide: AccommodationsService, useValue: mockAccommodationService },
