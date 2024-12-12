@@ -6,9 +6,13 @@ import {
   Min,
   Max,
   IsOptional,
+  IsUUID,
 } from 'class-validator';
 
 export class CreateReviewDto {
+  @IsUUID('4')
+  accommodationId: string;
+
   @ApiProperty({
     description: 'The review comment provided by the user',
     type: String,

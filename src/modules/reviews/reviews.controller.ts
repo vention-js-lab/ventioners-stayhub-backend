@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/request/creare-review.dto';
-import { ParseUUIDV4Pipe } from 'src/shared/pipes';
 import { GetUser } from 'src/shared/decorators';
 import { AuthTokenGuard } from 'src/shared/guards';
 import { User } from '../users/entities/user.entity';
@@ -20,18 +19,13 @@ export class ReviewsController {
     );
   }
 
-  @Post(':accommodationId')
+  @Post('')
   @CreateReviewSwaggerDecorator()
   @UseGuards(AuthTokenGuard)
   async createReview(
-    @Param('accommodationId', new ParseUUIDV4Pipe()) accommodationId: string,
     @Body() createReviewDto: CreateReviewDto,
     @GetUser() payload: User,
   ) {
-    return await this.reviewService.createReview(
-      accommodationId,
-      createReviewDto,
-      payload.id,
-    );
+    return await this.reviewService.createReview(createReviewDto, payload.id);
   }
 }

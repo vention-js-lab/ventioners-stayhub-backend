@@ -39,13 +39,9 @@ export class ReviewsService {
     });
   }
 
-  async createReview(
-    accommodationId: string,
-    createReviewDto: CreateReviewDto,
-    userId: string,
-  ) {
+  async createReview(createReviewDto: CreateReviewDto, userId: string) {
     const accommodation = await this.accommodationRepository.findOne({
-      where: { id: accommodationId },
+      where: { id: createReviewDto.accommodationId },
     });
 
     if (!accommodation) {
