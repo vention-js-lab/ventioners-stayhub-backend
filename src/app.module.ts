@@ -12,6 +12,7 @@ import { MinioModule } from './modules/minio/minio.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { OAuthModule } from './modules/oAuth';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { MailModule } from './modules/mail/mail.module';
 import { StripeModule } from './modules/stripe/stripe.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 
@@ -35,6 +36,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
     StripeModule,
     PaymentsModule,
     ReviewsModule,
+    MailModule,
     PaymentsModule,
   ],
 })
