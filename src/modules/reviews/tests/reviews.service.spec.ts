@@ -5,6 +5,7 @@ import { Review } from '../entities';
 import { Accommodation } from 'src/modules/accommodations';
 import { NotFoundException } from '@nestjs/common';
 import { Booking } from 'src/modules/bookings/entities/booking.entity';
+import { UsersService } from 'src/modules/users/users.service';
 
 describe('ReviewsService', () => {
   let service: ReviewsService;
@@ -12,6 +13,7 @@ describe('ReviewsService', () => {
   const mockReviewRepository = { find: jest.fn() };
   const mockAccommodationRepository = { find: jest.fn() };
   const mockBookingRepository = { find: jest.fn() };
+  const mockUsersService = { findUserById: jest.fn() };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -26,6 +28,7 @@ describe('ReviewsService', () => {
           provide: getRepositoryToken(Booking),
           useValue: mockBookingRepository,
         },
+        { provide: UsersService, useValue: mockUsersService },
       ],
     }).compile();
 
