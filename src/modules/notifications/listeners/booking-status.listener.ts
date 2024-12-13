@@ -9,16 +9,16 @@ export class BookingStatusListener {
 
   @OnEvent('booking.status.changed')
   async handleBookingStatusChange(event: NotificationEvent) {
-    this.mailerService.sendStatusMail(event.bookingId);
+    await this.mailerService.sendStatusMail(event.booking);
   }
 
   @OnEvent('booking.status.confirmed')
   async handleBookingStatusConfirmed(event: NotificationEvent) {
-    this.mailerService.sendInvoiceMail(event.bookingId);
+    await this.mailerService.sendInvoiceMail(event.booking);
   }
 
   @OnEvent('booking.status.review')
   async handleBookingStatusCancelled(event: NotificationEvent) {
-    this.mailerService.sendReviewMail(event.bookingId);
+    await this.mailerService.sendReviewMail(event.booking);
   }
 }

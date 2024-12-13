@@ -183,7 +183,7 @@ export class BookingsService {
   ) {
     const booking = await this.bookingRepository.findOne({
       where: { id: bookingId },
-      relations: ['accommodation', 'accommodation.owner'],
+      relations: ['accommodation', 'accommodation.owner', 'user'],
     });
 
     if (!booking) {
@@ -204,17 +204,17 @@ export class BookingsService {
     if (dto.status === BookingStatus.CONFIRMED) {
       this.notificationService.emitNotification(
         'booking.status.confirmed',
-        bookingId,
+        updatedBooking,
       );
     } else if (dto.status === BookingStatus.CHECKED_OUT) {
       this.notificationService.emitNotification(
         'booking.status.review',
-        bookingId,
+        updatedBooking,
       );
     } else {
       this.notificationService.emitNotification(
         'booking.status.changed',
-        bookingId,
+        updatedBooking,
       );
     }
 
