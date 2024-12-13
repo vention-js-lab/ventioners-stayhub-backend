@@ -52,11 +52,31 @@ export class AccommodationsService {
     const limit = searchParams.limit || 10;
     const skip = (page - 1) * limit;
 
-    if (searchParams.search) {
-      query.andWhere(
-        '(accommodation.name ILIKE :search OR accommodation.description ILIKE :search OR accommodation.location ILIKE :search)',
-        { search: `%${searchParams.search}%` },
-      );
+    if (searchParams.location) {
+      query.andWhere('accommodation.location ILIKE :location', {
+        location: `%${searchParams.location}%`,
+      });
+    }
+
+    if (searchParams.numberOfGuests) {
+      query.andWhere('accommodation.number_of_guests >= :numberOfGuests', {
+        numberOfGuests: searchParams.numberOfGuests,
+      });
+    }
+
+    if (searchParams.fromDate && searchParams.toDate) {
+      query
+        .leftJoin('booking', 'b', 'b.accommodationId = accommodation.id')
+        .andWhere(
+          `(
+            b.check_in_date >= :checkOut OR
+            b.check_out_date <= :checkIn
+          )`,
+          {
+            checkIn: searchParams.fromDate,
+            checkOut: searchParams.toDate,
+          },
+        );
     }
 
     query.leftJoinAndSelect('accommodation.images', 'images');
