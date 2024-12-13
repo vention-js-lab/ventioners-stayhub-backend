@@ -7,8 +7,8 @@ export const generatePublicFileUrl = (
   cdnUrl?: string,
 ): string => {
   if (isProd) {
-    return `${cdnUrl}/raw/${fileName}`;
+    return `${cdnUrl}/${fileName}`;
   }
 
-  return `http://${host}:${port}/${bucketName}/raw/${fileName}`;
+  return `http://${host}:${port}/${bucketName}/${fileName}`;
 };

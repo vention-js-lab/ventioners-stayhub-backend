@@ -297,6 +297,10 @@ export class AccommodationsService {
         metadata,
       );
 
+      console.log(fileName);
+
+      console.log(this.buildImageUrl(fileName));
+
       const image = this.imageRepository.create({
         url: this.buildImageUrl(fileName),
         order: index,
