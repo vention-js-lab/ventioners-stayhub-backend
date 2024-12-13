@@ -15,6 +15,7 @@ import {
 import { CreateBookingReqDto } from '../dto/request';
 import { BookingStatus } from '../constants';
 import { NotificationModule } from 'src/modules/notifications/notificaton.module';
+import { NotificationService } from 'src/modules/notifications/notification.service';
 
 const mockAccommodationsService: Partial<AccommodationsService> = {
   getAccommodationById: jest.fn().mockResolvedValue(mockAccommodations[0]),
@@ -62,6 +63,12 @@ describe('BookingsService', () => {
         {
           provide: getRepositoryToken(Booking),
           useValue: mockBookingRepository,
+        },
+        {
+          provide: NotificationService,
+          useValue: {
+            sendNotification: jest.fn(),
+          },
         },
       ],
     }).compile();
