@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { CreateBookingReqDto } from '../dto/request';
 import { BookingStatus } from '../constants';
+import { NotificationModule } from 'src/modules/notifications/notificaton.module';
 
 const mockAccommodationsService: Partial<AccommodationsService> = {
   getAccommodationById: jest.fn().mockResolvedValue(mockAccommodations[0]),
@@ -53,6 +54,7 @@ describe('BookingsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         BookingsService,
+        NotificationModule,
         {
           provide: AccommodationsService,
           useValue: mockAccommodationsService,
