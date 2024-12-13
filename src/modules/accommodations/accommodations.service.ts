@@ -24,8 +24,6 @@ import {
   extractFileNameFromUrl,
   generatePublicFileUrl,
 } from 'src/shared/helpers';
-import sharp from 'sharp';
-import { encode } from 'blurhash';
 
 @Injectable()
 export class AccommodationsService {
@@ -281,11 +279,6 @@ export class AccommodationsService {
   ) {
     const accommodation = await this.getAccommodationById(accommodationId);
 
-    if (!accommodation) {
-      throw new NotFoundException(
-        `Accommodation with ${accommodationId} not found`,
-      );
-    }
     if (accommodation.owner.id !== userId) {
       throw new UnauthorizedException('Access denied.');
     }
@@ -293,58 +286,23 @@ export class AccommodationsService {
     const uploadedImages = [];
 
     for (const [index, file] of files.entries()) {
-      const sharpInstance = sharp(file.buffer);
+      const metadata = {
+        'x-amz-meta-accommodation-id': accommodationId,
+        'x-amz-meta-upload-index': index.toString(),
+      };
 
-      const [fullSizeBuffer, thumbnailBuffer, { data, info }] =
-        await Promise.all([
-          sharpInstance
-            .clone()
-            .resize({ width: 1280, height: 720 })
-            .jpeg({ quality: 80 })
-            .toBuffer(),
-          sharpInstance
-            .clone()
-            .resize({ height: 240, width: 427 })
-            .jpeg({ quality: 95 })
-            .toBuffer(),
-          sharpInstance
-            .clone()
-            .resize({ height: 240, width: 427 })
-            .ensureAlpha()
-            .raw()
-            .toBuffer({ resolveWithObject: true }),
-        ]);
-
-      const blurhash = encode(
-        new Uint8ClampedArray(data),
-        info.width,
-        info.height,
-        4,
-        4,
+      const fileName = await this.minioService.uploadFile(
+        file,
+        BucketName.Images,
+        metadata,
       );
 
-      const [fullSizeFileName, thumbnailFileName] = await Promise.all([
-        this.minioService.uploadFile({
-          ...file,
-          buffer: fullSizeBuffer,
-          size: fullSizeBuffer.length,
-        }),
-        this.minioService.uploadFile({
-          ...file,
-          buffer: thumbnailBuffer,
-          size: thumbnailBuffer.length,
-        }),
-      ]);
-
-      const fullSizeUrl = this.buildImageUrl(fullSizeFileName);
-      const thumbnailUrl = this.buildImageUrl(thumbnailFileName);
-
       const image = this.imageRepository.create({
-        url: fullSizeUrl,
+        url: this.buildImageUrl(fileName),
         order: index,
         accommodation,
-        thumbnailUrl,
-        blurhash,
+        thumbnailUrl: this.buildImageUrl(fileName),
+        blurhash: null,
       });
 
       uploadedImages.push(image);
