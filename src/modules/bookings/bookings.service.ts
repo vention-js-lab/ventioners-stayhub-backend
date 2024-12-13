@@ -20,6 +20,7 @@ import {
   BookingStatusTransitions,
 } from './constants';
 import { AccommodationsService } from '../accommodations/accommodations.service';
+import { NotificationService } from '../notifications/notification.service';
 
 @Injectable()
 export class BookingsService {
@@ -28,6 +29,8 @@ export class BookingsService {
     private readonly bookingRepository: Repository<Booking>,
     @Inject(AccommodationsService)
     private readonly accommodationsService: AccommodationsService,
+    @Inject(NotificationService)
+    private readonly notificationService: NotificationService,
   ) {}
 
   private readonly logger = new Logger(BookingsService.name);
@@ -197,7 +200,25 @@ export class BookingsService {
 
     booking.status = dto.status;
 
-    return await this.bookingRepository.save(booking);
+    const updatedBooking = await this.bookingRepository.save(booking);
+    if (dto.status === BookingStatus.CONFIRMED) {
+      this.notificationService.emitNotification(
+        'booking.status.confirmed',
+        bookingId,
+      );
+    } else if (dto.status === BookingStatus.CHECKED_OUT) {
+      this.notificationService.emitNotification(
+        'booking.status.review',
+        bookingId,
+      );
+    } else {
+      this.notificationService.emitNotification(
+        'booking.status.changed',
+        bookingId,
+      );
+    }
+
+    return updatedBooking;
   }
 
   async getBookingById(bookingId: string): Promise<Booking> {
