@@ -14,7 +14,6 @@ import {
 } from '@nestjs/common';
 import { CreateBookingReqDto } from '../dto/request';
 import { BookingStatus } from '../constants';
-import { NotificationModule } from 'src/modules/notifications/notificaton.module';
 import { NotificationService } from 'src/modules/notifications/notification.service';
 
 const mockAccommodationsService: Partial<AccommodationsService> = {
@@ -52,10 +51,13 @@ describe('BookingsService', () => {
   let service: BookingsService;
 
   beforeEach(async () => {
+    const mockNotificationService = {
+      emitNotification: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         BookingsService,
-        NotificationModule,
         {
           provide: AccommodationsService,
           useValue: mockAccommodationsService,
@@ -66,9 +68,7 @@ describe('BookingsService', () => {
         },
         {
           provide: NotificationService,
-          useValue: {
-            sendNotification: jest.fn(),
-          },
+          useValue: mockNotificationService,
         },
       ],
     }).compile();
