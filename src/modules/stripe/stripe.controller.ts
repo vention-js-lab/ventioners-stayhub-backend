@@ -21,9 +21,6 @@ export class StripeController {
     @Body() rawBody: Buffer,
     @Headers('stripe-signature') signature: string,
   ) {
-    this.logger.log('Received Stripe webhook');
-    this.logger.log(`Signature: ${signature}`);
-    this.logger.log(`Raw body: ${rawBody}`);
     if (!signature || !rawBody) {
       throw new BadRequestException('Missing signature or raw body');
     }

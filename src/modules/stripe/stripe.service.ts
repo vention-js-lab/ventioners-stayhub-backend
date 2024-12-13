@@ -180,8 +180,6 @@ export class StripeService {
 
   private verifyEvent(body: string | Buffer, signature: string) {
     try {
-      this.logger.log('Verifying Stripe webhook signature');
-      this.logger.log(`Webhook secret: ${this.webhookSecret}`);
       return this.stripe.webhooks.constructEvent(
         body,
         signature,
