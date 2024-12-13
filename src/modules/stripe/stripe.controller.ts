@@ -5,11 +5,14 @@ import {
   Headers,
   BadRequestException,
   Body,
+  Logger,
 } from '@nestjs/common';
 import { StripeService } from './stripe.service';
 
 @Controller('stripe')
 export class StripeController {
+  private logger = new Logger(StripeController.name, { timestamp: true });
+
   constructor(private readonly stripeService: StripeService) {}
 
   @Post('webhook')
@@ -18,6 +21,9 @@ export class StripeController {
     @Body() rawBody: Buffer,
     @Headers('stripe-signature') signature: string,
   ) {
+    this.logger.log('Received Stripe webhook');
+    this.logger.log(`Signature: ${signature}`);
+    this.logger.log(`Raw body: ${rawBody}`);
     if (!signature || !rawBody) {
       throw new BadRequestException('Missing signature or raw body');
     }
