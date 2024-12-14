@@ -108,7 +108,7 @@ export class MailerService {
     const { user, accommodation } = booking;
 
     const subject = `Review Your Stay at ${accommodation.name}`;
-    const reviewPageUrl = `${this.configService.get('WEB_REVIEW_URL')}/property/${booking.id}`;
+    const reviewPageUrl = `${this.configService.get('CLIENT_URL')}/property/${booking.accommodation.id}`;
 
     const htmlContent = `
     <p style="margin: 0">Hello ${user.firstName},</p>

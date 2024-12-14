@@ -7,7 +7,6 @@ import { BookingsModule } from '../bookings/bookings.module';
 
 @Module({
   imports: [ConfigModule, forwardRef(() => BookingsModule)],
-  controllers: [],
   providers: [NotificationService, BookingStatusListener, MailerService],
   exports: [NotificationService],
 })

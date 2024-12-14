@@ -10,7 +10,6 @@ const envConfigSchema = z
       )
       .pipe(z.array(z.string())),
     CLIENT_URL: z.string(),
-    WEB_REVIEW_URL: z.string(),
 
     NODE_ENV: z.enum(['development', 'production', 'test']),
 
