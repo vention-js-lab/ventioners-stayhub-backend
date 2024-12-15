@@ -24,6 +24,7 @@ import {
   extractFileNameFromUrl,
   generatePublicFileUrl,
 } from 'src/shared/helpers';
+import { Review } from '../reviews/entities';
 
 @Injectable()
 export class AccommodationsService {
@@ -135,14 +136,19 @@ export class AccommodationsService {
   async getAccommodationsByUser(userId: string): Promise<Accommodation[]> {
     const accommodations = await this.accommodationRepository.find({
       where: { owner: { id: userId } },
-      relations: ['category', 'amenities', 'images'],
+      relations: ['category', 'amenities', 'images', 'category', 'reviews'],
     });
 
     if (!accommodations.length) {
       throw new NotFoundException('No accommodations found for this user');
     }
 
-    return accommodations;
+    const accommodationsWithOverallRating = accommodations.map((acc) => ({
+      ...acc,
+      overallRating: this.caculateOverallRating(acc.reviews),
+    }));
+
+    return accommodationsWithOverallRating;
   }
 
   async getAccommodationById(
@@ -164,17 +170,7 @@ export class AccommodationsService {
       throw new NotFoundException(`Accommodation with ID ${id} not found`);
     }
 
-    const overallRating =
-      accommodation.reviews.length > 0
-        ? Math.round(
-            (accommodation.reviews.reduce(
-              (acc, review) => acc + Number(review.rating),
-              0,
-            ) /
-              accommodation.reviews.length) *
-              100,
-          ) / 100
-        : 0;
+    const overallRating = this.caculateOverallRating(accommodation.reviews);
 
     return { ...accommodation, overallRating };
   }
@@ -345,5 +341,15 @@ export class AccommodationsService {
       isProd(this.configService.get('NODE_ENV')),
       this.configService.get('CDN_URL'),
     );
+  }
+
+  private caculateOverallRating(reviews: Review[]): number {
+    return reviews.length > 0
+      ? Math.round(
+          (reviews.reduce((acc, review) => acc + Number(review.rating), 0) /
+            reviews.length) *
+            100,
+        ) / 100
+      : 0;
   }
 }
