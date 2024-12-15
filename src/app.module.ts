@@ -15,6 +15,8 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
 import { MailModule } from './modules/mail/mail.module';
 import { StripeModule } from './modules/stripe/stripe.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { NotificationModule } from './modules/notifications/notificaton.module';
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
       envFilePath: '.env',
       validate: validateEnv,
     }),
+    EventEmitterModule.forRoot(),
     DatabaseModule,
     RedisModule,
     UsersModule,
@@ -38,6 +41,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
     ReviewsModule,
     MailModule,
     PaymentsModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}

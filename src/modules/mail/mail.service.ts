@@ -4,6 +4,7 @@ import { createTransport } from 'nodemailer';
 import { BookingsService } from '../bookings/bookings.service';
 import dayjs from 'dayjs';
 import { MailSendingException } from 'src/shared/exceptions';
+import { Booking } from '../bookings/entities/booking.entity';
 
 @Injectable()
 export class MailerService {
@@ -40,8 +41,7 @@ export class MailerService {
     }
   }
 
-  async sendStatusMail(id: string) {
-    const booking = await this.bookingService.getBookingById(id);
+  async sendStatusMail(booking: Booking) {
     const {
       user,
       accommodation,
@@ -77,8 +77,7 @@ export class MailerService {
     await this.sendEmail(subject, text, user.email);
   }
 
-  async sendInvoiceMail(id: string) {
-    const booking = await this.bookingService.getBookingById(id);
+  async sendInvoiceMail(booking: Booking) {
     const { user, accommodation, totalPrice } = booking;
 
     const issueDate = dayjs().format('MMMM D, YYYY');
@@ -105,12 +104,11 @@ export class MailerService {
     );
   }
 
-  async sendReviewMail(id: string) {
-    const booking = await this.bookingService.getBookingById(id);
+  async sendReviewMail(booking: Booking) {
     const { user, accommodation } = booking;
 
     const subject = `Review Your Stay at ${accommodation.name}`;
-    const reviewPageUrl = `${this.configService.get('WEB_REVIEW_URL')}/property/${id}`;
+    const reviewPageUrl = `${this.configService.get('CLIENT_URL')}/property/${booking.accommodation.id}`;
 
     const htmlContent = `
     <p style="margin: 0">Hello ${user.firstName},</p>
