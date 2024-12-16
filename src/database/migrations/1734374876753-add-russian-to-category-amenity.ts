@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { accommodationAmenities } from '../data/accommodation-amenities.data';
 import { Amenity } from 'src/modules/amenities/entities';
-import { accommodationCategories } from '../data/accommodation-categories.data';
+import { accommodationAmenitiesV2 } from '../data/accommodation-amenities-v2.data';
+import { accommodationCategoriesV2 } from '../data/accommodation-categories-v2.data';
 import { AccommodationCategory } from 'src/modules/categories/entities';
 
 export class AddRussianColumnsForCategoryAndAmenity1734374876753
@@ -28,13 +28,13 @@ export class AddRussianColumnsForCategoryAndAmenity1734374876753
       `ALTER TABLE "accommodation_category" ADD CONSTRAINT "UQ_f73a602705d2ad4c846860f2f26" UNIQUE ("name_ru")`,
     );
 
-    const categories = accommodationCategories.map((categoryData) =>
+    const categories = accommodationCategoriesV2.map((categoryData) =>
       queryRunner.manager.create(AccommodationCategory, categoryData),
     );
 
     await queryRunner.manager.save(categories);
 
-    const amenities = accommodationAmenities.map((amenityData) =>
+    const amenities = accommodationAmenitiesV2.map((amenityData) =>
       queryRunner.manager.create(Amenity, amenityData),
     );
 

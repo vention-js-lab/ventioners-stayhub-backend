@@ -10,7 +10,7 @@ export class AmenitiesService {
     private readonly amenityRepository: Repository<Amenity>,
   ) {}
 
-  async getAllAmenities(acceptLanguage: string): Promise<Amenity[]> {
+  async getAllAmenities(acceptLanguage: string = 'en'): Promise<Amenity[]> {
     const amenities = await this.amenityRepository.find();
 
     return amenities.map((amenity) => ({
