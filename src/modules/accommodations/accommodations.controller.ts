@@ -82,7 +82,7 @@ export class AccommodationsController {
   @Get('my')
   @UseGuards(AuthTokenGuard)
   async getMyAccommodations(
-    @Headers('accept-language') acceptLanguage: string,
+    @Headers('accept-language') acceptLanguage: string = 'en',
     @GetUser() payload: User,
   ) {
     const accommodations =
@@ -96,7 +96,7 @@ export class AccommodationsController {
   @Get(':id')
   @GetByIdSwaggerDecorator()
   async getAccommodationById(
-    @Headers('accept-language') acceptLanguage: string,
+    @Headers('accept-language') acceptLanguage: string = 'en',
     @Param('id', new ParseUUIDV4Pipe()) id: string,
   ) {
     const accommodationData =

@@ -15,9 +15,9 @@ export class AmenitiesService {
 
     return amenities.map((amenity) => ({
       ...amenity,
-      name: acceptLanguage === 'en' ? amenity.name : amenity.name_ru,
+      name: acceptLanguage === 'ru' ? amenity.name_ru : amenity.name,
       description:
-        acceptLanguage === 'en' ? amenity.description : amenity.description_ru,
+        acceptLanguage === 'ru' ? amenity.description_ru : amenity.description,
     }));
   }
 

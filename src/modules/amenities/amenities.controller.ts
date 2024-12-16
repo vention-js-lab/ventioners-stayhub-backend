@@ -8,7 +8,9 @@ export class AmenitiesController {
 
   @Get('')
   @GetAmenitiesSwaggerDecorator()
-  async getAllAmenities(@Headers('accept-language') acceptLanguage: string) {
+  async getAllAmenities(
+    @Headers('accept-language') acceptLanguage: string = 'en',
+  ) {
     const amenities =
       await this.amenitiesService.getAllAmenities(acceptLanguage);
 
