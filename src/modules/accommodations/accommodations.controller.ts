@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpCode,
   Param,
   Post,
@@ -80,17 +81,26 @@ export class AccommodationsController {
 
   @Get('my')
   @UseGuards(AuthTokenGuard)
-  async getMyAccommodations(@GetUser() payload: User) {
+  async getMyAccommodations(
+    @Headers('accept-language') acceptLanguage: string,
+    @GetUser() payload: User,
+  ) {
     const accommodations =
-      await this.accommodationsService.getAccommodationsByUser(payload.id);
+      await this.accommodationsService.getAccommodationsByUser(
+        payload.id,
+        acceptLanguage,
+      );
     return { data: accommodations };
   }
 
   @Get(':id')
   @GetByIdSwaggerDecorator()
-  async getAccommodationById(@Param('id', new ParseUUIDV4Pipe()) id: string) {
+  async getAccommodationById(
+    @Headers('accept-language') acceptLanguage: string,
+    @Param('id', new ParseUUIDV4Pipe()) id: string,
+  ) {
     const accommodationData =
-      await this.accommodationsService.getAccommodationById(id);
+      await this.accommodationsService.getAccommodationById(id, acceptLanguage);
     return { data: accommodationData };
   }
 

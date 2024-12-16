@@ -133,7 +133,10 @@ export class AccommodationsService {
     return await this.accommodationRepository.save(newAccommodation);
   }
 
-  async getAccommodationsByUser(userId: string): Promise<Accommodation[]> {
+  async getAccommodationsByUser(
+    userId: string,
+    acceptLanguage: string = 'en',
+  ): Promise<Accommodation[]> {
     const accommodations = await this.accommodationRepository.find({
       where: { owner: { id: userId } },
       relations: ['category', 'amenities', 'images', 'category', 'reviews'],
@@ -145,6 +148,14 @@ export class AccommodationsService {
 
     const accommodationsWithOverallRating = accommodations.map((acc) => ({
       ...acc,
+      amenities: acc.amenities.map((amenity) => ({
+        ...amenity,
+        name: acceptLanguage === 'en' ? amenity.name : amenity.name_ru,
+        description:
+          acceptLanguage === 'en'
+            ? amenity.description
+            : amenity.description_ru,
+      })),
       overallRating: this.caculateOverallRating(acc.reviews),
     }));
 
@@ -153,8 +164,9 @@ export class AccommodationsService {
 
   async getAccommodationById(
     id: string,
+    acceptLanguage: string = 'en',
   ): Promise<Accommodation & { overallRating: number }> {
-    const accommodation = await this.accommodationRepository.findOne({
+    let accommodation = await this.accommodationRepository.findOne({
       where: { id },
       relations: [
         'amenities',
@@ -171,6 +183,18 @@ export class AccommodationsService {
     }
 
     const overallRating = this.caculateOverallRating(accommodation.reviews);
+
+    accommodation = {
+      ...accommodation,
+      amenities: accommodation.amenities.map((amenity) => ({
+        ...amenity,
+        name: acceptLanguage === 'en' ? amenity.name : amenity.name_ru,
+        description:
+          acceptLanguage === 'en'
+            ? amenity.description
+            : amenity.description_ru,
+      })),
+    };
 
     return { ...accommodation, overallRating };
   }

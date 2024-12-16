@@ -20,8 +20,19 @@ export class Amenity {
   })
   name: string;
 
+  @Column({
+    type: 'varchar',
+    length: 100,
+    unique: true,
+    nullable: true,
+  })
+  name_ru?: string;
+
   @Column({ type: 'text', nullable: true })
   description: string;
+
+  @Column({ type: 'text', nullable: true })
+  description_ru?: string;
 
   @ManyToMany(() => Accommodation)
   accommodations: Accommodation[];

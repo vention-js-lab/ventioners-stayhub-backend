@@ -10,8 +10,15 @@ export class AmenitiesService {
     private readonly amenityRepository: Repository<Amenity>,
   ) {}
 
-  async getAllAmenities(): Promise<Amenity[]> {
-    return this.amenityRepository.find();
+  async getAllAmenities(acceptLanguage: string): Promise<Amenity[]> {
+    const amenities = await this.amenityRepository.find();
+
+    return amenities.map((amenity) => ({
+      ...amenity,
+      name: acceptLanguage === 'en' ? amenity.name : amenity.name_ru,
+      description:
+        acceptLanguage === 'en' ? amenity.description : amenity.description_ru,
+    }));
   }
 
   async getAmenitiesByIds(ids: string[]): Promise<Amenity[]> {
