@@ -4,6 +4,7 @@ import { Injectable, PipeTransform, BadRequestException } from '@nestjs/common';
 export class AccommodationImagesValidationPipe implements PipeTransform {
   private readonly allowedMimeTypes: string[] = [
     'image/jpeg',
+    'image/avif',
     'image/jpg',
     'image/png',
     'image/gif',
