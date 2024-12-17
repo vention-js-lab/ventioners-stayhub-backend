@@ -36,7 +36,7 @@ export class MailerService {
         from: this.configService.get<string>('MAIL_FROM'),
         to: recipient,
         subject: subject,
-        text: text,
+        html: text,
       });
     } catch (error) {
       throw new MailSendingException('Error sending email');

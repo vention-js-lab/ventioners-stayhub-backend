@@ -29,6 +29,15 @@ export const generateEmailVerificationTemplate = ({
       margin: 0 auto;
       padding: 20px;
     }
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .logo-container svg {
+      max-width: 200px;
+      max-height: 60px;
+    }
     .verification-box {
       background-color: #f8f9fa;
       border: 1px solid #e9ecef;
@@ -50,7 +59,7 @@ export const generateEmailVerificationTemplate = ({
   </style>
 </head>
 <body>
-  ${HEADER_TEMPLATE}
+ ${HEADER_TEMPLATE}
   
   <div class="container">
     <div class="verification-box">

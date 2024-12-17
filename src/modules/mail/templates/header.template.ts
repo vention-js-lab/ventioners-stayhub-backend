@@ -1,4 +1,4 @@
-import { LOGO_TEMPLATE } from './logo.template';
+import { LOGO } from './logo-svg';
 
 export const HEADER_TEMPLATE = `
 <header style="
@@ -14,6 +14,6 @@ export const HEADER_TEMPLATE = `
     display: flex; 
     align-items: center;
   ">
-    ${LOGO_TEMPLATE}
+    ${LOGO}
   </a>
 </header>`;
