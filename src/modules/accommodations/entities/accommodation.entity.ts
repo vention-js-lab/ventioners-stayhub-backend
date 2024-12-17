@@ -30,7 +30,7 @@ export class Accommodation {
 
   @Column({
     type: 'varchar',
-    length: 255,
+    length: 2000,
   })
   description: string;
 
