@@ -18,6 +18,7 @@ import { RedisService } from 'src/redis/redis.service';
 import { randomBytes } from 'node:crypto';
 import { MailerService } from '../mail/mail.service';
 import { VERIFICATION_LINK_EXPIRE_TIME } from 'src/shared/constants';
+import { PendingUser } from './types';
 
 @Injectable()
 export class AuthService {
@@ -42,7 +43,7 @@ export class AuthService {
     }
 
     const pendingKey = this.generateVerificationKey(email);
-    const existingPendingUser = await this.redisService.hGet(pendingKey, 'EX');
+    const existingPendingUser = await this.redisService.get(pendingKey);
     if (existingPendingUser) {
       throw new ConflictException(
         'Verification is already in progress for this email',
@@ -51,24 +52,19 @@ export class AuthService {
 
     const hashedPassword = await Hasher.hashValue(password);
 
-    const verificationToken = randomBytes(32).toString('hex');
+    const verificationToken = this.generateVerificationToken();
 
-    const pendingUserData = {
+    const pendingUserData: PendingUser = {
       email,
       hashedPassword,
       firstName,
       lastName,
       verificationToken,
-      createdAt: new Date().toISOString(),
     };
 
-    await this.redisService.hSet(
+    await this.redisService.set(
       pendingKey,
-      'EX',
       JSON.stringify(pendingUserData),
-    );
-    await this.redisService.hSetExpiryTime(
-      pendingKey,
       VERIFICATION_LINK_EXPIRE_TIME,
     );
 
@@ -136,40 +132,29 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async verifyAndCreateUser(token: string) {
-    const pendingUserKeys =
-      await this.redisService.redis.keys('pending_user:*');
+  async verifyAndCreateUser(email: string, token: string) {
+    const pendingKey = this.generateVerificationKey(email);
+    const pendingUserData = await this.redisService.get(pendingKey);
 
-    let pendingUserData: any = null;
-    let pendingKey: string | null = null;
-
-    for (const key of pendingUserKeys) {
-      const userData = await this.redisService.get(key);
-      if (userData) {
-        const parsedUserData = JSON.parse(userData);
-        if (parsedUserData.verificationToken === token) {
-          pendingUserData = parsedUserData;
-          pendingKey = key;
-          break;
-        }
-      }
+    if (!pendingUserData || !token) {
+      throw new UnauthorizedException('Invalid or expired verification token');
     }
 
-    if (!pendingUserData) {
+    const userData = JSON.parse(pendingUserData) as PendingUser;
+
+    if (userData.verificationToken !== token) {
       throw new UnauthorizedException('Invalid or expired verification token');
     }
 
     try {
       const newUser = await this.usersRepository.createUser({
-        email: pendingUserData.email,
-        password: pendingUserData.hashedPassword,
-        firstName: pendingUserData.firstName,
-        lastName: pendingUserData.lastName,
+        email: userData.email,
+        password: userData.hashedPassword,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
       });
 
-      if (pendingKey) {
-        await this.redisService.hDel(pendingKey, ['EX']);
-      }
+      await this.redisService.delete(pendingKey);
 
       const payload = { sub: newUser.id, userEmail: newUser.email };
       const accessToken = await this.generateToken('ACCESS', payload);
@@ -196,5 +181,8 @@ export class AuthService {
 
   private generateVerificationKey(email: string) {
     return `pending_user:${email}`;
+  }
+  private generateVerificationToken() {
+    return randomBytes(32).toString('hex');
   }
 }
