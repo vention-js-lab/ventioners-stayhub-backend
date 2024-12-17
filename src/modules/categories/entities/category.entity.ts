@@ -20,6 +20,14 @@ export class AccommodationCategory {
   })
   name: string;
 
+  @Column({
+    type: 'varchar',
+    length: 125,
+    unique: true,
+    nullable: true,
+  })
+  name_ru?: string;
+
   @OneToMany(() => Accommodation, (accommodation) => accommodation.category)
   accommodations: Accommodation[];
 

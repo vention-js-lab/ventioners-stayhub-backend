@@ -75,7 +75,7 @@ describe('AccommodationsController', () => {
 
   describe('getAccommodationById', () => {
     it("returns an accommodation's data by id", async () => {
-      const result = await controller.getAccommodationById('1');
+      const result = await controller.getAccommodationById('en', '1');
 
       expect(result).toEqual({ data: mockAccommodations[0] });
     });
