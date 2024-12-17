@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/request/register.dto';
 import { LoginDto } from './dto/request/login.dto';
@@ -24,11 +32,21 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  async register(
-    @Body() registerDto: RegisterDto,
+  async register(@Body() registerDto: RegisterDto) {
+    const result = await this.authService.registerPendingUser(registerDto);
+
+    return {
+      data: result,
+    };
+  }
+
+  @Get('verify-email')
+  async verifyEmail(
     @Res({ passthrough: true }) res: Response,
+    @Query('email') email: string,
+    @Query('token') token: string,
   ) {
-    const tokens = await this.authService.register(registerDto);
+    const tokens = await this.authService.verifyAndCreateUser(email, token);
 
     this.setCookies(res, tokens);
   }
@@ -78,7 +96,7 @@ export class AuthController {
 
   private setCookies(
     res: Response,
-    tokens: Awaited<ReturnType<typeof this.authService.register>>,
+    tokens: Awaited<ReturnType<typeof this.authService.login>>,
   ) {
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,

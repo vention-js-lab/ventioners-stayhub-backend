@@ -50,12 +50,12 @@ describe('AuthController', () => {
         {
           provide: AuthService,
           useValue: {
-            register: jest
-              .fn<
-                Promise<{ accessToken: string; refreshToken: string }>,
-                [RegisterDto]
-              >()
-              .mockResolvedValue(mockTokens),
+            registerPendingUser: jest
+              .fn<Promise<{ message: string; email: string }>, [RegisterDto]>()
+              .mockResolvedValue({
+                message: 'Registration initiated. Please verify your email.',
+                email: 'example@example.com',
+              }),
             login: jest
               .fn<
                 Promise<{ accessToken: string; refreshToken: string }>,
@@ -94,7 +94,7 @@ describe('AuthController', () => {
   });
 
   describe('register', () => {
-    it("registers a user and sets the user's access and refresh tokens as cookies", async () => {
+    it('registers a pending user', async () => {
       const registerDto: RegisterDto = {
         email: 'example@example.com',
         firstName: 'John',
@@ -102,27 +102,14 @@ describe('AuthController', () => {
         password: '123123123',
       };
 
-      await controller.register(registerDto, mockRes);
+      const result = await controller.register(registerDto);
 
-      expect(mockRes.cookie).toHaveBeenCalledWith(
-        'accessToken',
-        mockTokens.accessToken,
-        {
-          httpOnly: true,
-          secure: true,
-          maxAge: 900000,
-        },
+      expect(result.data).toHaveProperty(
+        'message',
+        'Registration initiated. Please verify your email.',
       );
 
-      expect(mockRes.cookie).toHaveBeenCalledWith(
-        'refreshToken',
-        mockTokens.refreshToken,
-        {
-          httpOnly: true,
-          secure: true,
-          maxAge: 604800000,
-        },
-      );
+      expect(result.data).toHaveProperty('email', registerDto.email);
     });
   });
 

@@ -12,6 +12,8 @@ import { Hasher } from 'src/shared/libs';
 import { CreateUserReqDto } from 'src/modules/users/dto/request';
 import { LoginDto } from '../dto/request/login.dto';
 import { JwtPayload } from '../auth.types';
+import { RedisService } from 'src/redis/redis.service';
+import { MailerService } from 'src/modules/mail/mail.service';
 
 const mockUsersRepository = {
   findOne: jest
@@ -58,6 +60,16 @@ const mockJwtService = {
   }),
 };
 
+const mockRedisService = {
+  get: jest.fn(),
+  set: jest.fn(),
+  delete: jest.fn(),
+};
+
+const mockMailerService = {
+  sendVerificationEmail: jest.fn(),
+};
+
 describe('AuthService', () => {
   let service: AuthService;
 
@@ -77,6 +89,14 @@ describe('AuthService', () => {
           provide: ConfigService,
           useValue: mockConfigService,
         },
+        {
+          provide: RedisService,
+          useValue: mockRedisService,
+        },
+        {
+          provide: MailerService,
+          useValue: mockMailerService,
+        },
       ],
     }).compile();
 
@@ -91,7 +111,7 @@ describe('AuthService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('register', () => {
+  describe('register pending user', () => {
     const registerDto: RegisterDto = {
       email: 'existingemail@gmail.com',
       password: 'password',
@@ -100,20 +120,20 @@ describe('AuthService', () => {
     };
 
     it('throws a BadRequestException when the email already exists', async () => {
-      expect(service.register(registerDto)).rejects.toThrow(
+      expect(service.registerPendingUser(registerDto)).rejects.toThrow(
         BadRequestException,
       );
     });
 
-    it("registers a user and returns the user's access and refresh tokens", async () => {
-      const result = await service.register({
+    it("registers pending a user and returns the user's email", async () => {
+      const result = await service.registerPendingUser({
         ...registerDto,
         email: 'notexisting@gmail.com',
       });
 
       expect(result).toEqual({
-        accessToken: 'access-token',
-        refreshToken: 'refresh-token',
+        message: 'Registration initiated. Please verify your email.',
+        email: 'notexisting@gmail.com',
       });
     });
   });

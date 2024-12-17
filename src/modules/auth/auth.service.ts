@@ -1,43 +1,90 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Hasher } from './../../shared/libs/hasher.lib';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/request/register.dto';
-import { Hasher } from '../../shared/libs/hasher.lib';
 import { UsersRepository } from '../users/users.repository';
 import { ConfigService } from '@nestjs/config';
 import { LoginDto } from './dto/request/login.dto';
 import { JwtPayload } from './auth.types';
 import { UpdatePasswordDto } from './dto/request/update-password.dto';
 import { User } from '../users/entities/user.entity';
+import { RedisService } from 'src/redis/redis.service';
+import { randomBytes } from 'node:crypto';
+import { MailerService } from '../mail/mail.service';
+import { VERIFICATION_LINK_EXPIRE_TIME } from 'src/shared/constants';
+import { PendingUser } from './types';
+import { parseJSON } from 'src/shared/helpers';
 
 @Injectable()
 export class AuthService {
+  private logger = new Logger(AuthService.name, { timestamp: true });
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly redisService: RedisService,
+    private readonly mailService: MailerService,
   ) {}
 
-  async register(registerDto: RegisterDto) {
+  private async prepareUserData(createUserDto: RegisterDto) {
+    const { email, password, firstName, lastName } = createUserDto;
+
     const existingUser = await this.usersRepository.findOne({
-      where: { email: registerDto.email },
+      where: { email },
     });
 
     if (existingUser) {
-      throw new BadRequestException('Email already exists in the system');
+      throw new BadRequestException('User with this email already exists');
     }
 
-    const hashedPassword = await Hasher.hashValue(registerDto.password);
+    const pendingKey = this.generateVerificationKey(email);
+    const existingPendingUser = await this.redisService.get(pendingKey);
+    if (existingPendingUser) {
+      throw new ConflictException(
+        'Verification is already in progress for this email',
+      );
+    }
 
-    const createdUser = await this.usersRepository.createUser({
-      ...registerDto,
-      password: hashedPassword,
-    });
+    const hashedPassword = await Hasher.hashValue(password);
 
-    const payload = { sub: createdUser.id, userEmail: createdUser.email };
-    const accessToken = await this.generateToken('ACCESS', payload);
-    const refreshToken = await this.generateToken('REFRESH', payload);
+    const verificationToken = this.generateVerificationToken();
 
-    return { accessToken, refreshToken };
+    const pendingUserData: PendingUser = {
+      email,
+      hashedPassword,
+      firstName,
+      lastName,
+      verificationToken,
+    };
+
+    await this.redisService.set(
+      pendingKey,
+      JSON.stringify(pendingUserData),
+      VERIFICATION_LINK_EXPIRE_TIME,
+    );
+
+    return verificationToken;
+  }
+
+  async registerPendingUser(dto: RegisterDto) {
+    const verificationToken = await this.prepareUserData(dto);
+
+    await this.mailService.sendVerificationEmail(
+      dto.email,
+      dto.firstName,
+      verificationToken,
+    );
+
+    return {
+      message: 'Registration initiated. Please verify your email.',
+      email: dto.email,
+    };
   }
 
   async login(loginDto: LoginDto) {
@@ -86,6 +133,41 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
+  async verifyAndCreateUser(email: string, token: string) {
+    const pendingKey = this.generateVerificationKey(email);
+    const pendingUserData = await this.redisService.get(pendingKey);
+
+    if (!pendingUserData || !token) {
+      throw new UnauthorizedException('Invalid or expired verification token');
+    }
+
+    const userData = parseJSON(pendingUserData) as PendingUser;
+
+    if (userData.verificationToken !== token) {
+      throw new UnauthorizedException('Invalid or expired verification token');
+    }
+
+    try {
+      const newUser = await this.usersRepository.createUser({
+        email: userData.email,
+        password: userData.hashedPassword,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+      });
+
+      await this.redisService.delete(pendingKey);
+
+      const payload = { sub: newUser.id, userEmail: newUser.email };
+      const accessToken = await this.generateToken('ACCESS', payload);
+      const refreshToken = await this.generateToken('REFRESH', payload);
+
+      return { accessToken, refreshToken };
+    } catch (error) {
+      this.logger.error('User creation failed', error);
+      throw new UnauthorizedException('User creation failed');
+    }
+  }
+
   async generateToken(tokenType: 'REFRESH' | 'ACCESS', payload: JwtPayload) {
     const token = await this.jwtService.signAsync(
       { sub: payload.sub, userEmail: payload.userEmail },
@@ -96,5 +178,12 @@ export class AuthService {
     );
 
     return token;
+  }
+
+  private generateVerificationKey(email: string) {
+    return `pending_user:${email}`;
+  }
+  private generateVerificationToken() {
+    return randomBytes(32).toString('hex');
   }
 }

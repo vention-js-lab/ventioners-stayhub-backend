@@ -5,6 +5,8 @@ import { BookingsService } from '../bookings/bookings.service';
 import dayjs from 'dayjs';
 import { MailSendingException } from 'src/shared/exceptions';
 import { Booking } from '../bookings/entities/booking.entity';
+import { generateEmailVerificationTemplate } from './templates';
+import { VERIFICATION_LINK_EXPIRE_TIME } from 'src/shared/constants';
 
 @Injectable()
 export class MailerService {
@@ -34,7 +36,7 @@ export class MailerService {
         from: this.configService.get<string>('MAIL_FROM'),
         to: recipient,
         subject: subject,
-        text: text,
+        html: text,
       });
     } catch (error) {
       throw new MailSendingException('Error sending email');
@@ -121,5 +123,35 @@ export class MailerService {
   `;
 
     await this.sendEmail(subject, htmlContent, user.email);
+  }
+
+  private createVerificationEmail = (
+    username: string,
+    token: string,
+    email: string,
+    expirationMinutes: number,
+  ) => {
+    const verificationLink = `${this.configService.get('CLIENT_URL')}/verify-email?email=${email}&token=${token}`;
+
+    return generateEmailVerificationTemplate({
+      username,
+      verificationLink,
+      expirationMinutes,
+    });
+  };
+
+  async sendVerificationEmail(
+    email: string,
+    firstName: string,
+    verificationToken: string,
+  ) {
+    const mailBody = this.createVerificationEmail(
+      firstName,
+      verificationToken,
+      email,
+      VERIFICATION_LINK_EXPIRE_TIME / 60,
+    );
+
+    await this.sendEmail('Verify Your Email', mailBody, email);
   }
 }
