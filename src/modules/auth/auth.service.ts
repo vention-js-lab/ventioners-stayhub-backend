@@ -19,6 +19,7 @@ import { randomBytes } from 'node:crypto';
 import { MailerService } from '../mail/mail.service';
 import { VERIFICATION_LINK_EXPIRE_TIME } from 'src/shared/constants';
 import { PendingUser } from './types';
+import { parseJSON } from 'src/shared/helpers';
 
 @Injectable()
 export class AuthService {
@@ -140,7 +141,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired verification token');
     }
 
-    const userData = JSON.parse(pendingUserData) as PendingUser;
+    const userData = parseJSON(pendingUserData) as PendingUser;
 
     if (userData.verificationToken !== token) {
       throw new UnauthorizedException('Invalid or expired verification token');
