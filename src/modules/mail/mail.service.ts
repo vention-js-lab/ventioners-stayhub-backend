@@ -131,7 +131,7 @@ export class MailerService {
     email: string,
     expirationMinutes: number,
   ) => {
-    const verificationLink = `${this.configService.get('CLIENT_URL')}/verify-email?email=${email}&token=${token}`;
+    const verificationLink = `${this.configService.get('CLIENT_URL')}/auth/verify-email?email=${email}&token=${token}`;
 
     return generateEmailVerificationTemplate({
       username,
