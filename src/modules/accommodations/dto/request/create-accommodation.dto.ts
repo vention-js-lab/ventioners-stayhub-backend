@@ -20,8 +20,11 @@ export class CreateAccommodationDto {
 
   @IsString()
   @IsNotEmpty()
-  @MaxLength(255)
-  @ApiProperty({ default: 'A beautiful villa near the beach.', maxLength: 255 })
+  @MaxLength(2000)
+  @ApiProperty({
+    default: 'A beautiful villa near the beach.',
+    maxLength: 2000,
+  })
   description: string;
 
   @IsString()
