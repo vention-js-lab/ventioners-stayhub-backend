@@ -43,9 +43,10 @@ export class AuthController {
   @Get('verify-email')
   async verifyEmail(
     @Res({ passthrough: true }) res: Response,
+    @Query('email') email: string,
     @Query('token') token: string,
   ) {
-    const tokens = await this.authService.verifyAndCreateUser(token);
+    const tokens = await this.authService.verifyAndCreateUser(email, token);
 
     this.setCookies(res, tokens);
   }

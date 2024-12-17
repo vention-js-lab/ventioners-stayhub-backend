@@ -61,11 +61,9 @@ const mockJwtService = {
 };
 
 const mockRedisService = {
-  hGet: jest.fn(),
-  hSet: jest.fn(),
-  hDel: jest.fn(),
-  hSetExpiryTime: jest.fn(),
   get: jest.fn(),
+  set: jest.fn(),
+  delete: jest.fn(),
 };
 
 const mockMailerService = {
