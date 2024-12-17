@@ -31,7 +31,7 @@ describe('AmenitiesController', () => {
 
   describe('getAllAmenities', () => {
     it('returns a list of all amenities', async () => {
-      const amenities = await controller.getAllAmenities();
+      const amenities = await controller.getAllAmenities('en');
 
       expect(amenities).toEqual({ data: mockAmenities });
     });

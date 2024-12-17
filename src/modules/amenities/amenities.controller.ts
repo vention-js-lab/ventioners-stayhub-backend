@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Headers } from '@nestjs/common';
 import { GetAmenitiesSwaggerDecorator } from './decorators/swagger.decorator';
 import { AmenitiesService } from './amenities.service';
 
@@ -8,8 +8,11 @@ export class AmenitiesController {
 
   @Get('')
   @GetAmenitiesSwaggerDecorator()
-  async getAllAmenities() {
-    const amenities = await this.amenitiesService.getAllAmenities();
+  async getAllAmenities(
+    @Headers('accept-language') acceptLanguage: string = 'en',
+  ) {
+    const amenities =
+      await this.amenitiesService.getAllAmenities(acceptLanguage);
 
     return {
       data: amenities,
