@@ -38,7 +38,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new ConflictException('User with this email already exists');
+      throw new BadRequestException('User with this email already exists');
     }
 
     const pendingKey = this.generateVerificationKey(email);
@@ -168,7 +168,7 @@ export class AuthService {
       });
 
       if (pendingKey) {
-        await this.redisService.delete(pendingKey);
+        await this.redisService.hDel(pendingKey, ['EX']);
       }
 
       const payload = { sub: newUser.id, userEmail: newUser.email };
