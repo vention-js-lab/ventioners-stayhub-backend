@@ -238,16 +238,27 @@ export class BookingsService {
     checkInDate: Date,
     checkOutDate: Date,
   ): Promise<number> {
+    const adjustedCheckInDate = new Date(checkInDate);
+    adjustedCheckInDate.setUTCHours(9, 0, 0, 0);
+
+    const adjustedCheckOutDate = new Date(checkOutDate);
+    adjustedCheckOutDate.setUTCHours(7, 0, 0, 0);
+
     return await this.bookingRepository
       .createQueryBuilder('booking')
       .where('booking.accommodationId = :accommodationId', {
         accommodationId: accommodationId,
       })
       .andWhere(
-        `booking.checkInDate <= :checkInDate AND booking.checkOutDate >= :checkInDate OR 
-         booking.checkInDate <= :checkOutDate AND booking.checkOutDate >= :checkOutDate OR
-         booking.checkInDate >= :checkInDate AND booking.checkOutDate <= :checkOutDate`,
-        { checkInDate: checkInDate, checkOutDate: checkOutDate },
+        `(
+         (booking.checkInDate <= :checkInDate AND booking.checkOutDate >= :checkInDate) OR
+         (booking.checkInDate <= :checkOutDate AND booking.checkOutDate >= :checkOutDate) OR
+         (booking.checkInDate >= :checkInDate AND booking.checkOutDate <= :checkOutDate)
+       )`,
+        {
+          checkInDate: adjustedCheckInDate,
+          checkOutDate: adjustedCheckOutDate,
+        },
       )
       .andWhere('booking.status IN (:...activeStatuses)', {
         activeStatuses: [BookingStatus.CONFIRMED, BookingStatus.CHECKED_IN],
@@ -256,7 +267,7 @@ export class BookingsService {
   }
 
   private calculateNights(checkInDate: Date, checkOutDate: Date): number {
-    const diffInMilliseconds = checkInDate.getTime() - checkOutDate.getTime();
+    const diffInMilliseconds = checkOutDate.getTime() - checkInDate.getTime();
 
     const nights = diffInMilliseconds / (1000 * 60 * 60 * 24);
 

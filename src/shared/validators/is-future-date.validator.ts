@@ -16,7 +16,7 @@ export function IsFutureDate(validationOptions?: ValidationOptions) {
         validate(value: unknown): boolean {
           if (!(value instanceof Date)) return false;
 
-          const today = new Date();
+          const today = new Date(Date.now());
 
           today.setHours(0, 0, 0, 0);
 
