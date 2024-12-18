@@ -25,6 +25,7 @@ import {
   generatePublicFileUrl,
 } from 'src/shared/helpers';
 import { Review } from '../reviews/entities';
+import { BookingStatus } from '../bookings/constants';
 
 @Injectable()
 export class AccommodationsService {
@@ -64,18 +65,23 @@ export class AccommodationsService {
     }
 
     if (searchParams.fromDate && searchParams.toDate) {
-      query
-        .leftJoin('booking', 'b', 'b.accommodationId = accommodation.id')
-        .andWhere(
-          `(
-            b.check_in_date >= :checkOut OR
-            b.check_out_date <= :checkIn
-          )`,
-          {
-            checkIn: searchParams.fromDate,
-            checkOut: searchParams.toDate,
-          },
-        );
+      query.andWhere(
+        `NOT EXISTS (
+          SELECT 1 FROM booking b
+          WHERE "accommodationId" = accommodation.id
+            AND status IN (:...activeStatuses)
+            AND (
+              "check_in_date" <= :checkInDate AND "check_out_date" >= :checkInDate OR
+              "check_in_date" <= :checkOutDate AND "check_out_date" >= :checkOutDate OR
+              "check_in_date" >= :checkInDate AND "check_out_date" <= :checkOutDate
+            )
+        )`,
+        {
+          checkInDate: searchParams.fromDate,
+          checkOutDate: searchParams.toDate,
+          activeStatuses: [BookingStatus.CONFIRMED, BookingStatus.CHECKED_IN],
+        },
+      );
     }
 
     query.leftJoinAndSelect('accommodation.images', 'images');
