@@ -90,9 +90,9 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/ventioners-stayhub-backend
-            docker image prune
             docker-compose -f docker-compose.production.yml pull app
             docker-compose -f docker-compose.production.yml up -d --build app
+            docker image prune -f
 
       - name: revoke runner ip address
         run: |
