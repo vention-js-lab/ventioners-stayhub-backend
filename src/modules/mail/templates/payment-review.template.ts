@@ -6,7 +6,7 @@ export const generatePaymentReviewTemplate = (
 ) => {
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background-color: #f9f9f9;">
-  <div style="background-color: #007bff; color: white; text-align: center; padding: 20px;">
+  <div style="background-color: #ff0000; color: white; text-align: center; padding: 20px;">
     <h2 style="margin: 0; font-size: 22px;">We Value Your Feedback</h2>
   </div>
   <div style="padding: 20px; color: #333;">

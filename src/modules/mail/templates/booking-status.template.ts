@@ -13,7 +13,7 @@ export const generateBookingStatusMail = (booking: Booking) => {
 
   const htmlContent = `
    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f9f9f9;">
-  <div style="background-color: #007bff; color: white; text-align: center; padding: 15px;">
+  <div style="background-color: #ff0000; color: white; text-align: center; padding: 15px;">
     <h2 style="margin: 0; font-size: 20px;">Booking Status Update</h2>
   </div>
   <div style="padding: 15px; color: #333;">
