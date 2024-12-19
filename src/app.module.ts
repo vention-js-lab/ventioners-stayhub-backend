@@ -17,6 +17,7 @@ import { StripeModule } from './modules/stripe/stripe.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationModule } from './modules/notifications/notificaton.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { NotificationModule } from './modules/notifications/notificaton.module';
     EventEmitterModule.forRoot(),
     DatabaseModule,
     RedisModule,
+    ScheduleModule.forRoot(),
     UsersModule,
     AuthModule,
     OAuthModule,
