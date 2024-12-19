@@ -19,6 +19,10 @@ import { CreateStripeCheckoutDto } from '../payments/dto';
 import { PaymentsService } from '../payments/payments.service';
 import { PaymentStatus } from '../payments/constants';
 import { Accommodation } from '../accommodations';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 
 @Injectable()
 export class StripeService {
@@ -174,6 +178,17 @@ export class StripeService {
         bookingId,
       ),
     ]);
+
+    const today = dayjs().utc();
+    const bookingDate = dayjs(booking.checkInDate).utc();
+
+    if (bookingDate.isSame(today, 'day')) {
+      await this.bookingsService.updateStatus(
+        { status: BookingStatus.CHECKED_IN },
+        userId,
+        bookingId,
+      );
+    }
 
     return { received: true };
   }
