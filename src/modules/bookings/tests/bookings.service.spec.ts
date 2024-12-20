@@ -42,9 +42,14 @@ const mockBookingRepository: Partial<Repository<Booking>> = {
         return Promise.resolve(null);
       },
     ),
-  save: jest.fn().mockResolvedValue(mockBookings[0]),
+  save: jest
+    .fn()
+    .mockImplementation((data) =>
+      Array.isArray(data) ? mockBookings : mockBookings[0],
+    ),
   create: jest.fn().mockReturnValue(mockBookings[0]),
   update: jest.fn().mockResolvedValue({ affected: 1 }),
+  find: jest.fn().mockResolvedValue(mockBookings),
 };
 
 describe('BookingsService', () => {
