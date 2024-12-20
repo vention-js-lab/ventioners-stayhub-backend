@@ -42,24 +42,40 @@ export class BookingsService {
       `Starting updateBookingStatusToCheckedOut for date: ${truncatedToday.toISOString()}`,
     );
 
-    const result = await this.bookingRepository.update(
-      {
+    const bookingsToUpdate = await this.bookingRepository.find({
+      where: {
         status: BookingStatus.CHECKED_IN,
         checkOutDate: LessThanOrEqual(truncatedToday),
       },
-      { status: BookingStatus.CHECKED_OUT },
-    );
+      relations: ['accommodation', 'accommodation.owner', 'user'],
+    });
 
-    if (result.affected === 0) {
+    if (!bookingsToUpdate.length) {
       this.logger.warn(
         `updateBookingStatusToCheckedOut: No bookings found to update for date: ${truncatedToday.toISOString()}`,
       );
-
       return;
     }
 
+    bookingsToUpdate.forEach((booking) => {
+      booking.status = BookingStatus.CHECKED_OUT;
+    });
+
+    const updatedBookings = await this.bookingRepository.save(bookingsToUpdate);
+
+    updatedBookings.forEach((booking) => {
+      this.notificationService.emitNotification(
+        'booking.status.changed',
+        booking,
+      );
+      this.notificationService.emitNotification(
+        'booking.status.review',
+        booking,
+      );
+    });
+
     this.logger.log(
-      `updateBookingStatusToCheckedOut: Successfully updated ${result.affected} bookings for date: ${truncatedToday.toISOString()}`,
+      `updateBookingStatusToCheckedOut: Successfully updated ${bookingsToUpdate.length} bookings for date: ${truncatedToday.toISOString()}`,
     );
   }
 
@@ -70,24 +86,36 @@ export class BookingsService {
       `Starting updateBookingStatusToCheckedIn for date: ${truncatedToday.toISOString()}`,
     );
 
-    const result = await this.bookingRepository.update(
-      {
+    const bookingsToUpdate = await this.bookingRepository.find({
+      where: {
         status: BookingStatus.CONFIRMED,
         checkInDate: LessThanOrEqual(truncatedToday),
       },
-      { status: BookingStatus.CHECKED_IN },
-    );
+      relations: ['accommodation', 'accommodation.owner', 'user'],
+    });
 
-    if (result.affected === 0) {
+    if (!bookingsToUpdate.length) {
       this.logger.warn(
         `updateBookingStatusToCheckedIn: No bookings found to update for date: ${truncatedToday.toISOString()}`,
       );
-
       return;
     }
 
+    bookingsToUpdate.forEach((booking) => {
+      booking.status = BookingStatus.CHECKED_IN;
+    });
+
+    const updatedBookings = await this.bookingRepository.save(bookingsToUpdate);
+
+    updatedBookings.forEach((booking) => {
+      this.notificationService.emitNotification(
+        'booking.status.changed',
+        booking,
+      );
+    });
+
     this.logger.log(
-      `updateBookingStatusToCheckedIn: Successfully updated ${result.affected} bookings for date: ${truncatedToday.toISOString()}`,
+      `updateBookingStatusToCheckedIn: Successfully updated ${bookingsToUpdate.length} bookings for date: ${truncatedToday.toISOString()}`,
     );
   }
 
@@ -207,6 +235,10 @@ export class BookingsService {
         updatedBooking,
       );
     } else if (dto.status === BookingStatus.CHECKED_OUT) {
+      this.notificationService.emitNotification(
+        'booking.status.changed',
+        updatedBooking,
+      );
       this.notificationService.emitNotification(
         'booking.status.review',
         updatedBooking,
