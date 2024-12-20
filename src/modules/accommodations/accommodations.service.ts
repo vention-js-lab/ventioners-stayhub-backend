@@ -52,10 +52,13 @@ export class AccommodationsService {
     const limit = searchParams.limit || 10;
     const skip = (page - 1) * limit;
 
-    if (searchParams.location) {
-      query.andWhere('accommodation.location ILIKE :location', {
-        location: `%${searchParams.location}%`,
-      });
+    if (searchParams.search) {
+      query.andWhere(
+        '(accommodation.location ILIKE :search OR accommodation.name ILIKE :search)',
+        {
+          search: `%${searchParams.search}%`,
+        },
+      );
     }
 
     if (searchParams.numberOfGuests) {
