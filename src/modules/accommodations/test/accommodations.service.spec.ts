@@ -105,8 +105,7 @@ describe('AccommodationsService - toggleLikeAccommodation', () => {
       });
 
       expect(result).toEqual({
-        items: mockAccommodations,
-        overallRating: 0,
+        items: { ...mockAccommodations, overallRating: 0 },
         totalCount: mockAccommodations.length,
         page: 1,
         limit: 10,
