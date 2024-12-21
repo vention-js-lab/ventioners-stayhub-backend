@@ -88,6 +88,7 @@ export class AccommodationsService {
     }
 
     query.leftJoinAndSelect('accommodation.images', 'images');
+    query.leftJoinAndSelect('accommodation.reviews', 'reviews');
 
     if (searchParams.categoryId) {
       query.innerJoinAndSelect(
@@ -103,9 +104,13 @@ export class AccommodationsService {
     query.skip(skip).take(limit);
 
     const items = await query.getMany();
+    const accommodationsWithRatings = items.map((accommodation) => ({
+      ...accommodation,
+      overallRating: this.caculateOverallRating(accommodation.reviews),
+    }));
 
     return {
-      items,
+      items: accommodationsWithRatings,
       totalCount,
       page,
       limit,
