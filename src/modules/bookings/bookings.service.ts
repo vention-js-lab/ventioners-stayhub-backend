@@ -135,7 +135,8 @@ export class BookingsService {
 
     queryBuilder
       .leftJoinAndSelect('booking.accommodation', 'accommodation')
-      .select(['booking', 'accommodation']);
+      .leftJoinAndSelect('accommodation.images', 'images')
+      .select(['booking', 'accommodation', 'images']);
 
     return await queryBuilder.getMany();
   }
