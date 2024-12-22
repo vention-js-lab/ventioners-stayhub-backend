@@ -6,3 +6,4 @@ export * from './is-node-env-prod.helper';
 export * from './json.helper';
 export * from './omit-from-object.helper';
 export * from './create-location-cordinates.helper';
+export * from './format-booking-status.helper';
