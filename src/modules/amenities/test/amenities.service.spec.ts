@@ -3,6 +3,7 @@ import { mockAmenities } from './amenities.mock';
 import { AmenitiesService } from '../amenities.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Amenity } from '../entities';
+import { RedisService } from 'src/redis/redis.service';
 
 const mockAmenitiesRepository = {
   find: jest.fn().mockResolvedValue(mockAmenities),
@@ -18,6 +19,13 @@ describe('AmenitiesService', () => {
         {
           provide: getRepositoryToken(Amenity),
           useValue: mockAmenitiesRepository,
+        },
+        {
+          provide: RedisService,
+          useValue: {
+            get: jest.fn().mockResolvedValue(mockAmenities),
+            set: jest.fn(),
+          },
         },
       ],
     }).compile();

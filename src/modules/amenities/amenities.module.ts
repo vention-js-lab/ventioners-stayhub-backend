@@ -3,9 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Amenity } from './entities';
 import { AmenitiesController } from './amenities.controller';
 import { AmenitiesService } from './amenities.service';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Amenity])],
+  imports: [TypeOrmModule.forFeature([Amenity]), RedisModule],
   controllers: [AmenitiesController],
   providers: [AmenitiesService],
   exports: [AmenitiesService],

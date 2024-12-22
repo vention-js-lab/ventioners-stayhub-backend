@@ -3,6 +3,7 @@ import { mockCategories } from './categories.mock';
 import { CategoriesService } from '../categories.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AccommodationCategory } from '../entities';
+import { RedisService } from 'src/redis/redis.service';
 
 const mockCategoriesRepository = {
   find: jest.fn().mockResolvedValue(mockCategories),
@@ -18,6 +19,13 @@ describe('CategoriesService', () => {
         {
           provide: getRepositoryToken(AccommodationCategory),
           useValue: mockCategoriesRepository,
+        },
+        {
+          provide: RedisService,
+          useValue: {
+            get: jest.fn().mockResolvedValue(mockCategories),
+            set: jest.fn(),
+          },
         },
       ],
     }).compile();
