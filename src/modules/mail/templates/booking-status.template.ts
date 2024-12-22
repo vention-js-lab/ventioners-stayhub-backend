@@ -38,6 +38,10 @@ export const generateBookingStatusMail = (booking: Booking) => {
         <td style="padding: 8px; border: 1px solid #ddd;">${checkOutDateStr}</td>
       </tr>
       <tr>
+        <td style="padding: 8px; border: 1px solid #ddd; background-color: #f1f1f1; font-weight: bold;">Service fee</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${(totalPrice / 10).toFixed(2)} USD</td>
+      </tr>
+      <tr>
         <td style="padding: 8px; border: 1px solid #ddd; background-color: #f1f1f1; font-weight: bold;">Total Price</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${totalPrice} USD</td>
       </tr>
