@@ -1,4 +1,5 @@
 import { Booking } from 'src/modules/bookings/entities/booking.entity';
+import { formatBookingStatus } from 'src/shared/helpers';
 import dayjs from 'dayjs';
 
 export const generateBookingStatusMail = (booking: Booking) => {
@@ -44,7 +45,7 @@ export const generateBookingStatusMail = (booking: Booking) => {
         <td style="padding: 8px; border: 1px solid #ddd; background-color: #f1f1f1; font-weight: bold;">Status</td>
         <td style="padding: 8px; border: 1px solid #ddd; color: ${
           status === 'CANCELLED' ? 'red' : 'brown'
-        };">${status}</td>
+        };">${formatBookingStatus(status)}</td>
       </tr>
     </table>
     <p style="margin: 10px 0;">For any queries, please feel free to <a href="mailto:support@stayhub.com" style="color: #007bff; text-decoration: none;">contact us</a>.</p>
